@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin-Starknet Bridge | Send Dashboard</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #00d2ff;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            color: #00d2ff;
+        }
+        
+        .dashboard-title {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 968px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #00d2ff;
+        }
+        
+        .card-icon {
+            font-size: 1.8rem;
+            color: #00d2ff;
+        }
+        
+        .send-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-group label {
+            font-weight: 500;
+            color: #00d2ff;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: monospace;
+        }
+        
+        .amount-input {
+            position: relative;
+        }
+        
+        .amount-input input {
+            padding-left: 50px;
+        }
+        
+        .currency-symbol {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 600;
+            color: #00d2ff;
+        }
+        
+        .balance-info {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .max-btn {
+            background: rgba(0, 210, 255, 0.2);
+            border: none;
+            color: #00d2ff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .max-btn:hover {
+            background: rgba(0, 210, 255, 0.3);
+        }
+        
+        .network-selector {
+            display: flex;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .network-option {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .network-option.active {
+            background: rgba(0, 210, 255, 0.2);
+        }
+        
+        .address-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 15px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn {
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #00d2ff;
+            color: #00d2ff;
+        }
+        
+        .btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.3);
+        }
+        
+        .transaction-details {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .detail-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .detail-value {
+            font-weight: 500;
+        }
+        
+        .detail-total {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 12px;
+            margin-top: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .recent-contacts {
+            margin-top: 30px;
+        }
+        
+        .contacts-title {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #00d2ff;
+        }
+        
+        .contact-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .contact-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .contact-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 210, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00d2ff;
+            font-weight: 600;
+        }
+        
+        .contact-info {
+            flex: 1;
+        }
+        
+        .contact-name {
+            font-weight: 500;
+        }
+        
+        .contact-address {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-family: monospace;
+        }
+        
+        .bridge-visual {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+        }
+        
+        .chain {
+            text-align: center;
+            padding: 15px;
+            flex: 1;
+        }
+        
+        .chain-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .bitcoin {
+            color: #f2a900;
+        }
+        
+        .starknet {
+            color: #ff2c6e;
+        }
+        
+        .bridge-arrow {
+            font-size: 2rem;
+            color: #00d2ff;
+            padding: 0 15px;
+        }
+        
+        .limits-info {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .limits-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #00d2ff;
+        }
+        
+        .limits-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a2a32, #2c3e50);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: #00d2ff;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: rgba(0, 0, 0, 0.7);
+            border-left: 4px solid #00d2ff;
+            border-radius: 5px;
+            display: none;
+            animation: slideIn 0.3s forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 30px 0;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            nav ul {
+                gap: 15px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .network-selector {
+                flex-direction: column;
+            }
+            
+            .address-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-paper-plane"></i></div>
+                <div class="logo-text">Bitcoin-Starknet Bridge</div>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="../Bitstark/Wallet.html">Dashboard</a></li>
+                    <li><a href="../Wallet/Deposit.html">Deposit</a></li>
+                    <li><a href="../Wallet/Withdraw.html">Withdraw</a></li>
+                    <li><a href="#" class="active">Send</a></li>
+                    <li><a href="../Wallet/History.html">History</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <h1 class="dashboard-title">Send Assets</h1>
+        <p class="subtitle">Transfer assets between Bitcoin and Starknet networks</p>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Send Details</h2>
+                    <div class="card-icon"><i class="fa-solid fa-wallet"></i></div>
+                </div>
+                
+                <div class="network-selector">
+                    <div class="network-option active" data-network="bitcoin">
+                        <i class="fab fa-bitcoin bitcoin"></i> Bitcoin
+                    </div>
+                    <div class="network-option" data-network="starknet">
+                        <i class="fa-solid fa-link starknet"></i> Starknet
+                    </div>
+                </div>
+                
+                <form class="send-form" id="sendForm">
+                    <div class="form-group">
+                        <label for="fromAddress">From Address</label>
+                        <select id="fromAddress">
+                            <option value="bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq">bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq (1.2543 BTC)</option>
+                            <option value="bc1q9z4m9s5vner4nj24cnv3xdrp5p6c0v0y3j5g4z">bc1q9z4m9s5vner4nj24cnv3xdrp5p6c0v0y3j5g4z (0.8421 BTC)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="toAddress">To Address</label>
+                        <textarea id="toAddress" placeholder="Enter recipient address" required></textarea>
+                        
+                        <div class="address-actions">
+                            <button type="button" class="action-btn">
+                                <i class="fas fa-clipboard"></i> Paste
+                            </button>
+                            <button type="button" class="action-btn">
+                                <i class="fas fa-qrcode"></i> Scan QR
+                            </button>
+                            <button type="button" class="action-btn">
+                                <i class="fas fa-address-book"></i> Contacts
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sendAmount">Amount</label>
+                        <div class="amount-input">
+                            <span class="currency-symbol">₿</span>
+                            <input type="number" id="sendAmount" placeholder="0.00" step="0.000001" min="0.0001" required>
+                        </div>
+                        
+                        <div class="balance-info">
+                            <span>Balance: 1.2543 BTC</span>
+                            <button type="button" class="max-btn">MAX</button>
+                        </div>
+                    </div>
+                    
+                    <div class="transaction-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Network Fee:</span>
+                            <span class="detail-value">0.00015 BTC</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Bridge Fee:</span>
+                            <span class="detail-value">0.0005 BTC</span>
+                        </div>
+                        <div class="detail-item detail-total">
+                            <span class="detail-label">Total:</span>
+                            <span class="detail-value">0.10065 BTC</span>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="sendButton">
+                        <i class="fas fa-paper-plane"></i> Send Now
+                    </button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Transaction Preview</h2>
+                    <div class="card-icon"><i class="fa-solid fa-receipt"></i></div>
+                </div>
+                
+                <div class="bridge-visual">
+                    <div class="chain">
+                        <div class="chain-icon"><i class="fab fa-bitcoin bitcoin"></i></div>
+                        <h3>Bitcoin</h3>
+                        <p>Mainnet</p>
+                    </div>
+                    
+                    <div class="bridge-arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                    
+                    <div class="chain">
+                        <div class="chain-icon"><i class="fa-solid fa-link starknet"></i></div>
+                        <h3>Starknet</h3>
+                        <p>Layer 2</p>
+                    </div>
+                </div>
+                
+                <div class="transaction-details">
+                    <div class="detail-item">
+                        <span class="detail-label">From:</span>
+                        <span class="detail-value">bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">To:</span>
+                        <span class="detail-value">0x1234567890abcdef1234567890abcdef1234567890abcdef</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Amount:</span>
+                        <span class="detail-value">0.10000 BTC</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Estimated Time:</span>
+                        <span class="detail-value">20-40 minutes</span>
+                    </div>
+                </div>
+                
+                <div class="limits-info">
+                    <div class="limits-title">Transfer Limits</div>
+                    <div class="limits-item">
+                        <span>Minimum send:</span>
+                        <span>0.001 BTC</span>
+                    </div>
+                    <div class="limits-item">
+                        <span>Maximum send:</span>
+                        <span>10 BTC</span>
+                    </div>
+                    <div class="limits-item">
+                        <span>24h limit remaining:</span>
+                        <span>7.2 BTC</span>
+                    </div>
+                </div>
+                
+                <div class="recent-contacts">
+                    <h3 class="contacts-title">Recent Contacts</h3>
+                    <div class="contact-list">
+                        <div class="contact-item">
+                            <div class="contact-avatar">JD</div>
+                            <div class="contact-info">
+                                <div class="contact-name">John Doe</div>
+                                <div class="contact-address">0x1234567890abcdef1234567890abcdef12345678</div>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-avatar">AS</div>
+                            <div class="contact-info">
+                                <div class="contact-name">Alice Smith</div>
+                                <div class="contact-address">bc1q9z4m9s5vner4nj24cnv3xdrp5p6c0v0y3j5g4z</div>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-avatar">BJ</div>
+                            <div class="contact-info">
+                                <div class="contact-name">Bob Johnson</div>
+                                <div class="contact-address">0xabcdef1234567890abcdef1234567890abcdef12</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Confirm Transaction</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <p>Please confirm your transaction details:</p>
+                
+                <div style="background: rgba(0, 0, 0, 0.2); border-radius: 10px; padding: 15px; margin: 15px 0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Amount:</span>
+                        <span style="font-weight: 600;">0.10000 BTC</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>From:</span>
+                        <span style="font-family: monospace; font-size: 0.9rem;">bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>To:</span>
+                        <span style="font-family: monospace; font-size: 0.9rem;">0x1234567890abcdef1234567890abcdef1234567890abcdef</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Network Fee:</span>
+                        <span>0.00015 BTC</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Bridge Fee:</span>
+                        <span>0.0005 BTC</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-weight: 600; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <span>Total:</span>
+                        <span>0.10065 BTC</span>
+                    </div>
+                </div>
+                
+                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">
+                    <i class="fas fa-exclamation-circle" style="color: #ff9800;"></i>
+                    Transactions typically take 20-40 minutes to complete.
+                </p>
+            </div>
+            
+            <div style="display: flex; gap: 15px;">
+                <button class="btn btn-outline" id="cancelSend" style="flex: 1;">Cancel</button>
+                <button class="btn btn-primary" id="confirmSend" style="flex: 1;">Confirm & Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notificationText"></span>
+    </div>
+    
+    <footer>
+        <p>© 2025 Bitcoin-Starknet Bridge. All rights reserved. | Security Audit Passed | v2.1.4</p>
+        <p>Always verify addresses before sending. Transactions are irreversible.</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const sendForm = document.getElementById('sendForm');
+        const sendButton = document.getElementById('sendButton');
+        const confirmationModal = document.getElementById('confirmationModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelSend = document.getElementById('cancelSend');
+        const confirmSend = document.getElementById('confirmSend');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        const networkOptions = document.querySelectorAll('.network-option');
+        const maxButton = document.querySelector('.max-btn');
+        const sendAmount = document.getElementById('sendAmount');
+        
+        // Initialize the dashboard
+        function init() {
+            setupEventListeners();
+            updateTransactionPreview();
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            sendForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                confirmationModal.style.display = 'flex';
+            });
+            
+            closeModal.addEventListener('click', () => {
+                confirmationModal.style.display = 'none';
+            });
+            
+            cancelSend.addEventListener('click', () => {
+                confirmationModal.style.display = 'none';
+            });
+            
+            confirmSend.addEventListener('click', processSend);
+            
+            // Network selection
+            networkOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    networkOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    updateUIForNetwork(this.dataset.network);
+                });
+            });
+            
+            // Max button
+            maxButton.addEventListener('click', setMaxAmount);
+            
+            // Amount input changes
+            sendAmount.addEventListener('input', updateTransactionPreview);
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === confirmationModal) {
+                    confirmationModal.style.display = 'none';
+                }
+            });
+            
+            // Contact selection
+            const contactItems = document.querySelectorAll('.contact-item');
+            contactItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const address = this.querySelector('.contact-address').textContent;
+                    document.getElementById('toAddress').value = address;
+                    updateTransactionPreview();
+                });
+            });
+        }
+        
+        // Update UI based on selected network
+        function updateUIForNetwork(network) {
+            const currencySymbol = document.querySelector('.currency-symbol');
+            const fromAddressSelect = document.getElementById('fromAddress');
+            
+            if (network === 'bitcoin') {
+                currencySymbol.textContent = '₿';
+                fromAddressSelect.innerHTML = `
+                    <option value="bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq">bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq (1.2543 BTC)</option>
+                    <option value="bc1q9z4m9s5vner4nj24cnv3xdrp5p6c0v0y3j5g4z">bc1q9z4m9s5vner4nj24cnv3xdrp5p6c0v0y3j5g4z (0.8421 BTC)</option>
+                `;
+                document.querySelector('.balance-info span').textContent = 'Balance: 1.2543 BTC';
+            } else {
+                currencySymbol.textContent = '⧫';
+                fromAddressSelect.innerHTML = `
+                    <option value="0x1234567890abcdef1234567890abcdef12345678">0x1234567890abcdef1234567890abcdef12345678 (42.5 STRK)</option>
+                    <option value="0xabcdef1234567890abcdef1234567890abcdef12">0xabcdef1234567890abcdef1234567890abcdef12 (18.3 STRK)</option>
+                `;
+                document.querySelector('.balance-info span').textContent = 'Balance: 42.5 STRK';
+            }
+            
+            updateTransactionPreview();
+        }
+        
+        // Set maximum amount
+        function setMaxAmount() {
+            const balanceText = document.querySelector('.balance-info span').textContent;
+            const balance = parseFloat(balanceText.match(/(\d+\.\d+)/)[0]);
+            const fees = 0.00065; // Network + bridge fees
+            
+            // Leave a little for fees if sending from Bitcoin
+            const network = document.querySelector('.network-option.active').dataset.network;
+            const maxAmount = network === 'bitcoin' ? balance - fees : balance;
+            
+            sendAmount.value = maxAmount.toFixed(6);
+            updateTransactionPreview();
+        }
+        
+        // Update transaction preview
+        function updateTransactionPreview() {
+            const amount = parseFloat(sendAmount.value) || 0;
+            const toAddress = document.getElementById('toAddress').value;
+            const fromAddress = document.getElementById('fromAddress').value;
+            
+            // Update preview details
+            const previewDetails = document.querySelectorAll('.transaction-details .detail-value');
+            if (previewDetails.length >= 3) {
+                previewDetails[0].textContent = fromAddress;
+                previewDetails[1].textContent = toAddress || 'Enter recipient address';
+                previewDetails[2].textContent = `${amount.toFixed(5)} ${document.querySelector('.network-option.active').dataset.network === 'bitcoin' ? 'BTC' : 'STRK'}`;
+            }
+            
+            // Enable/disable send button based on input
+            sendButton.disabled = amount <= 0 || !toAddress;
+        }
+        
+        // Process send transaction
+        function processSend() {
+            const amount = parseFloat(sendAmount.value);
+            const toAddress = document.getElementById('toAddress').value;
+            const network = document.querySelector('.network-option.active').dataset.network;
+            
+            // In a real application, this would call a smart contract or API
+            console.log(`Sending ${amount} from ${network} to ${toAddress}`);
+            
+            // Show success message
+            showNotification(`Transaction sent successfully! ${amount} ${network === 'bitcoin' ? 'BTC' : 'STRK'} is being transferred.`);
+            
+            // Close the modal
+            confirmationModal.style.display = 'none';
+            
+            // Reset form
+            sendForm.reset();
+            sendButton.disabled = true;
+            updateTransactionPreview();
+        }
+        
+        // Show notification
+        function showNotification(message, isError = false) {
+            notificationText.textContent = message;
+            
+            if (isError) {
+                notification.style.borderLeftColor = '#f44336';
+            } else {
+                notification.style.borderLeftColor = '#00d2ff';
+            }
+            
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Initialize the dashboard
+        init();
+    </script>
+</body>
+</html>

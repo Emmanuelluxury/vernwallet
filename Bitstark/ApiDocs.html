@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - Bitcoin-Starknet Bridge</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --secondary: #1f2937;
+            --dark: #0f172a;
+            --light: #f9fafb;
+            --gray: #9ca3af;
+            --dark-gray: #4b5563;
+            --light-gray: #f3f4f6;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --info: #3b82f6;
+            --bitcoin: #f7931a;
+            --starknet: #7c3aed;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #0f172a;
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 300px;
+            background: rgba(31, 41, 55, 0.8);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(124, 58, 237, 0.2);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: white;
+        }
+        
+        .logo-icon {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--gray);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: rgba(124, 58, 237, 0.1);
+            color: white;
+            border-left-color: var(--primary);
+        }
+        
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .nav-group {
+            margin: 15px 0;
+        }
+        
+        .nav-group-title {
+            padding: 10px 20px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray);
+            font-weight: 600;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .header-title i {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* API Content */
+        .api-section {
+            margin-bottom: 40px;
+        }
+        
+        .api-section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--primary);
+        }
+        
+        .endpoint {
+            background: rgba(31, 41, 55, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(124, 58, 237, 0.1);
+        }
+        
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin-right: 10px;
+        }
+        
+        .method-get {
+            background: var(--info);
+            color: white;
+        }
+        
+        .method-post {
+            background: var(--success);
+            color: white;
+        }
+        
+        .method-put {
+            background: var(--warning);
+            color: black;
+        }
+        
+        .method-delete {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .endpoint-path {
+            font-family: monospace;
+            font-size: 1rem;
+            color: var(--light);
+        }
+        
+        .endpoint-description {
+            margin-bottom: 15px;
+            color: var(--gray);
+        }
+
+        .btn {
+            font-size: 1rem;
+            border-radius: 5px;
+            padding: 10px 20px;
+            text-align: center;
+            font-weight: 400;
+            cursor: pointer;
+            border: none;
+        }
+        
+        /* Parameters */
+        .parameters {
+            margin: 15px 0;
+        }
+        
+        .parameters-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--light);
+        }
+        
+        .parameter {
+            display: flex;
+            margin-bottom: 8px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+        }
+        
+        .parameter-name {
+            width: 150px;
+            font-family: monospace;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .parameter-type {
+            width: 100px;
+            color: var(--info);
+            font-size: 0.9rem;
+        }
+        
+        .parameter-description {
+            flex: 1;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .parameter-required {
+            width: 70px;
+            text-align: center;
+            font-size: 0.8rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--danger);
+            color: white;
+        }
+        
+        .parameter-optional {
+            width: 70px;
+            text-align: center;
+            font-size: 0.8rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--dark-gray);
+            color: white;
+        }
+        
+        /* Code blocks */
+        .code-tabs {
+            margin: 20px 0;
+        }
+        
+        .code-tab-header {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .code-tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--gray);
+            border-bottom: 2px solid transparent;
+        }
+        
+        .code-tab.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin-top: 0;
+        }
+        
+        .code-block pre {
+            margin: 0;
+            line-height: 1.5;
+        }
+        
+        .code-block code {
+            color: var(--light);
+        }
+        
+        .code-comment {
+            color: var(--gray);
+        }
+        
+        .code-keyword {
+            color: #ff79c6;
+        }
+        
+        .code-string {
+            color: #f1fa8c;
+        }
+        
+        .code-number {
+            color: #bd93f9;
+        }
+        
+        .code-function {
+            color: #50fa7b;
+        }
+        
+        /* Response */
+        .response {
+            margin: 20px 0;
+        }
+        
+        .response-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--light);
+        }
+        
+        .response-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+        
+        /* Try it section */
+        .try-it {
+            background: rgba(31, 41, 55, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(124, 58, 237, 0.1);
+        }
+        
+        .try-it-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: white;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .execute-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .execute-btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Response area */
+        .response-area {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        /* Quick stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(31, 41, 55, 0.6);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(124, 58, 237, 0.1);
+        }
+        
+        .stat-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .nav-item span, .nav-group-title {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .parameter {
+                flex-direction: column;
+            }
+            
+            .parameter-name, .parameter-type, .parameter-description, .parameter-required {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <i class="fas fa-code logo-icon"></i>
+                    <span>API Docs</span>
+                </a>
+            </div>
+            
+            <div class="nav-group">
+                <div class="nav-group-title">Introduction</div>
+                <a href="Dashboard.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="../Security/Authentication.html" class="nav-item">
+                    <i class="fas fa-key"></i>
+                    <span>Authentication</span>
+                </a>
+                <a href="../Security/ApiStatus.html" class="nav-item">
+                    <i class="fas fa-plug"></i>
+                    <span>API Status</span>
+                </a>
+            </div>
+            
+            <div class="nav-group">
+                <div class="nav-group-title">Core Endpoints</div>
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-wallet"></i>
+                    <span>Wallet Management</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Deposits & Withdrawals</span>
+                </a>
+                <a href="SPVProofs.html" class="nav-item">
+                    <i class="fas fa-file-contract"></i>
+                    <span>SPV Proofs</span>
+                </a>
+                <a href="Operators.html" class="nav-item">
+                    <i class="fas fa-server"></i>
+                    <span>Operators</span>
+                </a>
+            </div>
+            
+            <div class="nav-group">
+                <div class="nav-group-title">Advanced</div>
+                <a href="../Security/WebSocketApi.html" class="nav-item">
+                    <i class="fas fa-bolt"></i>
+                    <span>WebSocket API</span>
+                </a>
+                <a href="../Security/Webhooks.html" class="nav-item">
+                    <i class="fas fa-cogs"></i>
+                    <span>Webhooks</span>
+                </a>
+                <a href="Security.html" class="nav-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Security</span>
+                </a>
+            </div>
+            
+            <div class="nav-group">
+                <div class="nav-group-title">Resources</div>
+                <a href="../Security/Guides.html" class="nav-item">
+                    <i class="fas fa-book"></i>
+                    <span>Guides</span>
+                </a>
+                <a href="../Security/SDKs.html" class="nav-item">
+                    <i class="fas fa-code"></i>
+                    <span>SDKs</span>
+                </a>
+                <a href="../Security/Support.html" class="nav-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Support</span>
+                </a>
+            </div>
+            
+            <div style="flex: 1;"></div>
+            
+            <a href="../Bitstark/Dashboard.html" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="header-title"><i class="fas fa-code"></i> API Documentation</h1>
+                <div class="header-actions">
+                    <button class="btn" style="background: var(--primary);">
+                        <i class="fas fa-key"></i>
+                        API Keys
+                    </button>
+                    <button class="btn" style="background: var(--info);">
+                        <i class="fas fa-download"></i>
+                        Export Docs
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <div class="stat-value">24</div>
+                    <div class="stat-label">Endpoints</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-value">99.9%</div>
+                    <div class="stat-label">Uptime</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="stat-value">120ms</div>
+                    <div class="stat-label">Avg Response</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <div class="stat-value">2.4M</div>
+                    <div class="stat-label">Requests/Day</div>
+                </div>
+            </div>
+            
+            <!-- API Section -->
+            <div class="api-section">
+                <h2 class="api-section-title">Wallet Management</h2>
+                
+                <!-- Endpoint 1 -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method method-post">POST</span>
+                        <span class="endpoint-path">/api/v1/wallets/connect</span>
+                    </div>
+                    
+                    <div class="endpoint-description">
+                        Connect a user's Starknet wallet to the bridge service. Returns a connection token for authenticated requests.
+                    </div>
+                    
+                    <div class="parameters">
+                        <div class="parameters-title">Parameters</div>
+                        
+                        <div class="parameter">
+                            <div class="parameter-name">starknet_address</div>
+                            <div class="parameter-type">string</div>
+                            <div class="parameter-description">The Starknet wallet address to connect</div>
+                            <div class="parameter-required">required</div>
+                        </div>
+                        
+                        <div class="parameter">
+                            <div class="parameter-name">signature</div>
+                            <div class="parameter-type">string</div>
+                            <div class="parameter-description">Signature proving ownership of the wallet</div>
+                            <div class="parameter-required">required</div>
+                        </div>
+                        
+                        <div class="parameter">
+                            <div class="parameter-name">network</div>
+                            <div class="parameter-type">string</div>
+                            <div class="parameter-description">Network to connect to (mainnet, testnet)</div>
+                            <div class="parameter-optional">optional</div>
+                        </div>
+                    </div>
+                    
+                    <div class="code-tabs">
+                        <div class="code-tab-header">
+                            <div class="code-tab active" onclick="changeTab(this, 'request-1')">Request</div>
+                            <div class="code-tab" onclick="changeTab(this, 'response-1')">Response</div>
+                        </div>
+                        
+                        <div id="request-1" class="code-block">
+                            <pre><code>POST /api/v1/wallets/connect HTTP/1.1
+Host: api.sbtc-bridge.com
+Content-Type: application/json
+Authorization: Bearer &lt;api_key&gt;
+
+{
+  <span class="code-string">"starknet_address"</span>: <span class="code-string">"0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"</span>,
+  <span class="code-string">"signature"</span>: <span class="code-string">"0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"</span>,
+  <span class="code-string">"network"</span>: <span class="code-string">"testnet"</span>
+}</code></pre>
+                        </div>
+                        
+                        <div id="response-1" class="code-block" style="display: none;">
+                            <pre><code>HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  <span class="code-string">"status"</span>: <span class="code-string">"success"</span>,
+  <span class="code-string">"data"</span>: {
+    <span class="code-string">"connection_token"</span>: <span class="code-string">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."</span>,
+    <span class="code-string">"expires_in"</span>: <span class="code-number">3600</span>,
+    <span class="code-string">"wallet_status"</span>: <span class="code-string">"connected"</span>
+  }
+}</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="try-it">
+                        <div class="try-it-title">Try it out</div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Starknet Address</label>
+                            <input type="text" class="input-field" value="0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Signature</label>
+                            <input type="text" class="input-field" value="0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890">
+                        </div>
+                        
+                        <button class="execute-btn" onclick="executeRequest(this)">Execute</button>
+                        
+                        <div class="response-area" id="response-area-1"></div>
+                    </div>
+                </div>
+                
+                <!-- Endpoint 2 -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method method-get">GET</span>
+                        <span class="endpoint-path">/api/v1/wallets/{starknet_address}/balance</span>
+                    </div>
+                    
+                    <div class="endpoint-description">
+                        Get the sBTC balance for a connected Starknet wallet.
+                    </div>
+                    
+                    <div class="parameters">
+                        <div class="parameters-title">Parameters</div>
+                        
+                        <div class="parameter">
+                            <div class="parameter-name">starknet_address</div>
+                            <div class="parameter-type">string</div>
+                            <div class="parameter-description">The Starknet wallet address (path parameter)</div>
+                            <div class="parameter-required">required</div>
+                        </div>
+                    </div>
+                    
+                    <div class="code-tabs">
+                        <div class="code-tab-header">
+                            <div class="code-tab active" onclick="changeTab(this, 'request-2')">Request</div>
+                            <div class="code-tab" onclick="changeTab(this, 'response-2')">Response</div>
+                        </div>
+                        
+                        <div id="request-2" class="code-block">
+                            <pre><code>GET /api/v1/wallets/0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef/balance HTTP/1.1
+Host: api.sbtc-bridge.com
+Authorization: Bearer &lt;connection_token&gt;</code></pre>
+                        </div>
+                        
+                        <div id="response-2" class="code-block" style="display: none;">
+                            <pre><code>HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  <span class="code-string">"status"</span>: <span class="code-string">"success"</span>,
+  <span class="code-string">"data"</span>: {
+    <span class="code-string">"starknet_address"</span>: <span class="code-string">"0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"</span>,
+    <span class="code-string">"sbtc_balance"</span>: <span class="code-number">"1.254"</span>,
+    <span class="code-string">"sbtc_balance_usd"</span>: <span class="code-number">"45000.25"</span>,
+    <span class="code-string">"last_updated"</span>: <span class="code-string">"2023-10-25T14:30:22Z"</span>
+  }
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Another API Section -->
+            <div class="api-section">
+                <h2 class="api-section-title">Deposit Management</h2>
+                
+                <!-- Endpoint 3 -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method method-post">POST</span>
+                        <span class="endpoint-path">/api/v1/deposits/initiate</span>
+                    </div>
+                    
+                    <div class="endpoint-description">
+                        Initiate a Bitcoin deposit to generate a unique deposit address for a user.
+                    </div>
+                    
+                    <div class="parameters">
+                        <div class="parameters-title">Parameters</div>
+                        
+                        <div class="parameter">
+                            <div class="parameter-name">starknet_address</div>
+                            <div class="parameter-type">string</div>
+                            <div class="parameter-description">The Starknet wallet address to receive sBTC</div>
+                            <div class="parameter-required">required</div>
+                        </div>
+                        
+                        <div class="parameter">
+                            <div class="parameter-name">amount_btc</div>
+                            <div class="parameter-type">number</div>
+                            <div class="parameter-description">Amount of BTC to deposit (optional)</div>
+                            <div class="parameter-optional">optional</div>
+                        </div>
+                    </div>
+                    
+                    <div class="code-tabs">
+                        <div class="code-tab-header">
+                            <div class="code-tab active" onclick="changeTab(this, 'request-3')">Request</div>
+                            <div class="code-tab" onclick="changeTab(this, 'response-3')">Response</div>
+                        </div>
+                        
+                        <div id="request-3" class="code-block">
+                            <pre><code>POST /api/v1/deposits/initiate HTTP/1.1
+Host: api.sbtc-bridge.com
+Content-Type: application/json
+Authorization: Bearer &lt;connection_token&gt;
+
+{
+  <span class="code-string">"starknet_address"</span>: <span class="code-string">"0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"</span>,
+  <span class="code-string">"amount_btc"</span>: <span class="code-number">0.5</span>
+}</code></pre>
+                        </div>
+                        
+                        <div id="response-3" class="code-block" style="display: none;">
+                            <pre><code>HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  <span class="code-string">"status"</span>: <span class="code-string">"success"</span>,
+  <span class="code-string">"data"</span>: {
+    <span class="code-string">"deposit_id"</span>: <span class="code-string">"dep_abc123def456"</span>,
+    <span class="code-string">"bitcoin_address"</span>: <span class="code-string">"bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh"</span>,
+    <span class="code-string">"expires_at"</span>: <span class="code-string">"2023-10-25T15:30:22Z"</span>,
+    <span class="code-string">"qr_code"</span>: <span class="code-string">"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA..."</span>
+  }
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        function changeTab(tabElement, tabId) {
+            // Remove active class from all tabs
+            const tabs = tabElement.parentElement.querySelectorAll('.code-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Add active class to clicked tab
+            tabElement.classList.add('active');
+            
+            // Hide all code blocks in this endpoint
+            const codeBlocks = tabElement.closest('.code-tabs').querySelectorAll('.code-block');
+            codeBlocks.forEach(block => block.style.display = 'none');
+            
+            // Show the selected code block
+            document.getElementById(tabId).style.display = 'block';
+        }
+        
+        // Execute request simulation
+        function executeRequest(button) {
+            const responseArea = button.nextElementSibling;
+            responseArea.style.display = 'block';
+            responseArea.innerHTML = '<div style="color: #50fa7b;">Loading...</div>';
+            
+            // Simulate API request delay
+            setTimeout(() => {
+                responseArea.innerHTML = `<pre style="margin: 0; color: #f8f8f2;">{
+  <span style="color: #ff79c6;">"status"</span>: <span style="color: #f1fa8c;">"success"</span>,
+  <span style="color: #ff79c6;">"data"</span>: {
+    <span style="color: #ff79c6;">"connection_token"</span>: <span style="color: #f1fa8c;">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdGFya25ldF9hZGRyZXNzIjoiMHgxMjM0NTY3ODkwYWJjZGVmMTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmIiwiaWF0IjoxNjk4MjI0MjIyLCJleHAiOjE2OTgyMjc4MjJ9.ABC123DEF456"</span>,
+    <span style="color: #ff79c6;">"expires_in"</span>: <span style="color: #bd93f9;">3600</span>,
+    <span style="color: #ff79c6;">"wallet_status"</span>: <span style="color: #f1fa8c;">"connected"</span>
+  }
+}</pre>`;
+            }, 1500);
+        }
+        
+        // Initialize first code blocks as visible
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.code-tab.active').forEach(tab => {
+                const tabId = tab.getAttribute('onclick').split("'")[1];
+                document.getElementById(tabId).style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>

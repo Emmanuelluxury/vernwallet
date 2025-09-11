@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lock & Unlock | Bitcoin-StarkNet Bridge</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --primary-light: #8b5cf6;
+            --secondary: #10b981;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f9fafb;
+            --gray: #94a3b8;
+            --dark-gray: #4b5563;
+            --light-gray: #f3f4f6;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bitcoin: #f7931a;
+            --starknet: #7c3aed;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: var(--darker);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header & Navigation */
+        header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--gray);
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+            padding: 8px 0;
+        }
+        
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: white;
+        }
+        
+        .nav-links a:hover:after {
+            width: 100%;
+        }
+        
+        .connect-wallet {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(124, 58, 237, 0.25);
+        }
+        
+        .connect-wallet:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(124, 58, 237, 0.3);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 150px 0 100px;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 30px;
+            max-width: 500px;
+            margin: 0 auto 40px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .tab.active {
+            background: rgba(124, 58, 237, 0.2);
+            color: var(--primary);
+        }
+        
+        /* Lock/Unlock Interface */
+        .action-container {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .action-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), transparent);
+            opacity: 0.5;
+        }
+        
+        .action-header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .action-title {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: white;
+            font-weight: 700;
+        }
+        
+        .action-subtitle {
+            color: var(--gray);
+        }
+        
+        .action-visual {
+            display: flex;
+            justify-content: center;
+            margin: 40px 0;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .action-icon {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+        
+        .lock-icon {
+            background: rgba(124, 58, 237, 0.2);
+            border: 3px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .unlock-icon {
+            background: rgba(16, 185, 129, 0.2);
+            border: 3px solid var(--secondary);
+            color: var(--secondary);
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(124, 58, 237, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); }
+        }
+        
+        .action-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+        
+        .form-group input, .form-group select {
+            padding: 14px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+        }
+        
+        .amount-input {
+            position: relative;
+        }
+        
+        .amount-input input {
+            padding-left: 50px;
+        }
+        
+        .currency-symbol {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .balance-info {
+            font-size: 0.9rem;
+            color: var(--gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .max-btn {
+            background: rgba(124, 58, 237, 0.2);
+            border: none;
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .max-btn:hover {
+            background: rgba(124, 58, 237, 0.3);
+        }
+        
+        .fee-info {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .fee-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .fee-item:last-child {
+            border-bottom: none;
+        }
+        
+        .fee-total {
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .action-button {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px rgba(124, 58, 237, 0.25);
+            margin-top: 20px;
+        }
+        
+        .unlock-button {
+            background: linear-gradient(135deg, var(--secondary), #0d966c);
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(124, 58, 237, 0.3);
+        }
+        
+        .action-button:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Status Section */
+        .action-status {
+            margin-top: 40px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .status-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .status-confirmed {
+            background: var(--secondary);
+        }
+        
+        .status-pending {
+            background: var(--warning);
+        }
+        
+        .status-processing {
+            background: var(--primary);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .progress-container {
+            margin: 20px 0;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            color: var(--gray);
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 5px;
+            background: linear-gradient(to right, var(--primary), var(--primary-light));
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        
+        .unlock-progress {
+            background: linear-gradient(to right, var(--secondary), #0d966c);
+        }
+        
+        /* Recent Transactions */
+        .recent-transactions {
+            margin-top: 60px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+        
+        .transaction-item.lock {
+            border-left: 4px solid var(--primary);
+        }
+        
+        .transaction-item.unlock {
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .transaction-item:hover {
+            background: rgba(15, 23, 42, 0.7);
+            transform: translateX(5px);
+        }
+        
+        .transaction-info {
+            flex: 1;
+        }
+        
+        .transaction-amount {
+            font-weight: 700;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+        
+        .transaction-details {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .transaction-status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-completed {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--secondary);
+        }
+        
+        .status-pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+        
+        .status-processing {
+            background: rgba(124, 58, 237, 0.2);
+            color: var(--primary);
+        }
+        
+        /* Footer */
+        footer {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 60px 0 30px;
+            margin-top: 80px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .footer-description {
+            color: var(--gray);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            color: var(--gray);
+            font-size: 1.5rem;
+            transition: color 0.3s;
+        }
+        
+        .social-links a:hover {
+            color: var(--primary);
+        }
+        
+        .footer-links h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-links a {
+            color: var(--gray);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--gray);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .action-container {
+                padding: 25px;
+            }
+            
+            .action-icon {
+                width: 100px;
+                height: 100px;
+                font-size: 2.5rem;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">
+                    <i class="fas fa-link logo-icon"></i>
+                    BTC→STARK
+                </a>
+                <ul class="nav-links">
+                    <li><a href="../Bitstark/Wallet.html">Dashboard</a></li>
+                    <li><a href="../Wallet/Send.html">Send</a></li>
+                    <li><a href="../Wallet/Receive.html">Receive</a></li>
+                    <li><a href="#" class="active">Lock/Unlock</a></li>
+                    <li><a href="../Wallet/History.html">History</a></li>
+                </ul>
+                <button class="connect-wallet">
+                    <i class="fas fa-wallet"></i>
+                    Connect Wallet
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Lock & Unlock Assets</h1>
+                <p class="page-subtitle">Securely lock Bitcoin to use on StarkNet or unlock to return to Bitcoin network</p>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab active" id="lockTab">Lock Bitcoin</div>
+                <div class="tab" id="unlockTab">Unlock Bitcoin</div>
+            </div>
+            
+            <!-- Lock Interface -->
+            <div class="action-container" id="lockInterface">
+                <div class="action-header">
+                    <h2 class="action-title">Lock Bitcoin</h2>
+                    <p class="action-subtitle">Lock your Bitcoin to mint equivalent tokens on StarkNet</p>
+                </div>
+                
+                <div class="action-visual">
+                    <div class="action-icon lock-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                </div>
+                
+                <form class="action-form" id="lockForm">
+                    <div class="form-group">
+                        <label for="fromAddress">From Bitcoin Address</label>
+                        <select id="fromAddress">
+                            <option value="bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq">bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq (1.2543 BTC)</option>
+                            <option value="bc1q9z4m9s5vner4nj24cnv3xdrp5p6c0v0y3j5g4z">bc1q9z4m9s5vner4nj24cnv3xdrp5p6c0v0y3j5g4z (0.8421 BTC)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="toAddress">StarkNet Address</label>
+                        <input type="text" id="toAddress" placeholder="Enter your StarkNet address" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lockAmount">Amount to Lock</label>
+                        <div class="amount-input">
+                            <span class="currency-symbol">₿</span>
+                            <input type="number" id="lockAmount" placeholder="0.00" step="0.000001" min="0.001" required>
+                        </div>
+                        
+                        <div class="balance-info">
+                            <span>Balance: 1.2543 BTC</span>
+                            <button type="button" class="max-btn">MAX</button>
+                        </div>
+                    </div>
+                    
+                    <div class="fee-info">
+                        <div class="fee-item">
+                            <span>Network Fee:</span>
+                            <span>0.00015 BTC</span>
+                        </div>
+                        <div class="fee-item">
+                            <span>Bridge Fee:</span>
+                            <span>0.0005 BTC</span>
+                        </div>
+                        <div class="fee-item fee-total">
+                            <span>Total Fee:</span>
+                            <span>0.00065 BTC</span>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="action-button" id="lockButton">
+                        <i class="fas fa-lock"></i> Lock Bitcoin
+                    </button>
+                </form>
+                
+                <div class="action-status">
+                    <div class="status-header">
+                        <h3 class="status-title">Lock Status</h3>
+                        <div class="status-indicator">
+                            <div class="status-dot status-processing"></div>
+                            <span>Processing</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <span>Lock Progress</span>
+                            <span id="lockProgressValue">45%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="lockProgressFill" style="width: 45%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="fee-info">
+                        <div class="fee-item">
+                            <span>Transaction ID:</span>
+                            <span style="font-family: monospace; font-size: 0.8rem;">0x8a34f7d0d2c5e1b9a3c8f7a6b5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5</span>
+                        </div>
+                        <div class="fee-item">
+                            <span>Amount:</span>
+                            <span>0.10000 BTC</span>
+                        </div>
+                        <div class="fee-item">
+                            <span>Estimated Time:</span>
+                            <span>15-25 minutes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Unlock Interface (Initially Hidden) -->
+            <div class="action-container" id="unlockInterface" style="display: none;">
+                <div class="action-header">
+                    <h2 class="action-title">Unlock Bitcoin</h2>
+                    <p class="action-subtitle">Unlock your Bitcoin by burning tokens on StarkNet</p>
+                </div>
+                
+                <div class="action-visual">
+                    <div class="action-icon unlock-icon">
+                        <i class="fas fa-unlock"></i>
+                    </div>
+                </div>
+                
+                <form class="action-form" id="unlockForm">
+                    <div class="form-group">
+                        <label for="unlockFromAddress">From StarkNet Address</label>
+                        <select id="unlockFromAddress">
+                            <option value="0x072D4D4F4Ca56e4f1B515E214c23399B7cA312a9aA4F02679871d5bdafa7c7c1">0x072D...c7c1 (42.5 sBTC)</option>
+                            <option value="0x05b6b3f8b518b4696b24d6b0e729b66e4d9c3d3a7d87c6f3c6f3d3a7d87c6f3c">0x05b6...6f3c (18.3 sBTC)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="unlockToAddress">Bitcoin Address</label>
+                        <input type="text" id="unlockToAddress" placeholder="Enter your Bitcoin address" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="unlockAmount">Amount to Unlock</label>
+                        <div class="amount-input">
+                            <span class="currency-symbol">s₿</span>
+                            <input type="number" id="unlockAmount" placeholder="0.00" step="0.000001" min="0.001" required>
+                        </div>
+                        
+                        <div class="balance-info">
+                            <span>Balance: 42.5 sBTC</span>
+                            <button type="button" class="max-btn">MAX</button>
+                        </div>
+                    </div>
+                    
+                    <div class="fee-info">
+                        <div class="fee-item">
+                            <span>Network Fee:</span>
+                            <span>0.00015 ETH</span>
+                        </div>
+                        <div class="fee-item">
+                            <span>Bridge Fee:</span>
+                            <span>0.0005 ETH</span>
+                        </div>
+                        <div class="fee-item fee-total">
+                            <span>Total Fee:</span>
+                            <span>0.00065 ETH</span>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="action-button unlock-button" id="unlockButton">
+                        <i class="fas fa-unlock"></i> Unlock Bitcoin
+                    </button>
+                </form>
+                
+                <div class="action-status">
+                    <div class="status-header">
+                        <h3 class="status-title">Unlock Status</h3>
+                        <div class="status-indicator">
+                            <div class="status-dot status-pending"></div>
+                            <span>Pending</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <span>Unlock Progress</span>
+                            <span id="unlockProgressValue">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill unlock-progress" id="unlockProgressFill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="fee-info">
+                        <div class="fee-item">
+                            <span>Waiting for initiation</span>
+                            <span>-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Transactions -->
+            <div class="recent-transactions">
+                <h2 class="section-title">Recent Transactions</h2>
+                
+                <div class="transaction-list">
+                    <div class="transaction-item lock">
+                        <div class="transaction-info">
+                            <div class="transaction-amount">+0.125 BTC</div>
+                            <div class="transaction-details">Locked • Oct 28, 2023 14:23</div>
+                        </div>
+                        <div class="transaction-status-badge status-completed">Completed</div>
+                    </div>
+                    
+                    <div class="transaction-item unlock">
+                        <div class="transaction-info">
+                            <div class="transaction-amount">-0.500 BTC</div>
+                            <div class="transaction-details">Unlocked • Oct 27, 2023 09:47</div>
+                        </div>
+                        <div class="transaction-status-badge status-completed">Completed</div>
+                    </div>
+                    
+                    <div class="transaction-item lock">
+                        <div class="transaction-info">
+                            <div class="transaction-amount">+0.075 BTC</div>
+                            <div class="transaction-details">Locking • Oct 26, 2023 18:15</div>
+                        </div>
+                        <div class="transaction-status-badge status-processing">Processing</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <div class="footer-logo">
+                        <i class="fas fa-link"></i>
+                        BTC→STARK
+                    </div>
+                    <p class="footer-description">The most secure and efficient Bitcoin to StarkNet bridge on the market.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-telegram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>Product</h3>
+                    <ul>
+                        <li><a href="#">Bridge</a></li>
+                        <li><a href="#">Fees</a></li>
+                        <li><a href="#">Security</a></li>
+                        <li><a href="#">Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Tutorials</a></li>
+                        <li><a href="#">API</a></li>
+                        <li><a href="#">Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 Bitcoin-StarkNet Bridge. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const lockTab = document.getElementById('lockTab');
+        const unlockTab = document.getElementById('unlockTab');
+        const lockInterface = document.getElementById('lockInterface');
+        const unlockInterface = document.getElementById('unlockInterface');
+        const lockForm = document.getElementById('lockForm');
+        const unlockForm = document.getElementById('unlockForm');
+        const lockButton = document.getElementById('lockButton');
+        const unlockButton = document.getElementById('unlockButton');
+        const maxButtons = document.querySelectorAll('.max-btn');
+        const lockProgressFill = document.getElementById('lockProgressFill');
+        const lockProgressValue = document.getElementById('lockProgressValue');
+        const unlockProgressFill = document.getElementById('unlockProgressFill');
+        const unlockProgressValue = document.getElementById('unlockProgressValue');
+
+        // Initialize the interface
+        function init() {
+            setupEventListeners();
+            simulateLockProgress();
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Tab switching
+            lockTab.addEventListener('click', () => switchTab('lock'));
+            unlockTab.addEventListener('click', () => switchTab('unlock'));
+            
+            // Max buttons
+            maxButtons.forEach(button => {
+                button.addEventListener('click', setMaxAmount);
+            });
+            
+            // Form submissions
+            lockForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                initiateLockProcess();
+            });
+            
+            unlockForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                initiateUnlockProcess();
+            });
+        }
+
+        // Switch between lock and unlock tabs
+        function switchTab(tab) {
+            if (tab === 'lock') {
+                lockTab.classList.add('active');
+                unlockTab.classList.remove('active');
+                lockInterface.style.display = 'block';
+                unlockInterface.style.display = 'none';
+            } else {
+                unlockTab.classList.add('active');
+                lockTab.classList.remove('active');
+                unlockInterface.style.display = 'block';
+                lockInterface.style.display = 'none';
+            }
+        }
+
+        // Set maximum amount
+        function setMaxAmount() {
+            const balanceText = this.parentElement.querySelector('span').textContent;
+            const balance = parseFloat(balanceText.match(/(\d+\.\d+)/)[0]);
+            
+            // Determine if we're in lock or unlock form
+            const form = this.closest('form');
+            const amountInput = form.querySelector('input[type="number"]');
+            
+            // Set value with a small buffer for fees
+            amountInput.value = (balance * 0.99).toFixed(6);
+        }
+
+        // Initiate lock process
+        function initiateLockProcess() {
+            const amount = parseFloat(document.getElementById('lockAmount').value);
+            const toAddress = document.getElementById('toAddress').value;
+            
+            if (amount <= 0 || !toAddress) {
+                showNotification('Please enter a valid amount and destination address', true);
+                return;
+            }
+            
+            // In a real application, this would call a smart contract or API
+            console.log(`Locking ${amount} BTC to ${toAddress}`);
+            
+            // Show success message
+            showNotification(`Lock process initiated! ${amount} BTC is being locked.`);
+            
+            // Reset form
+            lockForm.reset();
+            lockButton.disabled = true;
+            
+            // Simulate progress
+            lockProgressFill.style.width = '10%';
+            lockProgressValue.textContent = '10%';
+        }
+
+        // Initiate unlock process
+        function initiateUnlockProcess() {
+            const amount = parseFloat(document.getElementById('unlockAmount').value);
+            const toAddress = document.getElementById('unlockToAddress').value;
+            
+            if (amount <= 0 || !toAddress) {
+                showNotification('Please enter a valid amount and destination address', true);
+                return;
+            }
+            
+            // In a real application, this would call a smart contract or API
+            console.log(`Unlocking ${amount} sBTC to ${toAddress}`);
+            
+            // Show success message
+            showNotification(`Unlock process initiated! ${amount} sBTC is being unlocked.`);
+            
+            // Reset form
+            unlockForm.reset();
+            unlockButton.disabled = true;
+            
+            // Simulate progress
+            unlockProgressFill.style.width = '10%';
+            unlockProgressValue.textContent = '10%';
+            
+            // Update status indicator
+            document.querySelector('#unlockInterface .status-dot').className = 'status-dot status-processing';
+            document.querySelector('#unlockInterface .status-indicator span').textContent = 'Processing';
+        }
+
+        // Simulate lock progress
+        function simulateLockProgress() {
+            let progress = 45;
+            const interval = setInterval(() => {
+                progress += 5;
+                if (progress > 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    showNotification('Lock process completed! Funds are now available on StarkNet.');
+                    
+                    // Update status indicator
+                    document.querySelector('#lockInterface .status-dot').className = 'status-dot status-confirmed';
+                    document.querySelector('#lockInterface .status-indicator span').textContent = 'Completed';
+                }
+                
+                lockProgressFill.style.width = `${progress}%`;
+                lockProgressValue.textContent = `${progress}%`;
+            }, 5000);
+        }
+
+        // Show notification
+        function showNotification(message, isError = false) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.bottom = '20px';
+            notification.style.right = '20px';
+            notification.style.padding = '15px 25px';
+            notification.style.background = isError ? 'rgba(239, 68, 68, 0.9)' : 'rgba(16, 185, 129, 0.9)';
+            notification.style.color = 'white';
+            notification.style.borderRadius = '8px';
+            notification.style.zIndex = '1000';
+            notification.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.2)';
+            notification.textContent = message;
+            
+            // Add to page
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 500);
+            }, 3000);
+        }
+
+        // Initialize the interface
+        init();
+    </script>
+</body>
+</html>

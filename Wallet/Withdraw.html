@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin-Starknet Bridge | Withdraw Dashboard</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #00d2ff;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            color: #00d2ff;
+        }
+        
+        .dashboard-title {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+        
+        .actions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #00d2ff;
+            color: #00d2ff;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.3);
+        }
+        
+        .btn-danger:hover {
+            box-shadow: 0 5px 15px rgba(255, 75, 43, 0.3);
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #00d2ff;
+        }
+        
+        .card-icon {
+            font-size: 1.8rem;
+            color: #00d2ff;
+        }
+        
+        .balance {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 15px 0;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .currency {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .withdraw-form {
+            margin-top: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #00d2ff;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+        
+        .amount-input {
+            position: relative;
+        }
+        
+        .amount-input input {
+            padding-left: 40px;
+        }
+        
+        .amount-input::before {
+            content: '₿';
+            position: absolute;
+            left: 15px;
+            top: 12px;
+            font-size: 1.2rem;
+            color: #f2a900;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .fee-info {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 0.9rem;
+        }
+        
+        .fee-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .fee-total {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 10px;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+        
+        .progress-container {
+            margin: 20px 0;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .status-confirmed {
+            background: #4caf50;
+        }
+        
+        .status-pending {
+            background: #ff9800;
+        }
+        
+        .status-processing {
+            background: #2196f3;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .transactions-container {
+            margin-top: 40px;
+        }
+        
+        .transactions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #00d2ff;
+        }
+        
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .transactions-table th, .transactions-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .transactions-table th {
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            color: #00d2ff;
+        }
+        
+        .transactions-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .tx-hash {
+            font-family: monospace;
+            color: #00d2ff;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .tx-amount {
+            font-weight: 600;
+        }
+        
+        .tx-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-completed {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .status-pending {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+        }
+        
+        .status-processing {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+        
+        .status-failed {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+        
+        .bridge-visual {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+        }
+        
+        .chain {
+            text-align: center;
+            padding: 15px;
+            flex: 1;
+        }
+        
+        .chain-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .starknet {
+            color: #ff2c6e;
+        }
+        
+        .bitcoin {
+            color: #f2a900;
+        }
+        
+        .bridge-arrow {
+            font-size: 2rem;
+            color: #00d2ff;
+            padding: 0 15px;
+        }
+        
+        .limits-info {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .limits-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #00d2ff;
+        }
+        
+        .limits-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a2a32, #2c3e50);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: #00d2ff;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: rgba(0, 0, 0, 0.7);
+            border-left: 4px solid #00d2ff;
+            border-radius: 5px;
+            display: none;
+            animation: slideIn 0.3s forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 30px 0;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            nav ul {
+                gap: 15px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .actions-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .bridge-visual {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .transactions-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-arrow-up"></i></div>
+                <div class="logo-text">Bitcoin-Starknet Bridge</div>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="../Bitstark/Wallet.html">Dashboard</a></li>
+                    <li><a href="../Wallet/Deposit.html">Deposit</a></li>
+                    <li><a href="#" class="active">Withdraw</a></li>
+                    <li><a href="../Bitstark/Transactions.html">Transactions</a></li>
+                    <li><a href="../Security/Support.html">Support</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <h1 class="dashboard-title">Withdraw Dashboard</h1>
+        <p class="subtitle">Bridge your Bitcoin from Starknet back to Bitcoin network</p>
+        
+        <div class="actions-header">
+            <h2>Withdraw Bitcoin</h2>
+            <button class="btn btn-outline">
+                <i class="fas fa-history"></i> Transaction History
+            </button>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Starknet Balance</h2>
+                    <div class="card-icon"><i class="fa-solid fa-coins starknet"></i></div>
+                </div>
+                <div class="balance">3.428 <span class="currency">BTC</span></div>
+                <p>Available for withdrawal to Bitcoin network</p>
+                
+                <div class="limits-info">
+                    <div class="limits-title">Withdrawal Limits</div>
+                    <div class="limits-item">
+                        <span>Minimum withdrawal:</span>
+                        <span>0.001 BTC</span>
+                    </div>
+                    <div class="limits-item">
+                        <span>Maximum withdrawal:</span>
+                        <span>10 BTC</span>
+                    </div>
+                    <div class="limits-item">
+                        <span>24h limit remaining:</span>
+                        <span>7.2 BTC</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Withdraw Funds</h2>
+                    <div class="card-icon"><i class="fa-solid fa-wallet"></i></div>
+                </div>
+                
+                <div class="withdraw-form">
+                    <div class="form-group">
+                        <label for="btcAddress">Bitcoin Address</label>
+                        <input type="text" id="btcAddress" placeholder="Enter your Bitcoin address">
+                    </div>
+                    
+                    <div class="form-group amount-input">
+                        <label for="withdrawAmount">Amount</label>
+                        <input type="number" id="withdrawAmount" placeholder="0.00" step="0.000001" min="0.001" max="10">
+                    </div>
+                    
+                    <div class="fee-info">
+                        <div class="fee-item">
+                            <span>Network fee:</span>
+                            <span>0.00015 BTC</span>
+                        </div>
+                        <div class="fee-item">
+                            <span>Bridge fee:</span>
+                            <span>0.0005 BTC</span>
+                        </div>
+                        <div class="fee-item fee-total">
+                            <span>Total fee:</span>
+                            <span>0.00065 BTC</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="withdrawSpeed">Processing Speed</label>
+                        <select id="withdrawSpeed">
+                            <option value="slow">Slow (1-4 hours) - 0.00015 BTC fee</option>
+                            <option value="medium" selected>Medium (30-60 min) - 0.0003 BTC fee</option>
+                            <option value="fast">Fast (10-20 min) - 0.0006 BTC fee</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button class="btn btn-outline" id="previewBtn">Preview</button>
+                        <button class="btn btn-primary" id="withdrawBtn">Withdraw</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Withdrawal Status</h2>
+                    <div class="card-icon"><i class="fa-solid fa-chart-line"></i></div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>Withdrawal Progress</span>
+                        <span id="progressValue">40%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 40%"></div>
+                    </div>
+                </div>
+                
+                <div class="status-indicator">
+                    <div class="status-dot status-processing"></div>
+                    <span>Processing - Starknet confirmation</span>
+                </div>
+                
+                <div class="bridge-visual">
+                    <div class="chain">
+                        <div class="chain-icon"><i class="fa-solid fa-link starknet"></i></div>
+                        <h3>Starknet</h3>
+                        <p>Layer 2</p>
+                    </div>
+                    
+                    <div class="bridge-arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                    
+                    <div class="chain">
+                        <div class="chain-icon"><i class="fab fa-bitcoin bitcoin"></i></div>
+                        <h3>Bitcoin</h3>
+                        <p>Mainnet</p>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 15px;">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-external-link-alt"></i> Track on Explorer
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="transactions-container">
+            <div class="transactions-header">
+                <h2 class="section-title">Recent Withdrawal Transactions</h2>
+                <button class="btn btn-outline">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+            </div>
+            
+            <table class="transactions-table">
+                <thead>
+                    <tr>
+                        <th>Transaction Hash</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="tx-hash">0x8a34f7d0d2c5e1b9a3c8f7a6b5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5</td>
+                        <td class="tx-amount">1.250 BTC</td>
+                        <td>Oct 28, 2023 14:23</td>
+                        <td><span class="tx-status status-processing">Processing</span></td>
+                        <td>
+                            <button class="icon-btn"><i class="fas fa-eye"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tx-hash">0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef</td>
+                        <td class="tx-amount">0.500 BTC</td>
+                        <td>Oct 27, 2023 09:47</td>
+                        <td><span class="tx-status status-completed">Completed</span></td>
+                        <td>
+                            <button class="icon-btn"><i class="fas fa-eye"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tx-hash">0xf2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e58a34f7d0d2c5e1b9a3c8f7a6b5d4e3</td>
+                        <td class="tx-amount">2.075 BTC</td>
+                        <td>Oct 26, 2023 18:15</td>
+                        <td><span class="tx-status status-completed">Completed</span></td>
+                        <td>
+                            <button class="icon-btn"><i class="fas fa-eye"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tx-hash">0xd2e1f0a9b8c7d6e58a34f7d0d2c5e1b9a3c8f7a6b5d4e3f2a1b0c9d8e7f6a5b4c3</td>
+                        <td class="tx-amount">0.200 BTC</td>
+                        <td>Oct 25, 2023 11:32</td>
+                        <td><span class="tx-status status-failed">Failed</span></td>
+                        <td>
+                            <button class="icon-btn"><i class="fas fa-redo"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Confirm Withdrawal</h2>
+                <button class="close-modal" id="closeConfirmModal">&times;</button>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <p>Please confirm your withdrawal details:</p>
+                
+                <div style="background: rgba(0, 0, 0, 0.2); border-radius: 10px; padding: 15px; margin: 15px 0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Amount:</span>
+                        <span style="font-weight: 600;">1.250 BTC</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>To Address:</span>
+                        <span style="font-family: monospace; font-size: 0.9rem;">bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Network Fee:</span>
+                        <span>0.0003 BTC</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Bridge Fee:</span>
+                        <span>0.0005 BTC</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-weight: 600; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <span>Total:</span>
+                        <span>1.2508 BTC</span>
+                    </div>
+                </div>
+                
+                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">
+                    <i class="fas fa-exclamation-circle" style="color: #ff9800;"></i>
+                    Withdrawals typically take 30-60 minutes to process.
+                </p>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn btn-outline" id="cancelWithdraw">Cancel</button>
+                <button class="btn btn-primary" id="confirmWithdraw">Confirm Withdrawal</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notificationText"></span>
+    </div>
+    
+    <footer>
+        <p>© 2025 Bitcoin-Starknet Bridge. All rights reserved. | Security Audit Passed | v2.1.4</p>
+        <p>Withdrawal processing time: 30-60 minutes | Network fees vary based on congestion</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const previewBtn = document.getElementById('previewBtn');
+        const withdrawBtn = document.getElementById('withdrawBtn');
+        const confirmationModal = document.getElementById('confirmationModal');
+        const closeConfirmModal = document.getElementById('closeConfirmModal');
+        const cancelWithdraw = document.getElementById('cancelWithdraw');
+        const confirmWithdraw = document.getElementById('confirmWithdraw');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        const progressFill = document.getElementById('progressFill');
+        const progressValue = document.getElementById('progressValue');
+        
+        // Initialize the dashboard
+        function init() {
+            setupEventListeners();
+            simulateWithdrawalProgress();
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            previewBtn.addEventListener('click', showPreview);
+            withdrawBtn.addEventListener('click', initiateWithdrawal);
+            
+            closeConfirmModal.addEventListener('click', () => {
+                confirmationModal.style.display = 'none';
+            });
+            
+            cancelWithdraw.addEventListener('click', () => {
+                confirmationModal.style.display = 'none';
+            });
+            
+            confirmWithdraw.addEventListener('click', processWithdrawal);
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === confirmationModal) {
+                    confirmationModal.style.display = 'none';
+                }
+            });
+        }
+        
+        // Show preview of withdrawal
+        function showPreview() {
+            const amount = document.getElementById('withdrawAmount').value;
+            const address = document.getElementById('btcAddress').value;
+            
+            if (!amount || amount <= 0 || !address) {
+                showNotification('Please enter a valid amount and Bitcoin address', true);
+                return;
+            }
+            
+            // In a real application, this would calculate fees based on amount and network conditions
+            confirmationModal.style.display = 'flex';
+        }
+        
+        // Initiate withdrawal process
+        function initiateWithdrawal() {
+            const amount = document.getElementById('withdrawAmount').value;
+            const address = document.getElementById('btcAddress').value;
+            
+            if (!amount || amount <= 0 || !address) {
+                showNotification('Please enter a valid amount and Bitcoin address', true);
+                return;
+            }
+            
+            showPreview();
+        }
+        
+        // Process withdrawal
+        function processWithdrawal() {
+            const amount = document.getElementById('withdrawAmount').value;
+            const address = document.getElementById('btcAddress').value;
+            
+            // In a real application, this would call an API to process the withdrawal
+            console.log('Processing withdrawal:', { amount, address });
+            
+            // Show success message
+            showNotification('Withdrawal initiated successfully! Processing...');
+            
+            // Close the modal
+            confirmationModal.style.display = 'none';
+            
+            // Reset the form
+            document.getElementById('withdrawAmount').value = '';
+            document.getElementById('btcAddress').value = '';
+            
+            // Simulate progress update
+            progressFill.style.width = '60%';
+            progressValue.textContent = '60%';
+        }
+        
+        // Show notification
+        function showNotification(message, isError = false) {
+            notificationText.textContent = message;
+            
+            if (isError) {
+                notification.style.borderLeftColor = '#f44336';
+            } else {
+                notification.style.borderLeftColor = '#00d2ff';
+            }
+            
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Simulate withdrawal progress
+        function simulateWithdrawalProgress() {
+            let progress = 40;
+            const interval = setInterval(() => {
+                progress += 5;
+                if (progress > 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    showNotification('Withdrawal completed! Funds are now on Bitcoin network.');
+                }
+                
+                progressFill.style.width = `${progress}%`;
+                progressValue.textContent = `${progress}%`;
+            }, 5000);
+        }
+        
+        // Initialize the dashboard
+        init();
+    </script>
+</body>
+</html>

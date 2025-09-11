@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proof of Builder - Bitcoin-StarkNet Bridge</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/solidity.min.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #f39c12;
+            --success: #2ecc71;
+            --warning: #e74c3c;
+            --info: #9b59b6;
+            --light: #ecf0f1;
+            --dark: #1a202c;
+            --gray: #7f8c8d;
+            --bitcoin: #f7931a;
+            --starknet: #7a3cff;
+            --dark-bg: #1a202c;
+            --card-bg: #2d3748;
+            --border: #4a5568;
+            --code-bg: #282c34;
+            --builder-primary: #ff6b35;
+            --builder-secondary: #00a896;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: #e2e8f0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--builder-primary), var(--builder-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logo-icon {
+            font-size: 32px;
+            color: var(--builder-primary);
+        }
+        
+        .starknet-icon {
+            color: var(--builder-secondary);
+        }
+        
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-btn {
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #e2e8f0;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .header-btn:hover {
+            background: var(--builder-primary);
+            border-color: var(--builder-primary);
+        }
+        
+        .builder-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            overflow-x: auto;
+        }
+        
+        .builder-tab {
+            padding: 12px 24px;
+            background: var(--card-bg);
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .builder-tab.active {
+            background: linear-gradient(90deg, var(--builder-primary), var(--builder-secondary));
+            color: white;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #a0aec0;
+        }
+        
+        .card-icon {
+            font-size: 24px;
+            color: var(--builder-primary);
+        }
+        
+        .stat {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--builder-primary), var(--builder-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: var(--success);
+        }
+        
+        .stat-change.negative {
+            color: var(--warning);
+        }
+        
+        .proof-image {
+            height: 280px;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .proof-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, var(--builder-primary), var(--builder-secondary));
+            opacity: 0.3;
+            z-index: -1;
+        }
+        
+        .proof-image h2 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .proof-image p {
+            max-width: 600px;
+            color: #e2e8f0;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .proof-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            background: linear-gradient(90deg, var(--builder-primary), var(--builder-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .contributions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .contribution-item {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 15px;
+            padding: 20px;
+            background: var(--dark-bg);
+            border-radius: 12px;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--builder-primary);
+        }
+        
+        .contribution-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .contribution-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: rgba(255, 107, 53, 0.2);
+            color: var(--builder-primary);
+        }
+        
+        .contribution-content {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .contribution-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .contribution-desc {
+            font-size: 14px;
+            color: #a0aec0;
+            line-height: 1.5;
+        }
+        
+        .contribution-time {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+        
+        .contribution-value {
+            text-align: right;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--builder-secondary);
+        }
+        
+        .verification-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .verification-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .verification-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .verification-icon {
+            font-size: 24px;
+            color: var(--builder-primary);
+        }
+        
+        .verification-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .verification-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(46, 204, 113, 0.2);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: var(--success);
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+        
+        .verification-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-label {
+            font-size: 14px;
+            color: #a0aec0;
+        }
+        
+        .form-input {
+            padding: 12px 15px;
+            background: var(--dark-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 14px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--builder-primary);
+        }
+        
+        .verify-btn {
+            padding: 12px 20px;
+            background: linear-gradient(90deg, var(--builder-primary), var(--builder-secondary));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .verify-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .builder-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .builder-item {
+            background: var(--dark-bg);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .builder-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .builder-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: var(--builder-primary);
+        }
+        
+        .builder-stat {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--builder-secondary);
+        }
+        
+        .builder-label {
+            font-size: 14px;
+            color: #a0aec0;
+        }
+        
+        .connections-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .connection-node {
+            background: var(--dark-bg);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .connection-node:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .node-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--builder-primary);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 107, 53, 0.1);
+        }
+        
+        .node-title {
+            font-size: 14px;
+            color: #a0aec0;
+            margin-bottom: 5px;
+        }
+        
+        .node-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--builder-secondary);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #a0aec0;
+            font-size: 14px;
+            border-top: 1px solid var(--border);
+        }
+        
+        @media (max-width: 1200px) {
+            .dashboard {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .connections-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .builder-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .connections-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .contribution-item {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-hard-hat logo-icon"></i>
+                <i class="fas fa-bridge starknet-icon"></i>
+                <h1>Proof of Builder - Bitcoin-StarkNet Bridge</h1>
+            </div>
+            <div class="header-controls">
+                <button class="header-btn">
+                    <i class="fas fa-medal"></i> My Contributions
+                </button>
+                <button class="header-btn">
+                    <i class="fas fa-trophy"></i> Leaderboard
+                </button>
+                <button class="header-btn">
+                    <i class="fas fa-file-contract"></i> Verify Proof
+                </button>
+            </div>
+        </header>
+        
+        <div class="builder-tabs">
+            <div class="builder-tab active">Contributions</div>
+            <div class="builder-tab">Verification</div>
+            <div class="builder-tab">Smart Contracts</div>
+            <div class="builder-tab">Governance</div>
+            <div class="builder-tab">Rewards</div>
+            <div class="builder-tab">Documentation</div>
+        </div>
+        
+        <div class="proof-image">
+            <h2>Proof of Builder Protocol</h2>
+            <p>Building the future of Bitcoin-StarkNet interoperability through verifiable contributions</p>
+        </div>
+        
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Total Contributions</div>
+                    <i class="fas fa-code-commit card-icon"></i>
+                </div>
+                <div class="stat">1,428</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+42 this week</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Active Builders</div>
+                    <i class="fas fa-users card-icon"></i>
+                </div>
+                <div class="stat">187</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+12 this month</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Verification Score</div>
+                    <i class="fas fa-shield-alt card-icon"></i>
+                </div>
+                <div class="stat">98.7%</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+2.3% this month</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Total Value</div>
+                    <i class="fas fa-coins card-icon"></i>
+                </div>
+                <div class="stat">$3.2M</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+$420K this month</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="connections-grid">
+            <div class="connection-node">
+                <div class="node-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="node-title">Code Commits</div>
+                <div class="node-value">4,218</div>
+            </div>
+            
+            <div class="connection-node">
+                <div class="node-icon">
+                    <i class="fas fa-bug"></i>
+                </div>
+                <div class="node-title">Bugs Fixed</div>
+                <div class="node-value">328</div>
+            </div>
+            
+            <div class="connection-node">
+                <div class="node-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <div class="node-title">Proposals</div>
+                <div class="node-value">142</div>
+            </div>
+            
+            <div class="connection-node">
+                <div class="node-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="node-title">Docs Updated</div>
+                <div class="node-value">87</div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="proof-section">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Builder Contributions</h2>
+                    <button class="header-btn">
+                        <i class="fas fa-plus"></i> Submit Proof
+                    </button>
+                </div>
+                
+                <div class="contributions-list">
+                    <div class="contribution-item">
+                        <div class="contribution-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="contribution-content">
+                            <div class="contribution-title">Optimized BTC-to-StarkNet transfer function</div>
+                            <div class="contribution-desc">Reduced gas costs by 23% and improved transaction speed</div>
+                            <div class="contribution-time">Verified 2 hours ago</div>
+                        </div>
+                        <div class="contribution-value">+125 POB</div>
+                    </div>
+                    
+                    <div class="contribution-item">
+                        <div class="contribution-icon">
+                            <i class="fas fa-bug"></i>
+                        </div>
+                        <div class="contribution-content">
+                            <div class="contribution-title">Fixed signature verification issue</div>
+                            <div class="contribution-desc">Resolved critical security vulnerability in multi-sig validation</div>
+                            <div class="contribution-time">Verified 5 hours ago</div>
+                        </div>
+                        <div class="contribution-value">+250 POB</div>
+                    </div>
+                    
+                    <div class="contribution-item">
+                        <div class="contribution-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="contribution-content">
+                            <div class="contribution-title">Updated API documentation</div>
+                            <div class="contribution-desc">Comprehensive documentation for new bridge endpoints</div>
+                            <div class="contribution-time">Verified 1 day ago</div>
+                        </div>
+                        <div class="contribution-value">+75 POB</div>
+                    </div>
+                    
+                    <div class="contribution-item">
+                        <div class="contribution-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div class="contribution-content">
+                            <div class="contribution-title">Proposed new governance mechanism</div>
+                            <div class="contribution-desc">Community voting system for protocol upgrades</div>
+                            <div class="contribution-time">Verified 2 days ago</div>
+                        </div>
+                        <div class="contribution-value">+150 POB</div>
+                    </div>
+                    
+                    <div class="contribution-item">
+                        <div class="contribution-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="contribution-content">
+                            <div class="contribution-title">Developed testing framework</div>
+                            <div class="contribution-desc">Comprehensive test suite for bridge security audits</div>
+                            <div class="contribution-time">Verified 3 days ago</div>
+                        </div>
+                        <div class="contribution-value">+200 POB</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="verification-sidebar">
+                <div class="verification-card">
+                    <div class="verification-header">
+                        <i class="fas fa-fingerprint verification-icon"></i>
+                        <div class="verification-title">Proof Verification</div>
+                    </div>
+                    
+                    <div class="verification-status">
+                        <div class="status-indicator"></div>
+                        <span>Verification System Operational</span>
+                    </div>
+                    
+                    <div class="verification-form">
+                        <div class="form-group">
+                            <label class="form-label">Contribution Hash</label>
+                            <input type="text" class="form-input" placeholder="Enter contribution hash">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Builder Address</label>
+                            <input type="text" class="form-input" placeholder="0x...">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Contribution Type</label>
+                            <select class="form-input">
+                                <option>Code Contribution</option>
+                                <option>Security Fix</option>
+                                <option>Documentation</option>
+                                <option>Proposal</option>
+                                <option>Testing</option>
+                            </select>
+                        </div>
+                        
+                        <button class="verify-btn">
+                            <i class="fas fa-check-circle"></i> Verify Proof
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="verification-card">
+                    <div class="verification-header">
+                        <i class="fas fa-trophy verification-icon"></i>
+                        <div class="verification-title">My Builder Stats</div>
+                    </div>
+                    
+                    <div class="builder-grid">
+                        <div class="builder-item">
+                            <div class="builder-icon">
+                                <i class="fas fa-medal"></i>
+                            </div>
+                            <div class="builder-stat">42</div>
+                            <div class="builder-label">Contributions</div>
+                        </div>
+                        
+                        <div class="builder-item">
+                            <div class="builder-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="builder-stat">5,280</div>
+                            <div class="builder-label">POB Points</div>
+                        </div>
+                        
+                        <div class="builder-item">
+                            <div class="builder-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="builder-stat">98%</div>
+                            <div class="builder-label">Success Rate</div>
+                        </div>
+                        
+                        <div class="builder-item">
+                            <div class="builder-icon">
+                                <i class="fas fa-ranking-star"></i>
+                            </div>
+                            <div class="builder-stat">#27</div>
+                            <div class="builder-label">Leaderboard</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Proof of Builder - Bitcoin-StarkNet Bridge v1.2.0 | Building the future of cross-chain interoperability</p>
+            <p>© 2023 Blockchain Bridge Technologies. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize syntax highlighting
+        hljs.highlightAll();
+        
+        // Simulate live data updates
+        function updateData() {
+            // Update connection nodes with random data to simulate live changes
+            const connections = document.querySelectorAll('.connection-node .node-value');
+            connections[0].textContent = (parseInt(connections[0].textContent) + Math.floor(Math.random() * 5)).toLocaleString();
+            connections[1].textContent = (parseInt(connections[1].textContent) + Math.floor(Math.random() * 2)).toLocaleString();
+            
+            // Update stats with random data
+            const stats = document.querySelectorAll('.stat');
+            stats[0].textContent = (parseInt(stats[0].textContent.replace(/,/g, '')) + Math.floor(Math.random() * 3)).toLocaleString();
+            stats[1].textContent = (parseInt(stats[1].textContent) + Math.floor(Math.random() * 1));
+            
+            // Add new contribution occasionally
+            if (Math.random() > 0.7) {
+                const contributionList = document.querySelector('.contributions-list');
+                const newContribution = document.querySelector('.contribution-item').cloneNode(true);
+                
+                // Randomize contribution type
+                const types = [
+                    {icon: 'code', title: 'Optimized bridge transaction', desc: 'Improved efficiency of cross-chain transfers', value: '+110 POB'},
+                    {icon: 'bug', title: 'Fixed security vulnerability', desc: 'Patched critical issue in smart contract', value: '+225 POB'},
+                    {icon: 'book', title: 'Updated developer documentation', desc: 'Added examples for new API endpoints', value: '+85 POB'},
+                    {icon: 'lightbulb', title: 'Submitted improvement proposal', desc: 'Proposed new feature for governance', value: '+150 POB'}
+                ];
+                
+                const type = types[Math.floor(Math.random() * types.length)];
+                
+                newContribution.querySelector('.contribution-icon i').className = `fas fa-${type.icon}`;
+                newContribution.querySelector('.contribution-title').textContent = type.title;
+                newContribution.querySelector('.contribution-desc').textContent = type.desc;
+                newContribution.querySelector('.contribution-value').textContent = type.value;
+                newContribution.querySelector('.contribution-time').textContent = 'Verified just now';
+                
+                contributionList.prepend(newContribution);
+                
+                // Show animation for new contribution
+                newContribution.style.opacity = '0';
+                newContribution.style.transform = 'translateY(-20px)';
+                
+                setTimeout(() => {
+                    newContribution.style.transition = 'all 0.5s ease';
+                    newContribution.style.opacity = '1';
+                    newContribution.style.transform = 'translateY(0)';
+                }, 100);
+            }
+        }
+        
+        // Update data every 8 seconds
+        setInterval(updateData, 8000);
+        
+        // Add interactivity to tabs
+        const tabs = document.querySelectorAll('.builder-tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+        
+        // Add verification form submission
+        const verifyBtn = document.querySelector('.verify-btn');
+        verifyBtn.addEventListener('click', () => {
+            verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+            
+            setTimeout(() => {
+                verifyBtn.innerHTML = '<i class="fas fa-check-circle"></i> Verified!';
+                verifyBtn.style.background = 'linear-gradient(90deg, var(--success), var(--success))';
+                
+                setTimeout(() => {
+                    verifyBtn.innerHTML = '<i class="fas fa-check-circle"></i> Verify Proof';
+                    verifyBtn.style.background = 'linear-gradient(90deg, var(--builder-primary), var(--builder-secondary))';
+                }, 2000);
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

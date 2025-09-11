@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Authentication | Bitcoin-StarkNet Bridge</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --primary-light: #8b5cf6;
+            --secondary: #10b981;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f9fafb;
+            --gray: #94a3b8;
+            --dark-gray: #4b5563;
+            --light-gray: #f3f4f6;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bitcoin: #f7931a;
+            --starknet: #7c3aed;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker) 0%, #1e293b 100%);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* Header */
+        .app-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .app-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .app-logo-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+        }
+        
+        .app-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .app-subtitle {
+            color: var(--gray);
+            font-size: 1rem;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        /* Wallet Auth Container */
+        .wallet-auth {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .wallet-auth::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(124, 58, 237, 0.1) 0%, transparent 70%);
+            opacity: 0.5;
+            animation: rotate 20s linear infinite;
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .wallet-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(16, 185, 129, 0.2));
+            border: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            color: var(--primary);
+            font-size: 2rem;
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+        }
+        
+        .auth-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: white;
+        }
+        
+        .auth-subtitle {
+            color: var(--gray);
+            font-size: 0.95rem;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        /* Setup Indicator */
+        .setup-indicator {
+            display: flex;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .setup-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: default;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        /* Auth Methods Tabs */
+        .auth-methods {
+            display: flex;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 14px;
+            padding: 5px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 5px;
+        }
+        
+        .auth-method {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .auth-method:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+        
+        .auth-method.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
+        }
+        
+        .auth-method i {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        
+        /* Auth Content */
+        .auth-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+            padding-left: 5px;
+        }
+        
+        .form-group input {
+            padding: 15px 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+        }
+        
+        .password-input {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .toggle-password:hover {
+            color: var(--primary);
+        }
+        
+        /* Pattern Grid */
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 15px 0;
+        }
+        
+        .pattern-dot {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pattern-dot.active {
+            background: var(--primary);
+            border-color: var(--primary-light);
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+        }
+        
+        .pattern-instructions {
+            text-align: center;
+            color: var(--gray);
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        /* Biometric Auth */
+        .biometric-auth {
+            text-align: center;
+            margin: 25px 0;
+        }
+        
+        .biometric-icon {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: pulse 2s infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .fingerprint {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1));
+            border: 2px solid var(--secondary);
+            color: var(--secondary);
+        }
+        
+        .face-id {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1));
+            border: 2px solid var(--info);
+            color: var(--info);
+        }
+        
+        .biometric-label {
+            color: var(--gray);
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+        
+        /* Auth Button */
+        .auth-button {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+            margin-top: 10px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .auth-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+        }
+        
+        .auth-button:hover::before {
+            left: 100%;
+        }
+        
+        .auth-button:disabled {
+            background: var(--dark-gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .auth-button:disabled:hover::before {
+            left: -100%;
+        }
+        
+        /* Footer */
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .auth-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 600;
+        }
+        
+        .auth-footer a:hover {
+            color: var(--primary-light);
+            text-decoration: underline;
+        }
+        
+        /* Dashboard Styles */
+        .wallet-dashboard {
+            display: none;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .dashboard-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .lock-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--gray);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .lock-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .wallet-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .wallet-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .wallet-card-title {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .wallet-card-value {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .wallet-card-currency {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .action-button {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .action-button.send {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+        }
+        
+        .action-button.receive {
+            background: linear-gradient(135deg, var(--secondary), #059669);
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+        }
+        
+        .recent-transactions {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .transaction-list {
+            list-style: none;
+        }
+        
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .transaction-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(124, 58, 237, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1rem;
+        }
+        
+        .transaction-details h4 {
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+        
+        .transaction-details p {
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+        
+        .transaction-amount {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .transaction-amount.positive {
+            color: var(--secondary);
+        }
+        
+        .transaction-amount.negative {
+            color: var(--danger);
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(124, 58, 237, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .shake {
+            animation: shake 0.5s;
+        }
+        
+        /* Success Animation */
+        .success-checkmark {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .check-icon {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            border-radius: 50%;
+            box-sizing: content-box;
+            margin: 0 auto;
+            opacity: 0;
+            transform: scale(0.5);
+            animation: checkmark-appear 0.5s forwards;
+        }
+        
+        .check-icon .icon-line {
+            height: 5px;
+            background-color: var(--secondary);
+            display: block;
+            border-radius: 2px;
+            position: absolute;
+            z-index: 10;
+            transform-origin: left;
+        }
+        
+        .check-icon .icon-line.line-tip {
+            top: 46px;
+            left: 14px;
+            width: 25px;
+            transform: rotate(45deg);
+            animation: icon-line-tip 0.5s forwards;
+        }
+        
+        .check-icon .icon-line.line-long {
+            top: 38px;
+            right: 8px;
+            width: 47px;
+            transform: rotate(-45deg);
+            animation: icon-line-long 0.5s forwards;
+            animation-delay: 0.2s;
+        }
+        
+        .check-icon .icon-circle {
+            top: -4px;
+            left: -4px;
+            z-index: 10;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            position: absolute;
+            box-sizing: content-box;
+            border: 4px solid var(--secondary);
+            transform: scale(0);
+            animation: icon-circle 0.5s forwards;
+            animation-delay: 0.4s;
+        }
+        
+        /* Dashboard Preview */
+        .dashboard-preview {
+            display: none;
+            text-align: center;
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            animation: fadeIn 0.5s forwards;
+        }
+        
+        .dashboard-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+        }
+        
+        .dashboard-preview h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+        
+        .dashboard-preview p {
+            color: var(--gray);
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+        
+        /* Checkmark animations */
+        @keyframes checkmark-appear {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes icon-line-tip {
+            0% { width: 0; left: 1px; top: 38px; }
+            100% { width: 25px; left: 14px; top: 46px; }
+        }
+        
+        @keyframes icon-line-long {
+            0% { width: 0; right: 26px; top: 30px; }
+            100% { width: 47px; right: 8px; top: 38px; }
+        }
+        
+        @keyframes icon-circle {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(0.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 500px) {
+            .wallet-auth {
+                padding: 25px 20px;
+            }
+            
+            .wallet-logo {
+                width: 70px;
+                height: 70px;
+                font-size: 1.8rem;
+            }
+            
+            .auth-title {
+                font-size: 1.4rem;
+            }
+            
+            .auth-method {
+                padding: 10px 5px;
+                font-size: 0.8rem;
+            }
+            
+            .auth-method i {
+                font-size: 1rem;
+            }
+            
+            .pattern-grid {
+                gap: 10px;
+            }
+            
+            .biometric-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 1.8rem;
+            }
+            
+            .form-group input {
+                padding: 13px 15px;
+            }
+            
+            .wallet-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="app-header">
+            <div class="app-logo">
+                <div class="app-logo-icon">
+                    <i class="fas fa-link"></i>
+                </div>
+                <h1 class="app-title">Bitcoin-StarkNet Bridge</h1>
+            </div>
+            <p class="app-subtitle">Secure cross-chain transactions between Bitcoin and StarkNet</p>
+        </div>
+        
+        <!-- Authentication Interface -->
+        <div class="wallet-auth" id="authInterface">
+            <div class="auth-header">
+                <div class="wallet-logo">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <h1 class="auth-title" id="authTitle">Set Up Wallet Security</h1>
+                <p class="auth-subtitle" id="authSubtitle">Choose your preferred authentication method</p>
+            </div>
+            
+            <div class="setup-indicator">
+                <div class="setup-tab" id="setupIndicator">
+                    Setup Mode: Creating New Authentication
+                </div>
+            </div>
+            
+            <div class="auth-methods">
+                <div class="auth-method active" data-method="password">
+                    <i class="fas fa-key"></i>
+                    <span>Password</span>
+                </div>
+                <div class="auth-method" data-method="pattern">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Pattern</span>
+                </div>
+                <div class="auth-method" data-method="fingerprint">
+                    <i class="fas fa-fingerprint"></i>
+                    <span>Fingerprint</span>
+                </div>
+                <div class="auth-method" data-method="faceid">
+                    <i class="fas fa-user-check"></i>
+                    <span>Face ID</span>
+                </div>
+            </div>
+            
+            <div class="auth-content">
+                <!-- Password Auth -->
+                <div class="auth-form" id="passwordAuth">
+                    <div class="form-group">
+                        <label for="password" id="passwordLabel">Create Password</label>
+                        <div class="password-input">
+                            <input type="password" id="password" placeholder="Enter your password" required>
+                            <button type="button" class="toggle-password" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group" id="confirmPasswordGroup">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <div class="password-input">
+                            <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+                            <button type="button" class="toggle-password" id="toggleConfirmPassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="auth-button" id="passwordButton">
+                        <i class="fas fa-lock"></i> <span id="passwordButtonText">Set Password</span>
+                    </button>
+                </div>
+                
+                <!-- Pattern Auth -->
+                <div class="auth-form" id="patternAuth" style="display: none;">
+                    <div class="pattern-instructions" id="patternInstruction">
+                        Draw your pattern to secure your wallet
+                    </div>
+                    <div class="pattern-grid">
+                        <div class="pattern-dot" data-dot="1"></div>
+                        <div class="pattern-dot" data-dot="2"></div>
+                        <div class="pattern-dot" data-dot="3"></div>
+                        <div class="pattern-dot" data-dot="4"></div>
+                        <div class="pattern-dot" data-dot="5"></div>
+                        <div class="pattern-dot" data-dot="6"></div>
+                        <div class="pattern-dot" data-dot="7"></div>
+                        <div class="pattern-dot" data-dot="8"></div>
+                        <div class="pattern-dot" data-dot="9"></div>
+                    </div>
+                    <div class="pattern-instructions" id="patternStatus">
+                        Connect at least 4 dots
+                    </div>
+                    <div class="pattern-instructions">
+                        <button class="auth-button" id="resetPatternButton" style="background: rgba(255, 255, 255, 0.1); color: var(--gray);">
+                            <i class="fas fa-redo"></i> Reset Pattern
+                        </button>
+                    </div>
+                    <button class="auth-button" id="patternButton" disabled>
+                        <i class="fas fa-lock"></i> <span id="patternButtonText">Set Pattern</span>
+                    </button>
+                </div>
+                
+                <!-- Fingerprint Auth -->
+                <div class="auth-form" id="fingerprintAuth" style="display: none;">
+                    <div class="biometric-auth">
+                        <div class="biometric-label" id="fingerprintLabel">Register your fingerprint</div>
+                        <div class="biometric-icon fingerprint" id="fingerprintButton">
+                            <i class="fas fa-fingerprint"></i>
+                        </div>
+                        <div class="biometric-label">or <a href="#" class="switch-method" data-method="password">use password</a></div>
+                    </div>
+                </div>
+                
+                <!-- Face ID Auth -->
+                <div class="auth-form" id="faceidAuth" style="display: none;">
+                    <div class="biometric-auth">
+                        <div class="biometric-label" id="faceidLabel">Register Face ID</div>
+                        <div class="biometric-icon face-id" id="faceidButton">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="biometric-label">or <a href="#" class="switch-method" data-method="password">use password</a></div>
+                    </div>
+                </div>
+                
+                <!-- Success Animation -->
+                <div class="success-checkmark" id="successCheckmark">
+                    <div class="check-icon">
+                        <span class="icon-line line-tip"></span>
+                        <span class="icon-line line-long"></span>
+                        <div class="icon-circle"></div>
+                    </div>
+                    <p id="successMessage">Authentication set up successfully!</p>
+                </div>
+                
+                <!-- Dashboard Preview -->
+                <div class="dashboard-preview" id="dashboardPreview">
+                    <div class="dashboard-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <h3>Wallet Ready!</h3>
+                    <p>Your wallet is now secured. Next time you need to unlock it with your authentication method.</p>
+                    <button class="auth-button" id="lockWalletButton">
+                        <i class="fas fa-lock"></i> Lock Wallet Now
+                    </button>
+                </div>
+            </div>
+            
+            <div class="auth-footer">
+                <p id="authFooter">Having trouble? <a href="#" id="resetAuth">Reset authentication method</a></p>
+            </div>
+        </div>
+        
+    <script>
+        // DOM Elements
+        const authInterface = document.getElementById('authInterface');
+        const walletDashboard = document.getElementById('walletDashboard');
+        const authTitle = document.getElementById('authTitle');
+        const authSubtitle = document.getElementById('authSubtitle');
+        const setupIndicator = document.getElementById('setupIndicator');
+        const authMethods = document.querySelectorAll('.auth-method');
+        const passwordAuth = document.getElementById('passwordAuth');
+        const patternAuth = document.getElementById('patternAuth');
+        const fingerprintAuth = document.getElementById('fingerprintAuth');
+        const faceidAuth = document.getElementById('faceidAuth');
+        const togglePassword = document.getElementById('togglePassword');
+        const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+        const passwordInput = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirmPassword');
+        const passwordLabel = document.getElementById('passwordLabel');
+        const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
+        const passwordButton = document.getElementById('passwordButton');
+        const passwordButtonText = document.getElementById('passwordButtonText');
+        const patternButton = document.getElementById('patternButton');
+        const patternButtonText = document.getElementById('patternButtonText');
+        const patternInstruction = document.getElementById('patternInstruction');
+        const resetPatternButton = document.getElementById('resetPatternButton');
+        const patternDots = document.querySelectorAll('.pattern-dot');
+        const patternStatus = document.getElementById('patternStatus');
+        const fingerprintButton = document.getElementById('fingerprintButton');
+        const fingerprintLabel = document.getElementById('fingerprintLabel');
+        const faceidButton = document.getElementById('faceidButton');
+        const faceidLabel = document.getElementById('faceidLabel');
+        const successCheckmark = document.getElementById('successCheckmark');
+        const successMessage = document.getElementById('successMessage');
+        const dashboardPreview = document.getElementById('dashboardPreview');
+        const lockWalletButton = document.getElementById('lockWalletButton');
+        const authFooter = document.getElementById('authFooter');
+        const resetAuth = document.getElementById('resetAuth');
+        const switchMethods = document.querySelectorAll('.switch-method');
+        const lockDashboardButton = document.getElementById('lockDashboardButton');
+
+        // State variables
+        let currentMethod = 'password';
+        let patternSequence = [];
+        let isSetupMode = true; // Track if we're in setup mode or unlock mode
+        let authConfigured = false; // Track if authentication is configured
+        let isAuthenticating = false; // Track if authentication is in progress
+
+        // Initialize the authentication interface
+        function init() {
+            // Check if we have authentication configured in localStorage
+            const authMethod = localStorage.getItem('walletAuthMethod');
+            
+            if (authMethod) {
+                // We have authentication configured, switch to unlock mode
+                switchToUnlockMode(authMethod);
+            } else {
+                // No authentication configured, stay in setup mode
+                setupIndicator.textContent = "Setup Mode: Creating New Authentication";
+            }
+            
+            setupEventListeners();
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Auth method tabs
+            authMethods.forEach(method => {
+                method.addEventListener('click', () => {
+                    const methodName = method.dataset.method;
+                    switchAuthMethod(methodName);
+                });
+            });
+            
+            // Toggle password visibility
+            togglePassword.addEventListener('click', () => {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    togglePassword.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                } else {
+                    passwordInput.type = 'password';
+                    togglePassword.innerHTML = '<i class="fas fa-eye"></i>';
+                }
+            });
+            
+            toggleConfirmPassword.addEventListener('click', () => {
+                if (confirmPassword.type === 'password') {
+                    confirmPassword.type = 'text';
+                    toggleConfirmPassword.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                } else {
+                    confirmPassword.type = 'password';
+                    toggleConfirmPassword.innerHTML = '<i class="fas fa-eye"></i>';
+                }
+            });
+            
+            // Password form submission
+            passwordButton.addEventListener('click', handlePasswordAction);
+            passwordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handlePasswordAction();
+                }
+            });
+            
+            confirmPassword.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handlePasswordAction();
+                }
+            });
+            
+            // Pattern dots
+            patternDots.forEach(dot => {
+                dot.addEventListener('click', handlePatternDotClick);
+            });
+            
+            // Reset pattern button
+            resetPatternButton.addEventListener('click', resetPattern);
+            
+            // Pattern form submission
+            patternButton.addEventListener('click', handlePatternAction);
+            
+            // Biometric authentication
+            fingerprintButton.addEventListener('click', handleFingerprintAction);
+            faceidButton.addEventListener('click', handleFaceIDAction);
+            
+            // Switch method links
+            switchMethods.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchAuthMethod(link.dataset.method);
+                });
+            });
+            
+            // Lock wallet button
+            lockWalletButton.addEventListener('click', lockWallet);
+            
+            // Lock dashboard button
+            lockDashboardButton.addEventListener('click', lockWallet);
+            
+            // Reset auth link
+            resetAuth.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm("Are you sure you want to reset your authentication method? This will require setting up a new authentication method.")) {
+                    resetAuthentication();
+                }
+            });
+        }
+
+        // Switch to unlock mode
+        function switchToUnlockMode(method) {
+            isSetupMode = false;
+            authConfigured = true;
+            currentMethod = method;
+            
+            // Update UI for unlock mode
+            authTitle.textContent = "Unlock Your Wallet";
+            authSubtitle.textContent = "Authenticate to access your wallet";
+            setupIndicator.textContent = "Unlock Mode: Authentication Required";
+            
+            // Update method buttons for unlock mode
+            passwordButtonText.textContent = "Unlock Wallet";
+            patternButtonText.textContent = "Unlock Wallet";
+            fingerprintLabel.textContent = "Tap to authenticate with fingerprint";
+            faceidLabel.textContent = "Authenticate with Face ID";
+            
+            // Hide confirm password field in unlock mode
+            confirmPasswordGroup.style.display = 'none';
+            passwordLabel.textContent = "Enter Password";
+            
+            // Activate the configured method
+            authMethods.forEach(m => {
+                if (m.dataset.method === method) {
+                    m.classList.add('active');
+                } else {
+                    m.classList.remove('active');
+                }
+            });
+            
+            // Show the configured auth method
+            switchAuthMethod(method);
+        }
+
+        // Switch authentication method
+        function switchAuthMethod(method) {
+            // Update active tab
+            authMethods.forEach(m => {
+                if (m.dataset.method === method) {
+                    m.classList.add('active');
+                } else {
+                    m.classList.remove('active');
+                }
+            });
+            
+            // Show appropriate auth form
+            passwordAuth.style.display = method === 'password' ? 'flex' : 'none';
+            patternAuth.style.display = method === 'pattern' ? 'flex' : 'none';
+            fingerprintAuth.style.display = method === 'fingerprint' ? 'flex' : 'none';
+            faceidAuth.style.display = method === 'faceid' ? 'flex' : 'none';
+            
+            // Reset pattern
+            if (method !== 'pattern') {
+                resetPattern();
+            }
+            
+            // Update current method
+            currentMethod = method;
+        }
+
+        // Handle pattern dot click
+        function handlePatternDotClick() {
+            if (isAuthenticating) return;
+            
+            const dotNumber = this.dataset.dot;
+            if (!patternSequence.includes(dotNumber)) {
+                patternSequence.push(dotNumber);
+                this.classList.add('active');
+                
+                // Update status
+                patternStatus.textContent = `Pattern length: ${patternSequence.length}`;
+                
+                // Enable button if pattern is long enough
+                patternButton.disabled = patternSequence.length < 4;
+            }
+        }
+
+        // Reset pattern
+        function resetPattern() {
+            patternSequence = [];
+            patternDots.forEach(dot => dot.classList.remove('active'));
+            patternStatus.textContent = 'Connect at least 4 dots';
+            patternButton.disabled = true;
+        }
+
+        // Handle password action (setup or unlock)
+        function handlePasswordAction() {
+            if (isAuthenticating) return;
+            
+            const password = passwordInput.value.trim();
+            
+            if (!password) {
+                showError(passwordInput, 'Please enter your password');
+                return;
+            }
+            
+            if (isSetupMode) {
+                // In setup mode, check if passwords match
+                const confirm = confirmPassword.value.trim();
+                if (password !== confirm) {
+                    showError(confirmPassword, 'Passwords do not match');
+                    return;
+                }
+                
+                // Save password and switch to unlock mode
+                localStorage.setItem('walletAuthMethod', 'password');
+                localStorage.setItem('walletPassword', password);
+                completeSetup('password');
+            } else {
+                // In unlock mode, verify password
+                const savedPassword = localStorage.getItem('walletPassword');
+                if (password === savedPassword) {
+                    unlockWallet();
+                } else {
+                    showError(passwordInput, 'Incorrect password');
+                }
+            }
+        }
+
+        // Handle pattern action (setup or unlock)
+        function handlePatternAction() {
+            if (isAuthenticating || patternSequence.length < 4) return;
+            
+            if (isSetupMode) {
+                // In setup mode, save pattern
+                localStorage.setItem('walletAuthMethod', 'pattern');
+                localStorage.setItem('walletPattern', patternSequence.join(''));
+                completeSetup('pattern');
+            } else {
+                // In unlock mode, verify pattern
+                const savedPattern = localStorage.getItem('walletPattern');
+                if (patternSequence.join('') === savedPattern) {
+                    unlockWallet();
+                } else {
+                    showError(patternStatus, 'Incorrect pattern');
+                    resetPattern();
+                }
+            }
+        }
+
+        // Handle fingerprint action (setup or unlock)
+        function handleFingerprintAction() {
+            if (isAuthenticating) return;
+            
+            if (isSetupMode) {
+                // In setup mode, simulate fingerprint registration
+                simulateBiometricSetup('fingerprint');
+            } else {
+                // In unlock mode, simulate fingerprint authentication
+                simulateBiometricAuth('fingerprint');
+            }
+        }
+
+        // Handle Face ID action (setup or unlock)
+        function handleFaceIDAction() {
+            if (isAuthenticating) return;
+            
+            if (isSetupMode) {
+                // In setup mode, simulate Face ID registration
+                simulateBiometricSetup('faceid');
+            } else {
+                // In unlock mode, simulate Face ID authentication
+                simulateBiometricAuth('faceid');
+            }
+        }
+
+        // Simulate biometric setup
+        function simulateBiometricSetup(method) {
+            isAuthenticating = true;
+            
+            // Add active class for visual feedback
+            const button = method === 'fingerprint' ? fingerprintButton : faceidButton;
+            button.classList.add('active');
+            
+            // Simulate biometric registration process
+            setTimeout(() => {
+                // Save biometric method
+                localStorage.setItem('walletAuthMethod', method);
+                completeSetup(method);
+                
+                // Remove active class after animation
+                button.classList.remove('active');
+                isAuthenticating = false;
+            }, 2000);
+        }
+
+        // Simulate biometric authentication
+        function simulateBiometricAuth(method) {
+            isAuthenticating = true;
+            
+            // Add active class for visual feedback
+            const button = method === 'fingerprint' ? fingerprintButton : faceidButton;
+            button.classList.add('active');
+            
+            // Simulate biometric authentication process
+            setTimeout(() => {
+                // For demo purposes, we'll always succeed
+                unlockWallet();
+                
+                // Remove active class after animation
+                button.classList.remove('active');
+                isAuthenticating = false;
+            }, 2000);
+        }
+
+        // Complete setup process
+        function completeSetup(method) {
+            authConfigured = true;
+
+            // Hide auth forms and show success animation
+            passwordAuth.style.display = 'none';
+            patternAuth.style.display = 'none';
+            fingerprintAuth.style.display = 'none';
+            faceidAuth.style.display = 'none';
+            successCheckmark.style.display = 'block';
+            successMessage.textContent = `${method.charAt(0).toUpperCase() + method.slice(1)} set up successfully! Redirecting to dashboard...`;
+
+            // Redirect to wallet dashboard after delay
+            setTimeout(() => {
+                window.location.href = 'Wallet.html';
+            }, 2000);
+        }
+
+        // Unlock wallet and redirect to dashboard
+        function unlockWallet() {
+            isAuthenticating = true;
+
+            // Hide auth forms and show success animation
+            passwordAuth.style.display = 'none';
+            patternAuth.style.display = 'none';
+            fingerprintAuth.style.display = 'none';
+            faceidAuth.style.display = 'none';
+            successCheckmark.style.display = 'block';
+            successMessage.textContent = "Authentication successful! Redirecting to dashboard...";
+
+            // Simulate unlocking delay then redirect
+            setTimeout(() => {
+                // Redirect to wallet dashboard page
+                window.location.href = 'Wallet.html';
+            }, 1500);
+        }
+
+        // Lock wallet and return to authentication
+        function lockWallet() {
+            // Hide dashboard and show authentication interface
+            walletDashboard.style.display = 'none';
+            authInterface.style.display = 'block';
+            
+            // Switch back to unlock mode
+            switchToUnlockMode(localStorage.getItem('walletAuthMethod'));
+            dashboardPreview.style.display = 'none';
+            
+            // Reset forms
+            passwordInput.value = '';
+            confirmPassword.value = '';
+            resetPattern();
+        }
+
+        // Reset authentication
+        function resetAuthentication() {
+            // Clear stored authentication data
+            localStorage.removeItem('walletAuthMethod');
+            localStorage.removeItem('walletPassword');
+            localStorage.removeItem('walletPattern');
+            
+            // Reset to setup mode
+            isSetupMode = true;
+            authConfigured = false;
+            
+            // Update UI for setup mode
+            authTitle.textContent = "Set Up Wallet Security";
+            authSubtitle.textContent = "Choose your preferred authentication method";
+            setupIndicator.textContent = "Setup Mode: Creating New Authentication";
+            
+            // Update method buttons for setup mode
+            passwordButtonText.textContent = "Set Password";
+            patternButtonText.textContent = "Set Pattern";
+            fingerprintLabel.textContent = "Register your fingerprint";
+            faceidLabel.textContent = "Register Face ID";
+            
+            // Show confirm password field in setup mode
+            confirmPasswordGroup.style.display = 'flex';
+            passwordLabel.textContent = "Create Password";
+            
+            // Reset forms
+            passwordInput.value = '';
+            confirmPassword.value = '';
+            resetPattern();
+            
+            // Show password auth by default
+            switchAuthMethod('password');
+            
+            // Hide dashboard preview
+            dashboardPreview.style.display = 'none';
+        }
+
+        // Show error for form field
+        function showError(field, message) {
+            // Add shake animation
+            field.classList.add('shake');
+            
+            // Show error message (in a real app)
+            if (field === patternStatus) {
+                patternStatus.textContent = message;
+                patternStatus.style.color = 'var(--danger)';
+            } else {
+                field.placeholder = message;
+                field.style.borderColor = 'var(--danger)';
+            }
+            
+            // Remove shake animation after delay
+            setTimeout(() => {
+                field.classList.remove('shake');
+                if (field !== patternStatus) {
+                    field.style.borderColor = '';
+                }
+            }, 500);
+        }
+
+        // Initialize the authentication interface
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin-Starknet Bridge | Receive Dashboard</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #00d2ff;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            color: #00d2ff;
+        }
+        
+        .dashboard-title {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 968px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #00d2ff;
+        }
+        
+        .card-icon {
+            font-size: 1.8rem;
+            color: #00d2ff;
+        }
+        
+        .network-selector {
+            display: flex;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .network-option {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .network-option.active {
+            background: rgba(0, 210, 255, 0.2);
+        }
+        
+        .bitcoin {
+            color: #f2a900;
+        }
+        
+        .starknet {
+            color: #ff2c6e;
+        }
+        
+        .address-card {
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .qr-container {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .qr-placeholder {
+            width: 170px;
+            height: 170px;
+            background: conic-gradient(at 50% 50%, #0f2027 0% 25%, #00d2ff 25% 50%, #0f2027 50% 75%, #3a7bd5 75% 100%);
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .qr-placeholder::before, .qr-placeholder::after {
+            content: '';
+            position: absolute;
+            background: #0f2027;
+            border-radius: 4px;
+        }
+        
+        .qr-placeholder::before {
+            width: 40px;
+            height: 40px;
+            top: 0;
+            left: 0;
+        }
+        
+        .qr-placeholder::after {
+            width: 40px;
+            height: 40px;
+            bottom: 0;
+            right: 0;
+        }
+        
+        .address-display {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .address-value {
+            font-family: monospace;
+            word-break: break-all;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #00d2ff;
+        }
+        
+        .address-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .action-btn {
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: rgba(0, 210, 255, 0.2);
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #00d2ff;
+            color: #00d2ff;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.3);
+        }
+        
+        .receive-info {
+            margin-top: 30px;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 210, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00d2ff;
+            font-size: 1.2rem;
+        }
+        
+        .info-content {
+            flex: 1;
+        }
+        
+        .info-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #00d2ff;
+        }
+        
+        .info-description {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .incoming-transactions {
+            margin-top: 30px;
+        }
+        
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .transaction-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(76, 175, 80, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4caf50;
+        }
+        
+        .transaction-info {
+            flex: 1;
+        }
+        
+        .transaction-amount {
+            font-weight: 600;
+            color: #4caf50;
+        }
+        
+        .transaction-date {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .transaction-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-confirmed {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .status-pending {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+        }
+        
+        .share-options {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .share-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+        
+        .share-btn:hover {
+            background: rgba(0, 210, 255, 0.2);
+        }
+        
+        .bridge-visual {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+        }
+        
+        .chain {
+            text-align: center;
+            padding: 15px;
+            flex: 1;
+        }
+        
+        .chain-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .bridge-arrow {
+            font-size: 2rem;
+            color: #00d2ff;
+            padding: 0 15px;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: rgba(0, 0, 0, 0.7);
+            border-left: 4px solid #00d2ff;
+            border-radius: 5px;
+            display: none;
+            animation: slideIn 0.3s forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 30px 0;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            nav ul {
+                gap: 15px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .network-selector {
+                flex-direction: column;
+            }
+            
+            .address-actions, .share-options {
+                flex-wrap: wrap;
+            }
+            
+            .qr-container {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .qr-placeholder {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-qrcode"></i></div>
+                <div class="logo-text">Bitcoin-Starknet Bridge</div>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="../Bitstark/Wallet.html">Dashboard</a></li>
+                    <li><a href="../Wallet/Send.html">Send</a></li>
+                    <li><a href="#" class="active">Receive</a></li>
+                    <li><a href="../Wallet/Swap.html">Swap</a></li>
+                    <li><a href="../Wallet/History.html">History</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <h1 class="dashboard-title">Receive Assets</h1>
+        <p class="subtitle">Generate addresses to receive assets on Bitcoin or Starknet networks</p>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Receive Address</h2>
+                    <div class="card-icon"><i class="fa-solid fa-wallet"></i></div>
+                </div>
+                
+                <div class="network-selector">
+                    <div class="network-option active" data-network="bitcoin">
+                        <i class="fab fa-bitcoin bitcoin"></i> Bitcoin
+                    </div>
+                    <div class="network-option" data-network="starknet">
+                        <i class="fa-solid fa-link starknet"></i> Starknet
+                    </div>
+                </div>
+                
+                <div class="address-card">
+                    <div class="qr-container">
+                        <div class="qr-placeholder"></div>
+                    </div>
+                    
+                    <div class="address-display">
+                        <div class="address-value" id="addressValue">bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq</div>
+                        
+                        <div class="address-actions">
+                            <button class="action-btn" id="copyAddressBtn">
+                                <i class="fas fa-copy"></i> Copy Address
+                            </button>
+                            <button class="action-btn" id="saveQrBtn">
+                                <i class="fas fa-download"></i> Save QR Code
+                            </button>
+                            <button class="action-btn" id="newAddressBtn">
+                                <i class="fas fa-refresh"></i> New Address
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="share-options">
+                        <button class="share-btn">
+                            <i class="fab fa-whatsapp"></i>
+                        </button>
+                        <button class="share-btn">
+                            <i class="fab fa-telegram"></i>
+                        </button>
+                        <button class="share-btn">
+                            <i class="fas fa-envelope"></i>
+                        </button>
+                        <button class="share-btn">
+                            <i class="fas fa-sms"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bridge-visual">
+                    <div class="chain">
+                        <div class="chain-icon"><i class="fab fa-bitcoin bitcoin"></i></div>
+                        <h3>Bitcoin</h3>
+                        <p>Mainnet</p>
+                    </div>
+                    
+                    <div class="bridge-arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                    
+                    <div class="chain">
+                        <div class="chain-icon"><i class="fa-solid fa-link starknet"></i></div>
+                        <h3>Starknet</h3>
+                        <p>Layer 2</p>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-eye"></i> View Address on Explorer
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Receive Information</h2>
+                    <div class="card-icon"><i class="fa-solid fa-info-circle"></i></div>
+                </div>
+                
+                <div class="receive-info">
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-title">Security First</div>
+                            <div class="info-description">Always verify the address on your device before sending funds. Double-check the first and last characters.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-title">Network Compatibility</div>
+                            <div class="info-description">Ensure you're sending from a compatible network. Bitcoin to Bitcoin, Starknet to Starknet.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-title">Important Notice</div>
+                            <div class="info-description">Do not send other cryptocurrencies to this address. Only send BTC to Bitcoin addresses and STRK to Starknet addresses.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="incoming-transactions">
+                    <h3 style="margin-bottom: 20px; color: #00d2ff;">Recent Incoming Transactions</h3>
+                    
+                    <div class="transaction-item">
+                        <div class="transaction-details">
+                            <div class="transaction-icon">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            <div class="transaction-info">
+                                <div class="transaction-amount">+0.125 BTC</div>
+                                <div class="transaction-date">Oct 28, 2023 14:23</div>
+                            </div>
+                        </div>
+                        <div class="transaction-status status-confirmed">Confirmed</div>
+                    </div>
+                    
+                    <div class="transaction-item">
+                        <div class="transaction-details">
+                            <div class="transaction-icon">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            <div class="transaction-info">
+                                <div class="transaction-amount">+1,250.50 STRK</div>
+                                <div class="transaction-date">Oct 27, 2023 09:47</div>
+                            </div>
+                        </div>
+                        <div class="transaction-status status-confirmed">Confirmed</div>
+                    </div>
+                    
+                    <div class="transaction-item">
+                        <div class="transaction-details">
+                            <div class="transaction-icon">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            <div class="transaction-info">
+                                <div class="transaction-amount">+0.500 BTC</div>
+                                <div class="transaction-date">Oct 26, 2023 18:15</div>
+                            </div>
+                        </div>
+                        <div class="transaction-status status-pending">Pending</div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-history"></i> View All Transactions
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notificationText"></span>
+    </div>
+    
+    <footer>
+        <p>© 2025 Bitcoin-Starknet Bridge. All rights reserved. | Security Audit Passed | v2.1.4</p>
+        <p>Always verify addresses before sending. Transactions are irreversible.</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const networkOptions = document.querySelectorAll('.network-option');
+        const addressValue = document.getElementById('addressValue');
+        const copyAddressBtn = document.getElementById('copyAddressBtn');
+        const saveQrBtn = document.getElementById('saveQrBtn');
+        const newAddressBtn = document.getElementById('newAddressBtn');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        
+        // Addresses for different networks
+        const addresses = {
+            bitcoin: [
+                'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq',
+                'bc1q9z4m9s5vner4nj24cnv3xdrp5p6c0v0y3j5g4z',
+                'bc1q3k4j5h6g7f8d9s0a1z2x3c4v5b6n7m8q9w0e1r2t3y4u5i6o7p8'
+            ],
+            starknet: [
+                '0x1234567890abcdef1234567890abcdef1234567890abcdef',
+                '0xabcdef1234567890abcdef1234567890abcdef1234567890',
+                '0x7890abcdef1234567890abcdef1234567890abcdef123456'
+            ]
+        };
+        
+        let currentNetwork = 'bitcoin';
+        let currentAddressIndex = 0;
+        
+        // Initialize the dashboard
+        function init() {
+            setupEventListeners();
+            updateAddressDisplay();
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Network selection
+            networkOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    networkOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    currentNetwork = this.dataset.network;
+                    currentAddressIndex = 0;
+                    updateAddressDisplay();
+                });
+            });
+            
+            // Copy address button
+            copyAddressBtn.addEventListener('click', copyAddressToClipboard);
+            
+            // Save QR button
+            saveQrBtn.addEventListener('click', saveQrCode);
+            
+            // New address button
+            newAddressBtn.addEventListener('click', generateNewAddress);
+            
+            // Share buttons
+            const shareButtons = document.querySelectorAll('.share-btn');
+            shareButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    shareAddress(this.querySelector('i').classList[1]);
+                });
+            });
+        }
+        
+        // Update address display based on current network
+        function updateAddressDisplay() {
+            addressValue.textContent = addresses[currentNetwork][currentAddressIndex];
+            // In a real application, this would also update the QR code
+        }
+        
+        // Copy address to clipboard
+        function copyAddressToClipboard() {
+            navigator.clipboard.writeText(addressValue.textContent)
+                .then(() => {
+                    showNotification('Address copied to clipboard!');
+                })
+                .catch(err => {
+                    showNotification('Failed to copy address', true);
+                    console.error('Failed to copy: ', err);
+                });
+        }
+        
+        // Save QR code
+        function saveQrCode() {
+            // In a real application, this would generate and download a QR code image
+            showNotification('QR code saved to your downloads folder!');
+        }
+        
+        // Generate new address
+        function generateNewAddress() {
+            currentAddressIndex = (currentAddressIndex + 1) % addresses[currentNetwork].length;
+            updateAddressDisplay();
+            showNotification('New address generated successfully!');
+        }
+        
+        // Share address via different platforms
+        function shareAddress(platform) {
+            const address = addressValue.textContent;
+            let message = `My ${currentNetwork} address: ${address}`;
+            
+            // In a real application, this would use proper sharing APIs
+            switch(platform) {
+                case 'fa-whatsapp':
+                    showNotification('Sharing via WhatsApp...');
+                    break;
+                case 'fa-telegram':
+                    showNotification('Sharing via Telegram...');
+                    break;
+                case 'fa-envelope':
+                    showNotification('Sharing via Email...');
+                    break;
+                case 'fa-sms':
+                    showNotification('Sharing via SMS...');
+                    break;
+                default:
+                    showNotification('Sharing address...');
+            }
+        }
+        
+        // Show notification
+        function showNotification(message, isError = false) {
+            notificationText.textContent = message;
+            
+            if (isError) {
+                notification.style.borderLeftColor = '#f44336';
+            } else {
+                notification.style.borderLeftColor = '#00d2ff';
+            }
+            
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Initialize the dashboard
+        init();
+    </script>
+</body>
+</html>

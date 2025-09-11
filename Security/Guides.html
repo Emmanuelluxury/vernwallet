@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin-Starknet Bridge | Guides & Documentation</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #00d2ff;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            color: #00d2ff;
+        }
+        
+        .dashboard-title {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+        
+        .search-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+        
+        .search-input {
+            width: 100%;
+            max-width: 500px;
+            padding: 15px 20px;
+            border-radius: 50px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #00d2ff;
+        }
+        
+        .guide-categories {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .category-btn {
+            padding: 12px 25px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .category-btn:hover, .category-btn.active {
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            transform: translateY(-2px);
+        }
+        
+        .guides-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .guide-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .guide-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .guide-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #00d2ff;
+        }
+        
+        .guide-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #00d2ff;
+        }
+        
+        .guide-description {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        
+        .guide-meta {
+            display: flex;
+            justify-content: space-between;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        
+        .guide-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(0, 210, 255, 0.2);
+            border: 1px solid #00d2ff;
+            color: #00d2ff;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .guide-link:hover {
+            background: #00d2ff;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .resources-section {
+            margin-top: 50px;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: #00d2ff;
+            text-align: center;
+        }
+        
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+        
+        .resource-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .resource-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #00d2ff;
+        }
+        
+        .resource-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .resource-link {
+            color: #00d2ff;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-block;
+            margin-top: 15px;
+        }
+        
+        .resource-link:hover {
+            text-decoration: underline;
+        }
+        
+        .quick-start {
+            background: rgba(0, 210, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 50px;
+            border-left: 5px solid #00d2ff;
+        }
+        
+        .quick-start-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #00d2ff;
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: monospace;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        
+        .code-comment {
+            color: #6a9955;
+        }
+        
+        .code-keyword {
+            color: #569cd6;
+        }
+        
+        .code-string {
+            color: #ce9178;
+        }
+        
+        .step {
+            margin-bottom: 25px;
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #00d2ff;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+            font-weight: 600;
+        }
+        
+        .step-title {
+            display: inline;
+            font-weight: 600;
+            color: #00d2ff;
+        }
+        
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 30px 0;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .guides-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            nav ul {
+                gap: 15px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .guide-categories {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .category-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-book"></i></div>
+                <div class="logo-text">Bitcoin-Starknet Bridge</div>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="../Bitstark/ApiDocs.html">Dashboard</a></li>
+                    <li><a href="../Wallet/Bridge.html">Bridge</a></li>
+                    <li><a href="../Security/ApiStatus.html">API Status</a></li>
+                    <li><a href="#" class="active">Guides</a></li>
+                    <li><a href="../Bitstark/Security.html">Security</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <h1 class="dashboard-title">Developer Guides & Documentation</h1>
+        <p class="subtitle">Learn how to integrate with the Bitcoin-Starknet bridge</p>
+        
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Search guides, tutorials, and documentation...">
+        </div>
+        
+        <div class="guide-categories">
+            <button class="category-btn active">All Guides</button>
+            <button class="category-btn">Getting Started</button>
+            <button class="category-btn">API Reference</button>
+            <button class="category-btn">Webhooks</button>
+            <button class="category-btn">Security</button>
+            <button class="category-btn">Best Practices</button>
+        </div>
+        
+        <div class="quick-start">
+            <h2 class="quick-start-title">Quick Start Guide</h2>
+            
+            <div class="step">
+                <span class="step-number">1</span>
+                <span class="step-title">Install the SDK</span>
+                <div class="code-block">
+                    <span class="code-comment"># Using npm</span><br>
+                    npm install bitcoin-starknet-bridge-sdk<br><br>
+                    
+                    <span class="code-comment"># Using yarn</span><br>
+                    yarn add bitcoin-starknet-bridge-sdk
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">2</span>
+                <span class="step-title">Initialize the Bridge</span>
+                <div class="code-block">
+                    <span class="code-keyword">import</span> { BitcoinStarknetBridge } <span class="code-keyword">from</span> <span class="code-string">'bitcoin-starknet-bridge-sdk'</span>;<br><br>
+                    
+                    <span class="code-keyword">const</span> bridge = <span class="code-keyword">new</span> BitcoinStarknetBridge({<br>
+                    &nbsp;&nbsp;apiKey: <span class="code-string">'your_api_key_here'</span>,<br>
+                    &nbsp;&nbsp;network: <span class="code-string">'mainnet'</span> <span class="code-comment">// or 'testnet'</span><br>
+                    });
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">3</span>
+                <span class="step-title">Bridge Your First Transaction</span>
+                <div class="code-block">
+                    <span class="code-comment">// Bridge Bitcoin to Starknet</span><br>
+                    <span class="code-keyword">const</span> result = <span class="code-keyword">await</span> bridge.deposit({<br>
+                    &nbsp;&nbsp;amount: 0.01, <span class="code-comment">// BTC amount</span><br>
+                    &nbsp;&nbsp;starknetAddress: <span class="code-string">'0x1234...abcd'</span><br>
+                    });<br><br>
+                    
+                    console.log(<span class="code-string">'Transaction ID:'</span>, result.transactionId);
+                </div>
+            </div>
+        </div>
+        
+        <div class="guides-grid">
+            <div class="guide-card">
+                <div class="guide-icon"><i class="fa-solid fa-rocket"></i></div>
+                <h3 class="guide-title">Getting Started with the Bridge</h3>
+                <p class="guide-description">Learn the fundamental concepts and make your first Bitcoin to Starknet transaction with our step-by-step tutorial.</p>
+                <div class="guide-meta">
+                    <span><i class="fa-regular fa-clock"></i> 15 min read</span>
+                    <span><i class="fa-regular fa-user"></i> Beginner</span>
+                </div>
+                <a href="#" class="guide-link">Read Guide</a>
+            </div>
+            
+            <div class="guide-card">
+                <div class="guide-icon"><i class="fa-solid fa-code"></i></div>
+                <h3 class="guide-title">API Integration Guide</h3>
+                <p class="guide-description">Comprehensive guide to integrating with our REST API. Learn about authentication, endpoints, and best practices.</p>
+                <div class="guide-meta">
+                    <span><i class="fa-regular fa-clock"></i> 25 min read</span>
+                    <span><i class="fa-regular fa-user"></i> Intermediate</span>
+                </div>
+                <a href="#" class="guide-link">Read Guide</a>
+            </div>
+            
+            <div class="guide-card">
+                <div class="guide-icon"><i class="fa-solid fa-plug"></i></div>
+                <h3 class="guide-title">Webhooks Implementation</h3>
+                <p class="guide-description">Set up webhooks to receive real-time notifications about bridge transactions and events.</p>
+                <div class="guide-meta">
+                    <span><i class="fa-regular fa-clock"></i> 20 min read</span>
+                    <span><i class="fa-regular fa-user"></i> Intermediate</span>
+                </div>
+                <a href="#" class="guide-link">Read Guide</a>
+            </div>
+            
+            <div class="guide-card">
+                <div class="guide-icon"><i class="fa-solid fa-shield-alt"></i></div>
+                <h3 class="guide-title">Security Best Practices</h3>
+                <p class="guide-description">Learn how to securely implement the bridge in your application and protect user funds.</p>
+                <div class="guide-meta">
+                    <span><i class="fa-regular fa-clock"></i> 18 min read</span>
+                    <span><i class="fa-regular fa-user"></i> Advanced</span>
+                </div>
+                <a href="#" class="guide-link">Read Guide</a>
+            </div>
+            
+            <div class="guide-card">
+                <div class="guide-icon"><i class="fa-solid fa-bolt"></i></div>
+                <h3 class="guide-title">Optimizing Gas Costs</h3>
+                <p class="guide-description">Learn techniques to minimize gas costs when using the Bitcoin-Starknet bridge.</p>
+                <div class="guide-meta">
+                    <span><i class="fa-regular fa-clock"></i> 12 min read</span>
+                    <span><i class="fa-regular fa-user"></i> Intermediate</span>
+                </div>
+                <a href="#" class="guide-link">Read Guide</a>
+            </div>
+            
+            <div class="guide-card">
+                <div class="guide-icon"><i class="fa-solid fa-bug"></i></div>
+                <h3 class="guide-title">Troubleshooting Common Issues</h3>
+                <p class="guide-description">Solutions to common problems developers encounter when integrating with the bridge.</p>
+                <div class="guide-meta">
+                    <span><i class="fa-regular fa-clock"></i> 22 min read</span>
+                    <span><i class="fa-regular fa-user"></i> All Levels</span>
+                </div>
+                <a href="#" class="guide-link">Read Guide</a>
+            </div>
+        </div>
+        
+        <div class="resources-section">
+            <h2 class="section-title">Additional Resources</h2>
+            
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon"><i class="fa-solid fa-book"></i></div>
+                    <h3 class="resource-title">API Reference</h3>
+                    <p>Complete documentation of all API endpoints, parameters, and responses.</p>
+                    <a href="#" class="resource-link">View API Reference →</a>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-icon"><i class="fa-solid fa-download"></i></div>
+                    <h3 class="resource-title">SDK Downloads</h3>
+                    <p>Client libraries available for JavaScript, Python, and other languages.</p>
+                    <a href="#" class="resource-link">Download SDKs →</a>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-icon"><i class="fa-solid fa-vial"></i></div>
+                    <h3 class="resource-title">Testing Guide</h3>
+                    <p>Learn how to test your integration using our testnet environment.</p>
+                    <a href="#" class="resource-link">Read Guide →</a>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-icon"><i class="fa-solid fa-users"></i></div>
+                    <h3 class="resource-title">Community Forum</h3>
+                    <p>Join our developer community to ask questions and share knowledge.</p>
+                    <a href="#" class="resource-link">Join Conversation →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2025 Bitcoin-Starknet Bridge. All rights reserved. | Security Audit Passed | v2.1.4</p>
+        <p>Need help? Contact our support team at support@bitcoin-starknet-bridge.com</p>
+    </footer>
+
+    <script>
+        // Simple search functionality
+        document.querySelector('.search-input').addEventListener('keyup', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const guideCards = document.querySelectorAll('.guide-card');
+            
+            guideCards.forEach(card => {
+                const title = card.querySelector('.guide-title').textContent.toLowerCase();
+                const description = card.querySelector('.guide-description').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+        
+        // Category filter functionality
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                categoryButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                // In a real application, this would filter the guides
+                // For this demo, we'll just simulate it
+                document.querySelector('.search-input').value = this.textContent;
+                document.querySelector('.search-input').dispatchEvent(new Event('keyup'));
+            });
+        });
+        
+        // Simulate code syntax highlighting
+        document.querySelectorAll('.code-block').forEach(block => {
+            const html = block.innerHTML;
+            // This would be replaced with a proper syntax highlighter in a real application
+            block.innerHTML = html;
+        });
+    </script>
+</body>
+</html>

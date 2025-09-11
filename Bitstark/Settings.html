@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings Dashboard - Bitcoin-Starknet Bridge</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8b5cf6; /* Purple for settings */
+            --primary-dark: #7c3aed;
+            --secondary: #1f2937;
+            --dark: #0f172a;
+            --light: #f9fafb;
+            --gray: #9ca3af;
+            --dark-gray: #4b5563;
+            --light-gray: #f3f4f6;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --info: #3b82f6;
+            --bitcoin: #f7931a;
+            --starknet: #7c3aed;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #0f172a;
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 260px;
+            background: rgba(31, 41, 55, 0.8);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(139, 92, 246, 0.2);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: white;
+        }
+        
+        .logo-icon {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--gray);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: rgba(139, 92, 246, 0.1);
+            color: white;
+            border-left-color: var(--primary);
+        }
+        
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .header-title i {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Cards */
+        .card {
+            background: rgba(31, 41, 55, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .card-title i {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.8rem;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+        }
+        
+        .btn-success {
+            background: var(--success);
+        }
+        
+        /* Settings Sections */
+        .settings-section {
+            margin-bottom: 30px;
+        }
+        
+        .settings-section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+        
+        .toggle-text {
+            flex: 1;
+        }
+        
+        .toggle-description {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+        
+        /* API Keys */
+        .api-key-list {
+            margin: 15px 0;
+        }
+        
+        .api-key-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .api-key-info {
+            flex: 1;
+        }
+        
+        .api-key-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .api-key-value {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--gray);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        
+        .api-key-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Security Indicators */
+        .security-indicators {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .security-indicator {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .security-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .security-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+        
+        .security-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                width: 80px;
+            }
+            
+            .nav-item span {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .security-indicators {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <i class="fas fa-cog logo-icon"></i>
+                    <span>Settings</span>
+                </a>
+            </div>
+            
+            <a href="Dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            
+            <a href="#" class="nav-item active">
+                <i class="fas fa-user-cog"></i>
+                <span>Profile</span>
+            </a>
+            
+            <a href="Security.html" class="nav-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Security</span>
+            </a>
+            
+            <a href="Lock-Screen.html" class="nav-item">
+                <i class="fas fa-wallet"></i>
+                <span>Wallet</span>
+            </a>
+            
+            <a href="../Bitcoin/Connections.html" class="nav-item">
+                <i class="fas fa-plug"></i>
+                <span>Connections</span>
+            </a>
+            
+            <a href="../Bitcoin/Notifications.html" class="nav-item">
+                <i class="fas fa-bell"></i>
+                <span>Notifications</span>
+            </a>
+            
+            <a href="../Bitcoin/Developer.html" class="nav-item">
+                <i class="fas fa-code"></i>
+                <span>Developer</span>
+            </a>
+            
+            <div style="flex: 1;"></div>
+            
+            <a href="Dashboard.html" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Back to App</span>
+            </a>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="header-title"><i class="fas fa-cog"></i> Settings Dashboard</h1>
+                <div class="header-actions">
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </button>
+                    <button class="btn btn-success">
+                        <i class="fas fa-save"></i>
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Left Column -->
+                <div>
+                    <!-- Profile Settings Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-user"></i> Profile Settings</h2>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Display Name</label>
+                            <input type="text" class="form-input" value="CryptoTrader92">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-input" value="user@example.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Bio</label>
+                            <textarea class="form-textarea">Crypto enthusiast and early adopter of Bitcoin-Starknet bridge technology.</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Profile Privacy</label>
+                            <select class="form-select">
+                                <option>Public</option>
+                                <option selected>Private</option>
+                                <option>Friends Only</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Notification Settings Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-bell"></i> Notification Preferences</h2>
+                        </div>
+                        
+                        <label class="toggle-label">
+                            <div class="toggle-text">
+                                <div>Email Notifications</div>
+                                <div class="toggle-description">Receive important updates via email</div>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </div>
+                        </label>
+                        
+                        <label class="toggle-label">
+                            <div class="toggle-text">
+                                <div>Transaction Alerts</div>
+                                <div class="toggle-description">Get notified about transaction status changes</div>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </div>
+                        </label>
+                        
+                        <label class="toggle-label">
+                            <div class="toggle-text">
+                                <div>Price Alerts</div>
+                                <div class="toggle-description">Receive alerts when prices reach certain levels</div>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="toggle-slider"></span>
+                            </div>
+                        </label>
+                        
+                        <label class="toggle-label">
+                            <div class="toggle-text">
+                                <div>Security Alerts</div>
+                                <div class="toggle-description">Get notified about security events</div>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <!-- Wallet Settings Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-wallet"></i> Wallet Settings</h2>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Default Currency</label>
+                            <select class="form-select">
+                                <option>USD</option>
+                                <option>EUR</option>
+                                <option>GBP</option>
+                                <option selected>BTC</option>
+                                <option>ETH</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Transaction Fee Priority</label>
+                            <select class="form-select">
+                                <option>Low (slower)</option>
+                                <option selected>Medium</option>
+                                <option>High (faster)</option>
+                                <option>Custom</option>
+                            </select>
+                        </div>
+                        
+                        <label class="toggle-label">
+                            <div class="toggle-text">
+                                <div>Auto-Lock Wallet</div>
+                                <div class="toggle-description">Automatically lock wallet after 15 minutes of inactivity</div>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </div>
+                        </label>
+                        
+                        <label class="toggle-label">
+                            <div class="toggle-text">
+                                <div>Hide Balances</div>
+                                <div class="toggle-description">Mask balances for privacy</div>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="toggle-slider"></span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Right Column -->
+                <div>
+                    <!-- Security Settings Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-shield-alt"></i> Security Settings</h2>
+                        </div>
+                        
+                        <div class="security-indicators">
+                            <div class="security-indicator">
+                                <div class="security-icon">
+                                    <i class="fas fa-lock"></i>
+                                </div>
+                                <div class="security-label">Password Strength</div>
+                                <div class="security-value">Strong</div>
+                            </div>
+                            
+                            <div class="security-indicator">
+                                <div class="security-icon">
+                                    <i class="fas fa-key"></i>
+                                </div>
+                                <div class="security-label">2FA Enabled</div>
+                                <div class="security-value">Yes</div>
+                            </div>
+                            
+                            <div class="security-indicator">
+                                <div class="security-icon">
+                                    <i class="fas fa-history"></i>
+                                </div>
+                                <div class="security-label">Last Login</div>
+                                <div class="security-value">2 hours ago</div>
+                            </div>
+                            
+                            <div class="security-indicator">
+                                <div class="security-icon">
+                                    <i class="fas fa-device"></i>
+                                </div>
+                                <div class="security-label">Devices</div>
+                                <div class="security-value">3</div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <div class="settings-section-title">
+                                <i class="fas fa-lock"></i>
+                                Password
+                            </div>
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-edit"></i>
+                                Change Password
+                            </button>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <div class="settings-section-title">
+                                <i class="fas fa-mobile-alt"></i>
+                                Two-Factor Authentication
+                            </div>
+                            <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--gray);">
+                                2FA is currently <span style="color: var(--success);">enabled</span> on your account.
+                            </p>
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-cog"></i>
+                                Manage 2FA
+                            </button>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <div class="settings-section-title">
+                                <i class="fas fa-device"></i>
+                                Connected Devices
+                            </div>
+                            <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--gray);">
+                                3 devices are currently connected to your account.
+                            </p>
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-list"></i>
+                                View Devices
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- API Settings Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-code"></i> API Settings</h2>
+                            <div class="card-actions">
+                                <button class="btn btn-sm">
+                                    <i class="fas fa-plus"></i>
+                                    New Key
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="api-key-list">
+                            <div class="api-key-item">
+                                <div class="api-key-info">
+                                    <div class="api-key-name">Trading Bot</div>
+                                    <div class="api-key-value">sk_live_abc123••••••••••••••••</div>
+                                </div>
+                                <div class="api-key-actions">
+                                    <button class="btn btn-sm btn-secondary">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="api-key-item">
+                                <div class="api-key-info">
+                                    <div class="api-key-name">Analytics Dashboard</div>
+                                    <div class="api-key-value">sk_live_def456••••••••••••••••</div>
+                                </div>
+                                <div class="api-key-actions">
+                                    <button class="btn btn-sm btn-secondary">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <label class="toggle-label">
+                            <div class="toggle-text">
+                                <div>API Access</div>
+                                <div class="toggle-description">Enable third-party application access via API</div>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </div>
+                        </label>
+                        
+                        <label class="toggle-label">
+                            <div class="toggle-text">
+                                <div>API Rate Limits</div>
+                                <div class="toggle-description">Apply rate limiting to API requests</div>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <!-- Danger Zone Card -->
+                    <div class="card" style="border-color: rgba(239, 68, 68, 0.3);">
+                        <div class="card-header">
+                            <h2 class="card-title" style="color: var(--danger);"><i class="fas fa-exclamation-triangle"></i> Danger Zone</h2>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <div class="settings-section-title" style="color: var(--danger);">
+                                <i class="fas fa-trash-alt"></i>
+                                Delete Account
+                            </div>
+                            <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--gray);">
+                                Permanently delete your account and all associated data. This action cannot be undone.
+                            </p>
+                            <button class="btn btn-danger">
+                                <i class="fas fa-trash-alt"></i>
+                                Delete Account
+                            </button>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <div class="settings-section-title" style="color: var(--danger);">
+                                <i class="fas fa-key"></i>
+                                Export Private Keys
+                            </div>
+                            <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--gray);">
+                                Export your wallet private keys. Be extremely careful with this function.
+                            </p>
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-download"></i>
+                                Export Keys
+                            </button>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <div class="settings-section-title" style="color: var(--danger);">
+                                <i class="fas fa-ban"></i>
+                                Revoke All Sessions
+                            </div>
+                            <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--gray);">
+                                Log out of all devices and revoke all active sessions.
+                            </p>
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Revoke Sessions
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple interactivity for demonstration
+        document.addEventListener('DOMContentLoaded', function() {
+            // Save button animation
+            const saveBtn = document.querySelector('.btn-success');
+            saveBtn.addEventListener('click', function() {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> Saved';
+                this.style.background = 'var(--success)';
+                
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.style.background = '';
+                }, 2000);
+            });
+            
+            // Toggle switch labels
+            const toggleSwitches = document.querySelectorAll('.toggle-switch input');
+            toggleSwitches.forEach(toggle => {
+                toggle.addEventListener('change', function() {
+                    const label = this.closest('.toggle-label');
+                    if (label) {
+                        label.style.color = this.checked ? 'var(--primary)' : '';
+                    }
+                });
+            });
+            
+            // Copy API key functionality
+            const copyButtons = document.querySelectorAll('.api-key-actions .btn:first-child');
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const originalHtml = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check"></i>';
+                    
+                    setTimeout(() => {
+                        this.innerHTML = originalHtml;
+                    }, 2000);
+                });
+            });
+            
+            // Danger zone confirmation
+            const dangerButtons = document.querySelectorAll('.btn-danger, .btn-secondary');
+            dangerButtons.forEach(button => {
+                if (button.closest('.card').querySelector('.card-title').textContent.includes('Danger Zone')) {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const action = this.textContent.trim();
+                        if (confirm(`Are you sure you want to ${action}? This action cannot be undone.`)) {
+                            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                            this.disabled = true;
+                            
+                            setTimeout(() => {
+                                this.innerHTML = '<i class="fas fa-check"></i> Done';
+                                setTimeout(() => {
+                                    this.innerHTML = action;
+                                    this.disabled = false;
+                                }, 1500);
+                            }, 2000);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

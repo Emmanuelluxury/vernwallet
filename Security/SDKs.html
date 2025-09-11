@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin-Starknet Bridge | SDK Dashboard</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #00d2ff;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            color: #00d2ff;
+        }
+        
+        .dashboard-title {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 12px 25px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover, .tab.active {
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            transform: translateY(-2px);
+        }
+        
+        .sdks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .sdk-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sdk-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .sdk-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .sdk-icon {
+            font-size: 2.5rem;
+            margin-right: 15px;
+            color: #00d2ff;
+        }
+        
+        .sdk-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #00d2ff;
+        }
+        
+        .sdk-version {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-left: auto;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+        
+        .sdk-description {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        
+        .sdk-features {
+            margin-bottom: 25px;
+        }
+        
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .feature-item i {
+            color: #4caf50;
+            margin-right: 10px;
+        }
+        
+        .sdk-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: auto;
+        }
+        
+        .sdk-btn {
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            flex: 1;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #00d2ff;
+            color: #00d2ff;
+        }
+        
+        .sdk-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.3);
+        }
+        
+        .code-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .code-title {
+            font-size: 1.5rem;
+            color: #00d2ff;
+        }
+        
+        .code-tabs {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .code-tab {
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .code-tab.active {
+            background: #00d2ff;
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        
+        .code-comment {
+            color: #6a9955;
+        }
+        
+        .code-keyword {
+            color: #569cd6;
+        }
+        
+        .code-string {
+            color: #ce9178;
+        }
+        
+        .code-function {
+            color: #dcdcaa;
+        }
+        
+        .comparison-section {
+            margin-top: 50px;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: #00d2ff;
+            text-align: center;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .comparison-table th {
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            color: #00d2ff;
+        }
+        
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .feature-supported {
+            color: #4caf50;
+            text-align: center;
+        }
+        
+        .feature-unsupported {
+            color: #f44336;
+            text-align: center;
+        }
+        
+        .feature-partial {
+            color: #ff9800;
+            text-align: center;
+        }
+        
+        .resources-section {
+            margin-top: 50px;
+        }
+        
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+        
+        .resource-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .resource-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #00d2ff;
+        }
+        
+        .resource-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .resource-link {
+            color: #00d2ff;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-block;
+            margin-top: 15px;
+        }
+        
+        .resource-link:hover {
+            text-decoration: underline;
+        }
+        
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 30px 0;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .sdks-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            nav ul {
+                gap: 15px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .tab {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .sdk-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-cube"></i></div>
+                <div class="logo-text">Bitcoin-Starknet Bridge</div>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="../Bitstark/ApiDocs.html">Dashboard</a></li>
+                    <li><a href="../Wallet/Bridge.html">Bridge</a></li>
+                    <li><a href="../Security/ApiStatus.html">API Status</a></li>
+                    <li><a href="#" class="active">SDKs</a></li>
+                    <li><a href="../Security/Guides.html">Guides</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <h1 class="dashboard-title">Software Development Kits</h1>
+        <p class="subtitle">Powerful libraries to integrate Bitcoin-Starknet bridge into your applications</p>
+        
+        <div class="tabs">
+            <div class="tab active">All SDKs</div>
+            <div class="tab">JavaScript</div>
+            <div class="tab">Python</div>
+            <div class="tab">Go</div>
+            <div class="tab">Java</div>
+            <div class="tab">Rust</div>
+        </div>
+        
+        <div class="sdks-grid">
+            <div class="sdk-card">
+                <div class="sdk-header">
+                    <div class="sdk-icon"><i class="fab fa-js-square"></i></div>
+                    <h3 class="sdk-title">JavaScript SDK</h3>
+                    <span class="sdk-version">v2.3.1</span>
+                </div>
+                <p class="sdk-description">A comprehensive JavaScript/TypeScript library for Node.js and browser environments. Perfect for web applications and services.</p>
+                
+                <div class="sdk-features">
+                    <ul class="feature-list">
+                        <li class="feature-item"><i class="fas fa-check-circle"></i> Full TypeScript support</li>
+                        <li class="feature-item"><i class="fas fa-check-circle"></i> Browser and Node.js compatible</li>
+                        <li class="feature-item"><i class="fas fa-check-circle"></i> Web3 integration</li>
+                        <li class="feature-item"><i class="fas fa-check-circle"></i> React hooks included</li>
+                    </ul>
+                </div>
+                
+                <div class="sdk-actions">
+                    <a href="#" class="sdk-btn btn-primary">Install</a>
+                    <a href="#" class="sdk-btn btn-outline">Documentation</a>
+                </div>
+            </div>
+            
+            <div class="sdk-card">
+                <div class="sdk-header">
+                    <div class="sdk-icon"><i class="fab fa-python"></i></div>
+                    <h3 class="sdk-title">Python SDK</h3>
+                    <span class="sdk-version">v1.8.0</span>
+                </div>
+                <p class="sdk-description">A robust Python library for backend services and data analysis. Includes async support and Django integration.</p>
+                
+                <div class="sdk-features">
+                    <ul class="feature-list">
+                        <li class="feature-item"><i class="fas fa-check-circle"></i> Async/await support</li>
+                        <li class="feature-item"><i class="fas fa-check-circle"></i> Django and Flask integration</li>
+                        <li class="feature-item"><i class="fas fa-check-circle"></i> Data analysis utilities</li>
+                        <li class="feature-item"><i class="fas fa-check-circle"></i> CLI tool included</li>
+                    </ul>
+                </div>
+                
+                <div class="sdk-actions">
+                    <a href="#" class="sdk-btn btn-primary">Install</a>
+                    <a href="#" class="sdk-btn btn-outline">Documentation</a>
+                </div>
+            </div>
+            
+            <div class="sdk-card">
+                <div class="sdk-header">
+                    <div class="sdk-icon"><i class="fab fa-golang"></i></div>
+                    <h3 class="sdk-title">Go SDK</h3>
+                    <span class="sdk-version">v1.5.2</span>
+                </div>
+                <p class="sdk-description">A high-performance Go library for building scalable microservices and blockchain applications.</p>
+                
+                <div class="sdk-features">
+                    <ul class="feature-list">
+                        <li class="feature-item"><i class="fas fa-check-circle"></i> High performance</li>
+                        <li class="feature-item"><i class="fas fa-check-circle"></i> Goroutine safe</li>
+                        <li class="feature-item"><i class="fas fa-check-circle"></i> GRPC support</li>
+                        <li class="feature-item"><i class="fas fa-check-circle"></i> Minimal dependencies</li>
+                    </ul>
+                </div>
+                
+                <div class="sdk-actions">
+                    <a href="#" class="sdk-btn btn-primary">Install</a>
+                    <a href="#" class="sdk-btn btn-outline">Documentation</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="code-section">
+            <div class="code-header">
+                <h2 class="code-title">Quick Start Example</h2>
+                <div class="code-tabs">
+                    <div class="code-tab active">JavaScript</div>
+                    <div class="code-tab">Python</div>
+                    <div class="code-tab">Go</div>
+                </div>
+            </div>
+            
+            <div class="code-block">
+                <span class="code-comment">// Install the SDK</span><br>
+                <span class="code-keyword">npm</span> install bitcoin-starknet-bridge-sdk<br><br>
+                
+                <span class="code-comment">// Import and initialize</span><br>
+                <span class="code-keyword">import</span> { BitcoinStarknetBridge } <span class="code-keyword">from</span> <span class="code-string">'bitcoin-starknet-bridge-sdk'</span>;<br><br>
+                
+                <span class="code-keyword">const</span> bridge = <span class="code-keyword">new</span> BitcoinStarknetBridge({<br>
+                &nbsp;&nbsp;apiKey: process.env.BRIDGE_API_KEY,<br>
+                &nbsp;&nbsp;network: <span class="code-string">'mainnet'</span><br>
+                });<br><br>
+                
+                <span class="code-comment">// Bridge Bitcoin to Starknet</span><br>
+                <span class="code-keyword">async</span> <span class="code-function">function</span> transferBitcoin() {<br>
+                &nbsp;&nbsp;<span class="code-keyword">try</span> {<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">const</span> result = <span class="code-keyword">await</span> bridge.deposit({<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;amount: 0.1,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;starknetAddress: <span class="code-string">'0x1234...abcd'</span>,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bitcoinAddress: <span class="code-string">'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq'</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;});<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;console.log(<span class="code-string">'Transaction ID:'</span>, result.transactionId);<br>
+                &nbsp;&nbsp;} <span class="code-keyword">catch</span> (error) {<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;console.error(<span class="code-string">'Transfer failed:'</span>, error.message);<br>
+                &nbsp;&nbsp;}<br>
+                }
+            </div>
+        </div>
+        
+        <div class="comparison-section">
+            <h2 class="section-title">SDK Feature Comparison</h2>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>JavaScript</th>
+                        <th>Python</th>
+                        <th>Go</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>TypeScript Support</td>
+                        <td class="feature-supported">Yes</td>
+                        <td class="feature-unsupported">No</td>
+                        <td class="feature-unsupported">No</td>
+                    </tr>
+                    <tr>
+                        <td>Async/Await</td>
+                        <td class="feature-supported">Yes</td>
+                        <td class="feature-supported">Yes</td>
+                        <td class="feature-supported">Yes</td>
+                    </tr>
+                    <tr>
+                        <td>Web3 Integration</td>
+                        <td class="feature-supported">Yes</td>
+                        <td class="feature-partial">Partial</td>
+                        <td class="feature-supported">Yes</td>
+                    </tr>
+                    <tr>
+                        <td>HTTP/2 Support</td>
+                        <td class="feature-partial">Partial</td>
+                        <td class="feature-supported">Yes</td>
+                        <td class="feature-supported">Yes</td>
+                    </tr>
+                    <tr>
+                        <td>WebSocket Events</td>
+                        <td class="feature-supported">Yes</td>
+                        <td class="feature-supported">Yes</td>
+                        <td class="feature-supported">Yes</td>
+                    </tr>
+                    <tr>
+                        <td>Middleware Support</td>
+                        <td class="feature-supported">Yes</td>
+                        <td class="feature-supported">Yes</td>
+                        <td class="feature-partial">Partial</td>
+                    </tr>
+                    <tr>
+                        <td>Testing Utilities</td>
+                        <td class="feature-supported">Yes</td>
+                        <td class="feature-supported">Yes</td>
+                        <td class="feature-supported">Yes</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="resources-section">
+            <h2 class="section-title">Additional Resources</h2>
+            
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon"><i class="fa-solid fa-book"></i></div>
+                    <h3 class="resource-title">API Reference</h3>
+                    <p>Complete documentation of all SDK methods and parameters.</p>
+                    <a href="#" class="resource-link">View Documentation →</a>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-icon"><i class="fa-solid fa-vial"></i></div>
+                    <h3 class="resource-title">Testing Guide</h3>
+                    <p>Learn how to test your SDK integration with our testnet.</p>
+                    <a href="#" class="resource-link">Read Guide →</a>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-icon"><i class="fa-solid fa-code"></i></div>
+                    <h3 class="resource-title">Examples Repository</h3>
+                    <p>Browse through practical code examples for each SDK.</p>
+                    <a href="#" class="resource-link">View Examples →</a>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-icon"><i class="fa-solid fa-life-ring"></i></div>
+                    <h3 class="resource-title">Support</h3>
+                    <p>Get help from our engineering team and community.</p>
+                    <a href="#" class="resource-link">Get Support →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2025 Bitcoin-Starknet Bridge. All rights reserved. | Security Audit Passed | v2.1.4</p>
+        <p>Need help integrating? Contact our developer support at dev-support@bitcoin-starknet-bridge.com</p>
+    </footer>
+
+    <script>
+        // Tab functionality
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // In a real application, this would filter the SDKs
+                const filter = this.textContent.toLowerCase();
+                const sdkCards = document.querySelectorAll('.sdk-card');
+                
+                sdkCards.forEach(card => {
+                    if (filter === 'all sdks') {
+                        card.style.display = 'flex';
+                    } else {
+                        const sdkTitle = card.querySelector('.sdk-title').textContent.toLowerCase();
+                        if (sdkTitle.includes(filter)) {
+                            card.style.display = 'flex';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        });
+        
+        // Code tab functionality
+        const codeTabs = document.querySelectorAll('.code-tab');
+        codeTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                codeTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // In a real application, this would change the code example
+                const language = this.textContent.toLowerCase();
+                const codeBlock = document.querySelector('.code-block');
+                
+                // Simulate code change
+                codeBlock.innerHTML = `<span class="code-comment">// Code example for ${language} would appear here</span><br><br>
+                <span class="code-comment">// Install the ${language} SDK</span><br>
+                <span class="code-keyword">// Implementation details...</span><br><br>
+                <span class="code-comment">// Initialize the bridge client</span><br>
+                <span class="code-keyword">// More code would be here...</span>`;
+            });
+        });
+        
+        // Simulate code syntax highlighting
+        document.querySelectorAll('.code-block').forEach(block => {
+            const html = block.innerHTML;
+            // This would be replaced with a proper syntax highlighter in a real application
+            block.innerHTML = html;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin-Starknet Bridge | Swap Dashboard</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #00d2ff;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            color: #00d2ff;
+        }
+        
+        .dashboard-title {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 968px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #00d2ff;
+        }
+        
+        .card-icon {
+            font-size: 1.8rem;
+            color: #00d2ff;
+        }
+        
+        .swap-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .swap-panel {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .swap-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .swap-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .swap-balance {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .swap-input-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .token-select {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            min-width: 120px;
+        }
+        
+        .token-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .btc-icon {
+            background: #f2a900;
+        }
+        
+        .eth-icon {
+            background: #627eea;
+        }
+        
+        .strk-icon {
+            background: #ff2c6e;
+        }
+        
+        .usdc-icon {
+            background: #2775ca;
+        }
+        
+        .token-symbol {
+            font-weight: 600;
+        }
+        
+        .swap-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: right;
+            outline: none;
+        }
+        
+        .swap-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .swap-divider {
+            display: flex;
+            justify-content: center;
+            margin: 5px 0;
+        }
+        
+        .swap-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        
+        .swap-button:hover {
+            background: rgba(0, 210, 255, 0.2);
+        }
+        
+        .swap-details {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .detail-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .detail-value {
+            font-weight: 500;
+        }
+        
+        .price-impact {
+            color: #4caf50;
+        }
+        
+        .price-impact.high {
+            color: #f44336;
+        }
+        
+        .swap-action {
+            margin-top: 20px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #00d2ff;
+            color: #00d2ff;
+        }
+        
+        .btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.3);
+        }
+        
+        .tokens-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .token-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .token-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .token-info {
+            flex: 1;
+        }
+        
+        .token-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .token-balance {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chart-placeholder {
+            color: rgba(255, 255, 255, 0.3);
+            text-align: center;
+        }
+        
+        .liquidity-pools {
+            margin-top: 30px;
+        }
+        
+        .pool-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .pool-tokens {
+            display: flex;
+            align-items: center;
+        }
+        
+        .token-pair {
+            display: flex;
+        }
+        
+        .token-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-right: -10px;
+            border: 2px solid #0f2027;
+        }
+        
+        .pool-info {
+            text-align: right;
+        }
+        
+        .pool-value {
+            font-weight: 600;
+        }
+        
+        .pool-apr {
+            font-size: 0.8rem;
+            color: #4caf50;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: rgba(0, 0, 0, 0.7);
+            border-left: 4px solid #00d2ff;
+            border-radius: 5px;
+            display: none;
+            animation: slideIn 0.3s forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 30px 0;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            nav ul {
+                gap: 15px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .tokens-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-arrow-right-arrow-left"></i></div>
+                <div class="logo-text">Bitcoin-Starknet Bridge</div>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="../Bitstark/Wallet.html">Dashboard</a></li>
+                    <li><a href="../Wallet/Deposit.html">Deposit</a></li>
+                    <li><a href="../Wallet/Withdraw.html">Withdraw</a></li>
+                    <li><a href="#" class="active">Swap</a></li>
+                    <li><a href="../Wallet/Pool.html">Pool</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <h1 class="dashboard-title">Swap Dashboard</h1>
+        <p class="subtitle">Exchange tokens instantly on the Bitcoin-Starknet bridge</p>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Swap Tokens</h2>
+                    <div class="card-icon"><i class="fa-solid fa-exchange"></i></div>
+                </div>
+                
+                <div class="swap-container">
+                    <div class="swap-panel">
+                        <div class="swap-header">
+                            <span class="swap-label">From</span>
+                            <span class="swap-balance">Balance: 1.2543 BTC</span>
+                        </div>
+                        <div class="swap-input-container">
+                            <div class="token-select" id="fromTokenSelect">
+                                <div class="token-icon btc-icon">
+                                    <i class="fab fa-bitcoin"></i>
+                                </div>
+                                <span class="token-symbol">BTC</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <input type="number" class="swap-input" placeholder="0.0" value="0.1" id="fromAmount">
+                        </div>
+                    </div>
+                    
+                    <div class="swap-divider">
+                        <button class="swap-button" id="switchTokens">
+                            <i class="fa-solid fa-arrow-down-arrow-up"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="swap-panel">
+                        <div class="swap-header">
+                            <span class="swap-label">To</span>
+                            <span class="swap-balance">Balance: 4,325.67 STRK</span>
+                        </div>
+                        <div class="swap-input-container">
+                            <div class="token-select" id="toTokenSelect">
+                                <div class="token-icon strk-icon">S</div>
+                                <span class="token-symbol">STRK</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <input type="number" class="swap-input" placeholder="0.0" value="423.18" id="toAmount" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="swap-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Exchange Rate</span>
+                            <span class="detail-value">1 BTC = 4,231.80 STRK</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Price Impact</span>
+                            <span class="detail-value price-impact">0.15%</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Minimum Received</span>
+                            <span class="detail-value">421.45 STRK</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Bridge Fee</span>
+                            <span class="detail-value">0.0005 BTC</span>
+                        </div>
+                    </div>
+                    
+                    <div class="swap-action">
+                        <button class="btn btn-primary" id="swapButton">Swap</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Market Overview</h2>
+                    <div class="card-icon"><i class="fa-solid fa-chart-line"></i></div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-placeholder">
+                        <i class="fa-solid fa-chart-line" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>BTC/STRK Price Chart</p>
+                    </div>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">24h Volume</span>
+                    <span class="detail-value">$4.2M</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">24h Price Change</span>
+                    <span class="detail-value" style="color: #4caf50;">+2.4%</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Liquidity</span>
+                    <span class="detail-value">$12.5M</span>
+                </div>
+                
+                <h3 style="margin: 20px 0 15px 0; color: #00d2ff;">Your Tokens</h3>
+                
+                <div class="tokens-grid">
+                    <div class="token-item">
+                        <div class="token-icon btc-icon">
+                            <i class="fab fa-bitcoin"></i>
+                        </div>
+                        <div class="token-info">
+                            <div class="token-name">Bitcoin</div>
+                            <div class="token-balance">1.2543 BTC</div>
+                        </div>
+                    </div>
+                    
+                    <div class="token-item">
+                        <div class="token-icon strk-icon">S</div>
+                        <div class="token-info">
+                            <div class="token-name">Starknet</div>
+                            <div class="token-balance">4,325.67 STRK</div>
+                        </div>
+                    </div>
+                    
+                    <div class="token-item">
+                        <div class="token-icon eth-icon">
+                            <i class="fab fa-ethereum"></i>
+                        </div>
+                        <div class="token-info">
+                            <div class="token-name">Ethereum</div>
+                            <div class="token-balance">3.421 ETH</div>
+                        </div>
+                    </div>
+                    
+                    <div class="token-item">
+                        <div class="token-icon usdc-icon">U</div>
+                        <div class="token-info">
+                            <div class="token-name">USDC</div>
+                            <div class="token-balance">2,450.50 USDC</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Liquidity Pools</h2>
+                <div class="card-icon"><i class="fa-solid fa-water"></i></div>
+            </div>
+            
+            <div class="liquidity-pools">
+                <div class="pool-item">
+                    <div class="pool-tokens">
+                        <div class="token-pair">
+                            <div class="token-badge btc-icon">
+                                <i class="fab fa-bitcoin"></i>
+                            </div>
+                            <div class="token-badge strk-icon">S</div>
+                        </div>
+                        <div class="pool-name">BTC/STRK</div>
+                    </div>
+                    <div class="pool-info">
+                        <div class="pool-value">$8.4M</div>
+                        <div class="pool-apr">12.5% APR</div>
+                    </div>
+                </div>
+                
+                <div class="pool-item">
+                    <div class="pool-tokens">
+                        <div class="token-pair">
+                            <div class="token-badge btc-icon">
+                                <i class="fab fa-bitcoin"></i>
+                            </div>
+                            <div class="token-badge eth-icon">
+                                <i class="fab fa-ethereum"></i>
+                            </div>
+                        </div>
+                        <div class="pool-name">BTC/ETH</div>
+                    </div>
+                    <div class="pool-info">
+                        <div class="pool-value">$2.7M</div>
+                        <div class="pool-apr">8.2% APR</div>
+                    </div>
+                </div>
+                
+                <div class="pool-item">
+                    <div class="pool-tokens">
+                        <div class="token-pair">
+                            <div class="token-badge strk-icon">S</div>
+                            <div class="token-badge usdc-icon">U</div>
+                        </div>
+                        <div class="pool-name">STRK/USDC</div>
+                    </div>
+                    <div class="pool-info">
+                        <div class="pool-value">$1.4M</div>
+                        <div class="pool-apr">15.3% APR</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-outline">
+                    <i class="fa-solid fa-plus"></i> Add Liquidity
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Token Select Modal -->
+    <div class="modal" id="tokenModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Select Token</h2>
+                <button class="close-modal" id="closeTokenModal">&times;</button>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <input type="text" placeholder="Search token name or address" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(0, 0, 0, 0.3); color: white;">
+            </div>
+            
+            <div style="max-height: 300px; overflow-y: auto;">
+                <div class="token-item">
+                    <div class="token-icon btc-icon">
+                        <i class="fab fa-bitcoin"></i>
+                    </div>
+                    <div class="token-info">
+                        <div class="token-name">Bitcoin</div>
+                        <div class="token-balance">1.2543 BTC</div>
+                    </div>
+                </div>
+                
+                <div class="token-item">
+                    <div class="token-icon strk-icon">S</div>
+                    <div class="token-info">
+                        <div class="token-name">Starknet</div>
+                        <div class="token-balance">4,325.67 STRK</div>
+                    </div>
+                </div>
+                
+                <div class="token-item">
+                    <div class="token-icon eth-icon">
+                        <i class="fab fa-ethereum"></i>
+                    </div>
+                    <div class="token-info">
+                        <div class="token-name">Ethereum</div>
+                        <div class="token-balance">3.421 ETH</div>
+                    </div>
+                </div>
+                
+                <div class="token-item">
+                    <div class="token-icon usdc-icon">U</div>
+                    <div class="token-info">
+                        <div class="token-name">USD Coin</div>
+                        <div class="token-balance">2,450.50 USDC</div>
+                    </div>
+                </div>
+                
+                <div class="token-item">
+                    <div class="token-icon" style="background: #7b3fe4;">D</div>
+                    <div class="token-info">
+                        <div class="token-name">DAI</div>
+                        <div class="token-balance">0.00 DAI</div>
+                    </div>
+                </div>
+                
+                <div class="token-item">
+                    <div class="token-icon" style="background: #f0b90b;">B</div>
+                    <div class="token-info">
+                        <div class="token-name">Binance USD</div>
+                        <div class="token-balance">0.00 BUSD</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notificationText"></span>
+    </div>
+    
+    <footer>
+        <p>© 2025 Bitcoin-Starknet Bridge. All rights reserved. | Security Audit Passed | v2.1.4</p>
+        <p>Swap fees: 0.3% | Slippage tolerance: 0.5%</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const fromTokenSelect = document.getElementById('fromTokenSelect');
+        const toTokenSelect = document.getElementById('toTokenSelect');
+        const fromAmount = document.getElementById('fromAmount');
+        const toAmount = document.getElementById('toAmount');
+        const switchTokens = document.getElementById('switchTokens');
+        const swapButton = document.getElementById('swapButton');
+        const tokenModal = document.getElementById('tokenModal');
+        const closeTokenModal = document.getElementById('closeTokenModal');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        
+        // State
+        let currentSelection = 'from';
+        const exchangeRates = {
+            'BTC-STRK': 4231.80,
+            'STRK-BTC': 0.000236,
+            'BTC-ETH': 14.32,
+            'ETH-BTC': 0.0698,
+            'BTC-USDC': 34500,
+            'USDC-BTC': 0.000029,
+            'STRK-ETH': 0.00338,
+            'ETH-STRK': 295.85,
+            'STRK-USDC': 0.85,
+            'USDC-STRK': 1.176
+        };
+        
+        // Initialize the dashboard
+        function init() {
+            setupEventListeners();
+            updateQuote();
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            fromTokenSelect.addEventListener('click', () => {
+                currentSelection = 'from';
+                tokenModal.style.display = 'flex';
+            });
+            
+            toTokenSelect.addEventListener('click', () => {
+                currentSelection = 'to';
+                tokenModal.style.display = 'flex';
+            });
+            
+            closeTokenModal.addEventListener('click', () => {
+                tokenModal.style.display = 'none';
+            });
+            
+            fromAmount.addEventListener('input', updateQuote);
+            
+            switchTokens.addEventListener('click', () => {
+                const fromToken = fromTokenSelect.querySelector('.token-symbol').textContent;
+                const toToken = toTokenSelect.querySelector('.token-symbol').textContent;
+                
+                // Swap tokens
+                fromTokenSelect.querySelector('.token-symbol').textContent = toToken;
+                toTokenSelect.querySelector('.token-symbol').textContent = fromToken;
+                
+                // Swap icons
+                const fromIcon = fromTokenSelect.querySelector('.token-icon').cloneNode(true);
+                const toIcon = toTokenSelect.querySelector('.token-icon').cloneNode(true);
+                
+                fromTokenSelect.querySelector('.token-icon').replaceWith(toIcon);
+                toTokenSelect.querySelector('.token-icon').replaceWith(fromIcon);
+                
+                // Update quote
+                updateQuote();
+            });
+            
+            swapButton.addEventListener('click', executeSwap);
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === tokenModal) {
+                    tokenModal.style.display = 'none';
+                }
+            });
+            
+            // Token selection from modal
+            const tokenItems = document.querySelectorAll('.token-item');
+            tokenItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const tokenSymbol = this.querySelector('.token-name').textContent;
+                    const tokenIcon = this.querySelector('.token-icon').cloneNode(true);
+                    
+                    if (currentSelection === 'from') {
+                        fromTokenSelect.querySelector('.token-symbol').textContent = tokenSymbol;
+                        fromTokenSelect.querySelector('.token-icon').replaceWith(tokenIcon);
+                    } else {
+                        toTokenSelect.querySelector('.token-symbol').textContent = tokenSymbol;
+                        toTokenSelect.querySelector('.token-icon').replaceWith(tokenIcon);
+                    }
+                    
+                    tokenModal.style.display = 'none';
+                    updateQuote();
+                });
+            });
+        }
+        
+        // Update swap quote
+        function updateQuote() {
+            const fromToken = fromTokenSelect.querySelector('.token-symbol').textContent;
+            const toToken = toTokenSelect.querySelector('.token-symbol').textContent;
+            const amount = parseFloat(fromAmount.value) || 0;
+            
+            if (fromToken === toToken) {
+                toAmount.value = amount;
+                return;
+            }
+            
+            const rateKey = `${fromToken}-${toToken}`;
+            if (exchangeRates[rateKey]) {
+                const result = amount * exchangeRates[rateKey];
+                toAmount.value = result.toFixed(2);
+            } else {
+                toAmount.value = '0.0';
+            }
+            
+            // Enable/disable swap button based on input
+            swapButton.disabled = amount <= 0;
+        }
+        
+        // Execute swap
+        function executeSwap() {
+            const fromToken = fromTokenSelect.querySelector('.token-symbol').textContent;
+            const toToken = toTokenSelect.querySelector('.token-symbol').textContent;
+            const amount = parseFloat(fromAmount.value) || 0;
+            
+            if (amount <= 0) {
+                showNotification('Please enter a valid amount', true);
+                return;
+            }
+            
+            // In a real application, this would call a smart contract
+            console.log(`Swapping ${amount} ${fromToken} to ${toToken}`);
+            
+            // Show success message
+            showNotification(`Swap executed successfully! ${toAmount.value} ${toToken} received.`);
+            
+            // Reset form
+            fromAmount.value = '';
+            toAmount.value = '';
+            swapButton.disabled = true;
+        }
+        
+        // Show notification
+        function showNotification(message, isError = false) {
+            notificationText.textContent = message;
+            
+            if (isError) {
+                notification.style.borderLeftColor = '#f44336';
+            } else {
+                notification.style.borderLeftColor = '#00d2ff';
+            }
+            
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Initialize the dashboard
+        init();
+    </script>
+</body>
+</html>

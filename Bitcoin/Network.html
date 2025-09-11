@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Dashboard - Bitcoin-Starknet Bridge</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6; /* Blue for network */
+            --primary-dark: #2563eb;
+            --secondary: #1f2937;
+            --dark: #0f172a;
+            --light: #f9fafb;
+            --gray: #9ca3af;
+            --dark-gray: #4b5563;
+            --light-gray: #f3f4f6;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --info: #3b82f6;
+            --bitcoin: #f7931a;
+            --starknet: #7c3aed;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #0f172a;
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 260px;
+            background: rgba(31, 41, 55, 0.8);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: white;
+        }
+        
+        .logo-icon {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--gray);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: white;
+            border-left-color: var(--primary);
+        }
+        
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .header-title i {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(31, 41, 55, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .stat-title {
+            font-size: 0.9rem;
+            color: var(--gray);
+            font-weight: 600;
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--primary);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-change {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .positive {
+            color: var(--success);
+        }
+        
+        .negative {
+            color: var(--danger);
+        }
+        
+        /* Cards */
+        .card {
+            background: rgba(31, 41, 55, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .card-title i {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Tables */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th {
+            text-align: left;
+            padding: 12px 15px;
+            font-size: 0.9rem;
+            color: var(--gray);
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-online {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+        
+        .status-offline {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+        
+        .status-syncing {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+        
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        /* Progress bars */
+        .progress-container {
+            margin: 15px 0;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .progress-label {
+            font-size: 0.9rem;
+        }
+        
+        .progress-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: var(--primary);
+        }
+        
+        /* Network visualization */
+        .network-visualization {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .network-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 120px;
+            position: relative;
+        }
+        
+        .node-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .node-icon.bitcoin {
+            background: rgba(247, 147, 26, 0.2);
+            color: var(--bitcoin);
+        }
+        
+        .node-icon.starknet {
+            background: rgba(124, 58, 237, 0.2);
+            color: var(--starknet);
+        }
+        
+        .node-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+        
+        .node-status {
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .node-connector {
+            position: absolute;
+            top: 30px;
+            left: 90px;
+            right: -30px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1;
+        }
+        
+        .node-connector.active {
+            background: var(--primary);
+        }
+        
+        /* Peer list */
+        .peer-list {
+            list-style: none;
+        }
+        
+        .peer-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .peer-item:last-child {
+            border-bottom: none;
+        }
+        
+        .peer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+        
+        .peer-details {
+            flex: 1;
+        }
+        
+        .peer-address {
+            font-weight: 600;
+            margin-bottom: 3px;
+            font-size: 0.9rem;
+        }
+        
+        .peer-meta {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .peer-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .status-connected {
+            background: var(--success);
+        }
+        
+        .status-disconnected {
+            background: var(--danger);
+        }
+        
+        /* Alerts */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .alert-info {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 4px solid var(--info);
+        }
+        
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.2);
+            border-left: 4px solid var(--warning);
+        }
+        
+        .alert-icon {
+            font-size: 1.2rem;
+        }
+        
+        .alert-content {
+            flex: 1;
+        }
+        
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .alert-description {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        /* Filters */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                width: 80px;
+            }
+            
+            .nav-item span {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .network-visualization {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 20px;
+            }
+            
+            .node-connector {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <i class="fas fa-network-wired logo-icon"></i>
+                    <span>Network</span>
+                </a>
+            </div>
+            
+            <a href="../Bitstark/BitcoinNode.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            
+            <a href="#" class="nav-item active">
+                <i class="fas fa-network-wired"></i>
+                <span>Network Status</span>
+            </a>
+            
+            <a href="../Bitcoin/Nodes.html" class="nav-item">
+                <i class="fas fa-server"></i>
+                <span>Nodes</span>
+            </a>
+            
+            <a href="../Bitcoin/Peers.html" class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>Peers</span>
+            </a>
+            
+            <a href="../Bitcoin/Proformance.html" class="nav-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Performance</span>
+            </a>
+            
+            <a href="../Bitcoin/Connections.html" class="nav-item">
+                <i class="fas fa-plug"></i>
+                <span>Connections</span>
+            </a>
+            
+            <div style="flex: 1;"></div>
+            
+            <a href="../Bitstark/Dashboard.html" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Back to App</span>
+            </a>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="header-title"><i class="fas fa-network-wired"></i> Network Dashboard</h1>
+                <div class="header-actions">
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                    <button class="btn">
+                        <i class="fas fa-plus"></i>
+                        Add Node
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">ACTIVE NODES</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-server"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">14/16</div>
+                    <div class="stat-change negative">
+                        <i class="fas fa-arrow-down"></i>
+                        -2 today
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">CONNECTED PEERS</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">42</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +5 today
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">NETWORK LATENCY</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">128 ms</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-down"></i>
+                        -12 ms
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">UPTIME</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">99.8%</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +0.2%
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Alerts Section -->
+            <div class="alert alert-info">
+                <div class="alert-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">Network Optimization</div>
+                    <div class="alert-description">Network performance has improved by 15% after recent optimizations.</div>
+                </div>
+            </div>
+            
+            <div class="alert alert-warning">
+                <div class="alert-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">Node 03 Offline</div>
+                    <div class="alert-description">Node 03 has been offline for 45 minutes. Check connectivity.</div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Left Column -->
+                <div>
+                    <!-- Network Status Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-network-wired"></i> Network Status</h2>
+                            <div class="card-actions">
+                                <button class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-history"></i>
+                                    View History
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="network-visualization">
+                            <div class="network-node">
+                                <div class="node-icon bitcoin">
+                                    <i class="fab fa-bitcoin"></i>
+                                </div>
+                                <div class="node-label">Bitcoin Network</div>
+                                <div class="node-status" style="color: var(--success);">Online</div>
+                                <div class="node-connector active"></div>
+                            </div>
+                            
+                            <div class="network-node">
+                                <div class="node-icon">
+                                    <i class="fas fa-bridge"></i>
+                                </div>
+                                <div class="node-label">Bridge Service</div>
+                                <div class="node-status" style="color: var(--success);">Online</div>
+                                <div class="node-connector active"></div>
+                            </div>
+                            
+                            <div class="network-node">
+                                <div class="node-icon starknet">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <div class="node-label">Starknet</div>
+                                <div class="node-status" style="color: var(--success);">Online</div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">Bitcoin Sync Status</div>
+                                <div class="progress-value">100%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%; background: var(--bitcoin);"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">Starknet Sync Status</div>
+                                <div class="progress-value">100%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%; background: var(--starknet);"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">Bridge Health</div>
+                                <div class="progress-value">98%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 98%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Connected Peers Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-users"></i> Connected Peers</h2>
+                            <div class="card-actions">
+                                <button class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-download"></i>
+                                    Export
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="filter-bar">
+                            <select class="filter-select">
+                                <option>All Peers</option>
+                                <option>Bitcoin</option>
+                                <option>Starknet</option>
+                                <option>Bridge</option>
+                            </select>
+                            
+                            <select class="filter-select">
+                                <option>All Statuses</option>
+                                <option>Connected</option>
+                                <option>Disconnected</option>
+                                <option>Syncing</option>
+                            </select>
+                        </div>
+                        
+                        <ul class="peer-list">
+                            <li class="peer-item">
+                                <div class="peer-avatar">
+                                    <i class="fab fa-bitcoin"></i>
+                                </div>
+                                <div class="peer-details">
+                                    <div class="peer-address">103.21.244.0:8333</div>
+                                    <div class="peer-meta">Bitcoin • USA • 120 ms</div>
+                                </div>
+                                <div class="peer-status status-connected"></div>
+                            </li>
+                            
+                            <li class="peer-item">
+                                <div class="peer-avatar">
+                                    <i class="fab fa-bitcoin"></i>
+                                </div>
+                                <div class="peer-details">
+                                    <div class="peer-address">104.18.123.168:8333</div>
+                                    <div class="peer-meta">Bitcoin • Germany • 42 ms</div>
+                                </div>
+                                <div class="peer-status status-connected"></div>
+                            </li>
+                            
+                            <li class="peer-item">
+                                <div class="peer-avatar">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <div class="peer-details">
+                                    <div class="peer-address">192.168.1.15:8333</div>
+                                    <div class="peer-meta">Starknet • Local • 2 ms</div>
+                                </div>
+                                <div class="peer-status status-connected"></div>
+                            </li>
+                            
+                            <li class="peer-item">
+                                <div class="peer-avatar">
+                                    <i class="fas fa-bridge"></i>
+                                </div>
+                                <div class="peer-details">
+                                    <div class="peer-address">103.10.124.55:8333</div>
+                                    <div class="peer-meta">Bridge • Japan • 210 ms</div>
+                                </div>
+                                <div class="peer-status status-connected"></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Right Column -->
+                <div>
+                    <!-- Node Status Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-server"></i> Node Status</h2>
+                            <div class="card-actions">
+                                <button class="btn btn-sm">
+                                    <i class="fas fa-plus"></i>
+                                    Add Node
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Node</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Version</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Node 01</td>
+                                    <td>Bitcoin</td>
+                                    <td>
+                                        <span class="status-badge status-online">
+                                            <i class="fas fa-check-circle"></i>
+                                            Online
+                                        </span>
+                                    </td>
+                                    <td>24.0.1</td>
+                                </tr>
+                                <tr>
+                                    <td>Node 02</td>
+                                    <td>Starknet</td>
+                                    <td>
+                                        <span class="status-badge status-online">
+                                            <i class="fas fa-check-circle"></i>
+                                            Online
+                                        </span>
+                                    </td>
+                                    <td>0.11.0</td>
+                                </tr>
+                                <tr>
+                                    <td>Node 03</td>
+                                    <td>Bridge</td>
+                                    <td>
+                                        <span class="status-badge status-offline">
+                                            <i class="fas fa-times-circle"></i>
+                                            Offline
+                                        </span>
+                                    </td>
+                                    <td>1.2.3</td>
+                                </tr>
+                                <tr>
+                                    <td>Node 04</td>
+                                    <td>Bitcoin</td>
+                                    <td>
+                                        <span class="status-badge status-online">
+                                            <i class="fas fa-check-circle"></i>
+                                            Online
+                                        </span>
+                                    </td>
+                                    <td>24.0.1</td>
+                                </tr>
+                                <tr>
+                                    <td>Node 05</td>
+                                    <td>Starknet</td>
+                                    <td>
+                                        <span class="status-badge status-syncing">
+                                            <i class="fas fa-sync-alt fa-spin"></i>
+                                            Syncing
+                                        </span>
+                                    </td>
+                                    <td>0.11.0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Network Performance Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-tachometer-alt"></i> Network Performance</h2>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">CPU Usage</div>
+                                <div class="progress-value">42%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 42%; background: var(--info);"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">Memory Usage</div>
+                                <div class="progress-value">64%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 64%; background: var(--warning);"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">Network I/O</div>
+                                <div class="progress-value">78%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 78%;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">Disk I/O</div>
+                                <div class="progress-value">35%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 35%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Network Actions Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-cog"></i> Network Actions</h2>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-sync-alt"></i>
+                                Resync Nodes
+                            </button>
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-redo"></i>
+                                Restart Services
+                            </button>
+                            <button class="btn">
+                                <i class="fas fa-bolt"></i>
+                                Optimize Network
+                            </button>
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-ban"></i>
+                                Disconnect Peers
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Network Info Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-info-circle"></i> Network Information</h2>
+                        </div>
+                        
+                        <table class="table">
+                            <tr>
+                                <td>Bitcoin Network</td>
+                                <td>Mainnet</td>
+                            </tr>
+                            <tr>
+                                <td>Bitcoin Block Height</td>
+                                <td>788,543</td>
+                            </tr>
+                            <tr>
+                                <td>Starknet Network</td>
+                                <td>Mainnet</td>
+                            </tr>
+                            <tr>
+                                <td>Starknet Block Height</td>
+                                <td>1,245,872</td>
+                            </tr>
+                            <tr>
+                                <td>Protocol Version</td>
+                                <td>70016</td>
+                            </tr>
+                            <tr>
+                                <td>Connection Time</td>
+                                <td>14 days, 2 hours</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple interactivity for demonstration
+        document.addEventListener('DOMContentLoaded', function() {
+            // Refresh button animation
+            const refreshBtn = document.querySelector('.header-actions .btn-secondary');
+            refreshBtn.addEventListener('click', function() {
+                this.querySelector('i').classList.add('fa-spin');
+                setTimeout(() => {
+                    this.querySelector('i').classList.remove('fa-spin');
+                    
+                    // Simulate node status update
+                    const offlineNode = document.querySelector('.status-offline');
+                    if (offlineNode) {
+                        offlineNode.classList.remove('status-offline');
+                        offlineNode.classList.add('status-online');
+                        offlineNode.innerHTML = '<i class="fas fa-check-circle"></i> Online';
+                    }
+                }, 1000);
+            });
+            
+            // Simulate network performance updates
+            setInterval(() => {
+                const cpuValue = document.querySelectorAll('.progress-value')[0];
+                const cpuFill = document.querySelectorAll('.progress-fill')[0];
+                
+                if (cpuValue && cpuFill) {
+                    const currentValue = parseInt(cpuValue.textContent);
+                    const newValue = Math.max(20, Math.min(80, currentValue + (Math.random() * 10 - 5)));
+                    
+                    cpuValue.textContent = Math.round(newValue) + '%';
+                    cpuFill.style.width = newValue + '%';
+                }
+            }, 5000);
+        });
+    </script>
+</body>
+</html>

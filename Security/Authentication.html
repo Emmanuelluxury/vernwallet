@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin-Starknet Bridge | Authentication Dashboard</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #00d2ff;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            color: #00d2ff;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #00d2ff;
+            color: #00d2ff;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.3);
+        }
+        
+        .dashboard-title {
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #00d2ff;
+        }
+        
+        .card-icon {
+            font-size: 1.8rem;
+            color: #00d2ff;
+        }
+        
+        .auth-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .status-connected {
+            background: #4caf50;
+        }
+        
+        .status-disconnected {
+            background: #f44336;
+        }
+        
+        .status-pending {
+            background: #ff9800;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .wallet-address {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+            word-break: break-all;
+            font-size: 0.9rem;
+        }
+        
+        .balance {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 15px 0;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .currency {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .bridge-visual {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 40px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+        }
+        
+        .chain {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .chain-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .bitcoin {
+            color: #f2a900;
+        }
+        
+        .starknet {
+            color: #ff2c6e;
+        }
+        
+        .bridge-arrow {
+            font-size: 2.5rem;
+            color: #00d2ff;
+        }
+        
+        .transaction-list {
+            margin-top: 20px;
+        }
+        
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .transaction-details {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .transaction-amount {
+            font-weight: 600;
+        }
+        
+        .transaction-in {
+            color: #4caf50;
+        }
+        
+        .transaction-out {
+            color: #f44336;
+        }
+        
+        .transaction-date {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a2a32, #2c3e50);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: #00d2ff;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .wallet-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .wallet-option {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .wallet-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .wallet-icon {
+            font-size: 1.8rem;
+        }
+        
+        .bridge-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-group label {
+            font-weight: 500;
+            color: #00d2ff;
+        }
+        
+        .form-group input, .form-group select {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: rgba(0, 0, 0, 0.7);
+            border-left: 4px solid #00d2ff;
+            border-radius: 5px;
+            display: none;
+            animation: slideIn 0.3s forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 30px 0;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            nav ul {
+                gap: 15px;
+            }
+            
+            .bridge-visual {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-link"></i></div>
+                <div class="logo-text">Bitcoin-Starknet Bridge</div>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="../Bitstark/ApiDocs.html" class="active">Dashboard</a></li>
+                    <li><a href="../Wallet/Bridge.html">Bridge</a></li>
+                    <li><a href="../Bitstark/Transactions.html">Transactions</a></li>
+                    <li><a href="../Bitstark/Security.html">Security</a></li>
+                </ul>
+            </nav>
+            
+            <div class="auth-buttons">
+                <button class="btn btn-outline" id="connectWalletBtn">Connect Wallet</button>
+                <button class="btn btn-primary" id="signOutBtn" style="display: none;">Sign Out</button>
+            </div>
+        </header>
+        
+        <h1 class="dashboard-title">Authentication Dashboard</h1>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Wallet Connection</h2>
+                    <div class="card-icon"><i class="fa-solid fa-wallet"></i></div>
+                </div>
+                <div class="auth-status">
+                    <div class="status-indicator status-disconnected" id="statusIndicator"></div>
+                    <div class="status-text" id="statusText">Disconnected</div>
+                </div>
+                <div class="wallet-address" id="walletAddress">No wallet connected</div>
+                <p>Connect your wallet to use the Bitcoin-Starknet Bridge</p>
+                <div class="action-buttons">
+                    <button class="btn btn-outline btn-small" id="disconnectBtn" disabled>Disconnect</button>
+                    <button class="btn btn-primary btn-small" id="changeWalletBtn" disabled>Change Wallet</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Bitcoin Balance</h2>
+                    <div class="card-icon"><i class="fab fa-bitcoin bitcoin"></i></div>
+                </div>
+                <div class="balance" id="btcBalance">0.000000 <span class="currency">BTC</span></div>
+                <p>Available for bridging to Starknet</p>
+                <div class="action-buttons">
+                    <button class="btn btn-outline btn-small" id="depositBtn" disabled>Deposit</button>
+                    <button class="btn btn-primary btn-small" id="bridgeToStarknetBtn" disabled>Bridge to Starknet</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Starknet Balance</h2>
+                    <div class="card-icon"><i class="fa-solid fa-coins starknet"></i></div>
+                </div>
+                <div class="balance" id="starknetBalance">0.000 <span class="currency">BTC</span></div>
+                <p>Bridged Bitcoin on Starknet</p>
+                <div class="action-buttons">
+                    <button class="btn btn-outline btn-small" id="withdrawBtn" disabled>Withdraw</button>
+                    <button class="btn btn-primary btn-small" id="bridgeToBtcBtn" disabled>Bridge to Bitcoin</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bridge-visual">
+            <div class="chain">
+                <div class="chain-icon"><i class="fab fa-bitcoin bitcoin"></i></div>
+                <h3>Bitcoin Network</h3>
+                <p>Mainnet</p>
+            </div>
+            
+            <div class="bridge-arrow">
+                <i class="fa-solid fa-arrows-left-right"></i>
+            </div>
+            
+            <div class="chain">
+                <div class="chain-icon"><i class="fa-solid fa-link starknet"></i></div>
+                <h3>Starknet Network</h3>
+                <p>Layer 2</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Recent Transactions</h2>
+                <div class="card-icon"><i class="fa-solid fa-receipt"></i></div>
+            </div>
+            
+            <div class="transaction-list" id="transactionList">
+                <div class="transaction-item">
+                    <div class="transaction-details">
+                        <div class="transaction-type">No transactions yet</div>
+                        <div class="transaction-date">Connect your wallet to start</div>
+                    </div>
+                    <div class="transaction-amount">0.000 BTC</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Wallet Connection Modal -->
+    <div class="modal" id="walletModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Connect Wallet</h2>
+                <button class="close-modal" id="closeWalletModal">&times;</button>
+            </div>
+            <div class="wallet-options">
+                <div class="wallet-option" data-wallet="metamask">
+                    <div class="wallet-icon"><i class="fab fa-ethereum"></i></div>
+                    <div class="wallet-info">
+                        <h3>MetaMask</h3>
+                        <p>Connect to your MetaMask Wallet</p>
+                    </div>
+                </div>
+                <div class="wallet-option" data-wallet="starknet">
+                    <div class="wallet-icon"><i class="fa-solid fa-wallet"></i></div>
+                    <div class="wallet-info">
+                        <h3>StarkNet Wallet</h3>
+                        <p>Connect to your StarkNet Wallet</p>
+                    </div>
+                </div>
+                <div class="wallet-option" data-wallet="unisat">
+                    <div class="wallet-icon"><i class="fab fa-bitcoin"></i></div>
+                    <div class="wallet-info">
+                        <h3>UniSat Wallet</h3>
+                        <p>Connect to your Bitcoin Wallet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bridge Modal -->
+    <div class="modal" id="bridgeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="bridgeModalTitle">Bridge Bitcoin</h2>
+                <button class="close-modal" id="closeBridgeModal">&times;</button>
+            </div>
+            <div class="bridge-form">
+                <div class="form-group">
+                    <label for="bridgeAmount">Amount</label>
+                    <input type="number" id="bridgeAmount" placeholder="Enter amount to bridge">
+                </div>
+                <div class="form-group">
+                    <label for="bridgeFrom">From</label>
+                    <select id="bridgeFrom">
+                        <option value="bitcoin">Bitcoin Network</option>
+                        <option value="starknet">Starknet Network</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="bridgeTo">To</label>
+                    <select id="bridgeTo">
+                        <option value="starknet">Starknet Network</option>
+                        <option value="bitcoin">Bitcoin Network</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" id="confirmBridgeBtn">Confirm Bridge</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notificationText"></span>
+    </div>
+    
+    <footer>
+        <p>© 2025 Bitcoin-Starknet Bridge. All rights reserved. | Security Audit Passed | v2.1.4</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const connectWalletBtn = document.getElementById('connectWalletBtn');
+        const signOutBtn = document.getElementById('signOutBtn');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const statusText = document.getElementById('statusText');
+        const walletAddress = document.getElementById('walletAddress');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const changeWalletBtn = document.getElementById('changeWalletBtn');
+        const btcBalance = document.getElementById('btcBalance');
+        const starknetBalance = document.getElementById('starknetBalance');
+        const depositBtn = document.getElementById('depositBtn');
+        const bridgeToStarknetBtn = document.getElementById('bridgeToStarknetBtn');
+        const withdrawBtn = document.getElementById('withdrawBtn');
+        const bridgeToBtcBtn = document.getElementById('bridgeToBtcBtn');
+        const transactionList = document.getElementById('transactionList');
+        const walletModal = document.getElementById('walletModal');
+        const closeWalletModal = document.getElementById('closeWalletModal');
+        const walletOptions = document.querySelectorAll('.wallet-option');
+        const bridgeModal = document.getElementById('bridgeModal');
+        const closeBridgeModal = document.getElementById('closeBridgeModal');
+        const bridgeModalTitle = document.getElementById('bridgeModalTitle');
+        const confirmBridgeBtn = document.getElementById('confirmBridgeBtn');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        
+        // State
+        let isConnected = false;
+        let currentWallet = null;
+        let transactions = [];
+        
+        // Wallet addresses for demo
+        const walletAddresses = {
+            metamask: "0x8a34f7d0d2c5e1b9a3c8f7a6b5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5",
+            starknet: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+            unisat: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq"
+        };
+        
+        // Initialize the application
+        function init() {
+            // Check if wallet was previously connected (from localStorage)
+            const savedWallet = localStorage.getItem('connectedWallet');
+            if (savedWallet) {
+                connectWallet(savedWallet);
+            }
+            
+            // Set up event listeners
+            setupEventListeners();
+        }
+        
+        // Set up all event listeners
+        function setupEventListeners() {
+            connectWalletBtn.addEventListener('click', () => {
+                walletModal.style.display = 'flex';
+            });
+            
+            closeWalletModal.addEventListener('click', () => {
+                walletModal.style.display = 'none';
+            });
+            
+            walletOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const walletType = option.getAttribute('data-wallet');
+                    connectWallet(walletType);
+                    walletModal.style.display = 'none';
+                });
+            });
+            
+            disconnectBtn.addEventListener('click', disconnectWallet);
+            
+            changeWalletBtn.addEventListener('click', () => {
+                walletModal.style.display = 'flex';
+            });
+            
+            signOutBtn.addEventListener('click', disconnectWallet);
+            
+            bridgeToStarknetBtn.addEventListener('click', () => {
+                openBridgeModal('bitcoin', 'starknet');
+            });
+            
+            bridgeToBtcBtn.addEventListener('click', () => {
+                openBridgeModal('starknet', 'bitcoin');
+            });
+            
+            closeBridgeModal.addEventListener('click', () => {
+                bridgeModal.style.display = 'none';
+            });
+            
+            confirmBridgeBtn.addEventListener('click', processBridging);
+            
+            // Close modals when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === walletModal) {
+                    walletModal.style.display = 'none';
+                }
+                if (e.target === bridgeModal) {
+                    bridgeModal.style.display = 'none';
+                }
+            });
+        }
+        
+        // Connect wallet function
+        function connectWallet(walletType) {
+            isConnected = true;
+            currentWallet = walletType;
+            
+            // Update UI
+            statusIndicator.className = 'status-indicator status-connected';
+            statusText.textContent = 'Connected';
+            walletAddress.textContent = walletAddresses[walletType];
+            connectWalletBtn.style.display = 'none';
+            signOutBtn.style.display = 'block';
+            disconnectBtn.disabled = false;
+            changeWalletBtn.disabled = false;
+            depositBtn.disabled = false;
+            bridgeToStarknetBtn.disabled = false;
+            withdrawBtn.disabled = false;
+            bridgeToBtcBtn.disabled = false;
+            
+            // Set demo balances
+            btcBalance.textContent = '0.254873 BTC';
+            starknetBalance.textContent = '3.428 BTC';
+            
+            // Generate demo transactions
+            generateDemoTransactions();
+            
+            // Show notification
+            showNotification(`Successfully connected to ${getWalletName(walletType)}`);
+            
+            // Save to localStorage
+            localStorage.setItem('connectedWallet', walletType);
+        }
+        
+        // Disconnect wallet function
+        function disconnectWallet() {
+            isConnected = false;
+            currentWallet = null;
+            
+            // Update UI
+            statusIndicator.className = 'status-indicator status-disconnected';
+            statusText.textContent = 'Disconnected';
+            walletAddress.textContent = 'No wallet connected';
+            connectWalletBtn.style.display = 'block';
+            signOutBtn.style.display = 'none';
+            disconnectBtn.disabled = true;
+            changeWalletBtn.disabled = true;
+            depositBtn.disabled = true;
+            bridgeToStarknetBtn.disabled = true;
+            withdrawBtn.disabled = true;
+            bridgeToBtcBtn.disabled = true;
+            
+            // Reset balances
+            btcBalance.textContent = '0.000000 BTC';
+            starknetBalance.textContent = '0.000 BTC';
+            
+            // Clear transactions
+            transactionList.innerHTML = `
+                <div class="transaction-item">
+                    <div class="transaction-details">
+                        <div class="transaction-type">No transactions yet</div>
+                        <div class="transaction-date">Connect your wallet to start</div>
+                    </div>
+                    <div class="transaction-amount">0.000 BTC</div>
+                </div>
+            `;
+            
+            // Show notification
+            showNotification('Wallet disconnected');
+            
+            // Remove from localStorage
+            localStorage.removeItem('connectedWallet');
+        }
+        
+        // Open bridge modal
+        function openBridgeModal(from, to) {
+            bridgeModal.style.display = 'flex';
+            document.getElementById('bridgeFrom').value = from;
+            document.getElementById('bridgeTo').value = to;
+            
+            const fromName = from === 'bitcoin' ? 'Bitcoin' : 'Starknet';
+            const toName = to === 'bitcoin' ? 'Bitcoin' : 'Starknet';
+            bridgeModalTitle.textContent = `Bridge from ${fromName} to ${toName}`;
+        }
+        
+        // Process bridging transaction
+        function processBridging() {
+            const amount = document.getElementById('bridgeAmount').value;
+            const from = document.getElementById('bridgeFrom').value;
+            const to = document.getElementById('bridgeTo').value;
+            
+            if (!amount || amount <= 0) {
+                showNotification('Please enter a valid amount', true);
+                return;
+            }
+            
+            // Show pending status
+            statusIndicator.className = 'status-indicator status-pending';
+            statusText.textContent = 'Processing...';
+            
+            // Simulate transaction processing
+            setTimeout(() => {
+                // Update balances
+                if (from === 'bitcoin') {
+                    const currentBtc = parseFloat(btcBalance.textContent);
+                    const newBtc = currentBtc - parseFloat(amount);
+                    btcBalance.textContent = newBtc.toFixed(6) + ' BTC';
+                    
+                    const currentStarknet = parseFloat(starknetBalance.textContent);
+                    const newStarknet = currentStarknet + parseFloat(amount);
+                    starknetBalance.textContent = newStarknet.toFixed(3) + ' BTC';
+                } else {
+                    const currentStarknet = parseFloat(starknetBalance.textContent);
+                    const newStarknet = currentStarknet - parseFloat(amount);
+                    starknetBalance.textContent = newStarknet.toFixed(3) + ' BTC';
+                    
+                    const currentBtc = parseFloat(btcBalance.textContent);
+                    const newBtc = currentBtc + parseFloat(amount);
+                    btcBalance.textContent = newBtc.toFixed(6) + ' BTC';
+                }
+                
+                // Add transaction to history
+                addTransaction({
+                    type: `${from} to ${to}`,
+                    amount: parseFloat(amount),
+                    date: new Date()
+                });
+                
+                // Restore connected status
+                statusIndicator.className = 'status-indicator status-connected';
+                statusText.textContent = 'Connected';
+                
+                // Close modal and show notification
+                bridgeModal.style.display = 'none';
+                showNotification(`Successfully bridged ${amount} BTC from ${from} to ${to}`);
+            }, 3000);
+        }
+        
+        // Generate demo transactions
+        function generateDemoTransactions() {
+            transactions = [
+                { type: 'bitcoin to starknet', amount: 0.125, date: new Date('2025-10-15T14:32:00') },
+                { type: 'starknet to bitcoin', amount: 0.050, date: new Date('2025-10-12T09:17:00') },
+                { type: 'bitcoin to starknet', amount: 0.075, date: new Date('2025-10-08T18:45:00') }
+            ];
+            
+            updateTransactionList();
+        }
+        
+        // Add a transaction
+        function addTransaction(transaction) {
+            transactions.unshift(transaction);
+            updateTransactionList();
+        }
+        
+        // Update transaction list UI
+        function updateTransactionList() {
+            transactionList.innerHTML = '';
+            
+            transactions.forEach(transaction => {
+                const transactionItem = document.createElement('div');
+                transactionItem.className = 'transaction-item';
+                
+                const isIn = transaction.type.includes('bitcoin to starknet');
+                const amountClass = isIn ? 'transaction-amount transaction-in' : 'transaction-amount transaction-out';
+                const amountSign = isIn ? '+' : '-';
+                
+                transactionItem.innerHTML = `
+                    <div class="transaction-details">
+                        <div class="transaction-type">${formatTransactionType(transaction.type)}</div>
+                        <div class="transaction-date">${formatDate(transaction.date)}</div>
+                    </div>
+                    <div class="${amountClass}">${amountSign}${transaction.amount} BTC</div>
+                `;
+                
+                transactionList.appendChild(transactionItem);
+            });
+        }
+        
+        // Format transaction type for display
+        function formatTransactionType(type) {
+            return type.split(' to ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' to ');
+        }
+        
+        // Format date for display
+        function formatDate(date) {
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            }) + ' - ' + date.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+        
+        // Get wallet name for display
+        function getWalletName(walletType) {
+            const names = {
+                metamask: 'MetaMask',
+                starknet: 'StarkNet Wallet',
+                unisat: 'UniSat Wallet'
+            };
+            
+            return names[walletType] || 'Wallet';
+        }
+        
+        // Show notification
+        function showNotification(message, isError = false) {
+            notificationText.textContent = message;
+            
+            if (isError) {
+                notification.style.borderLeftColor = '#f44336';
+            } else {
+                notification.style.borderLeftColor = '#00d2ff';
+            }
+            
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>

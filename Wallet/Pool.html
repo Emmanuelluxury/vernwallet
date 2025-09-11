@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin-Starknet Bridge | Pool Dashboard</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #00d2ff;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            color: #00d2ff;
+        }
+        
+        .dashboard-title {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+        
+        .pool-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .pool-tab {
+            padding: 12px 25px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pool-tab:hover, .pool-tab.active {
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            transform: translateY(-2px);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .stat-change {
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .change-positive {
+            color: #4caf50;
+        }
+        
+        .change-negative {
+            color: #f44336;
+        }
+        
+        .pools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .pool-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .pool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .pool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .pool-tokens {
+            display: flex;
+            align-items: center;
+        }
+        
+        .token-pair {
+            display: flex;
+        }
+        
+        .token-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            margin-right: -10px;
+            border: 2px solid #0f2027;
+            position: relative;
+        }
+        
+        .token-badge:first-child {
+            z-index: 2;
+        }
+        
+        .token-badge:last-child {
+            z-index: 1;
+        }
+        
+        .btc-badge {
+            background: #f2a900;
+        }
+        
+        .strk-badge {
+            background: #ff2c6e;
+        }
+        
+        .eth-badge {
+            background: #627eea;
+        }
+        
+        .usdc-badge {
+            background: #2775ca;
+        }
+        
+        .pool-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-left: 15px;
+            color: #00d2ff;
+        }
+        
+        .pool-apr {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 15px 0;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .pool-details {
+            margin: 20px 0;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+        
+        .detail-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .detail-value {
+            font-weight: 500;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #00d2ff;
+            color: #00d2ff;
+        }
+        
+        .btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.3);
+        }
+        
+        .my-pools {
+            margin-top: 50px;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: #00d2ff;
+        }
+        
+        .pools-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .pools-table th, .pools-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .pools-table th {
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            color: #00d2ff;
+        }
+        
+        .pools-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .pool-asset {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .pool-amount {
+            font-weight: 600;
+        }
+        
+        .pool-apr-cell {
+            color: #4caf50;
+            font-weight: 600;
+        }
+        
+        .pool-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: rgba(0, 210, 255, 0.2);
+        }
+        
+        .rewards-section {
+            margin-top: 50px;
+        }
+        
+        .rewards-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .rewards-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .rewards-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .rewards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .reward-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .reward-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .reward-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin: 40px 0;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chart-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                rgba(0, 210, 255, 0.1) 0%, 
+                rgba(58, 123, 213, 0.1) 25%, 
+                rgba(255, 44, 110, 0.1) 50%, 
+                rgba(242, 169, 0, 0.1) 75%, 
+                rgba(0, 210, 255, 0.1) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 1.2rem;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: rgba(0, 0, 0, 0.7);
+            border-left: 4px solid #00d2ff;
+            border-radius: 5px;
+            display: none;
+            animation: slideIn 0.3s forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 30px 0;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .pool-actions {
+                flex-direction: column;
+            }
+            
+            .pool-tab {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .pools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pools-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .pool-actions {
+                flex-direction: column;
+            }
+            
+            .rewards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-water"></i></div>
+                <div class="logo-text">Bitcoin-Starknet Bridge</div>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="../Bitstark/Wallet.html">Dashboard</a></li>
+                    <li><a href="../Wallet/Earn.html">Earn</a></li>
+                    <li><a href="#" class="active">Pool</a></li>
+                    <li><a href="../Wallet/Swap.html">Swap</a></li>
+                    <li><a href="../Wallet/History.html">History</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <h1 class="dashboard-title">Liquidity Pools</h1>
+        <p class="subtitle">Provide liquidity and earn fees from the Bitcoin-Starknet bridge</p>
+        
+        <div class="pool-actions">
+            <div class="pool-tab active">All Pools</div>
+            <div class="pool-tab">My Pools</div>
+            <div class="pool-tab">High APR</div>
+            <div class="pool-tab">Stablecoins</div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">$24.7M</div>
+                <div class="stat-label">Total Liquidity</div>
+                <div class="stat-change change-positive">+7.3% <i class="fas fa-arrow-up"></i></div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">$1.8M</div>
+                <div class="stat-label">Volume (24h)</div>
+                <div class="stat-change change-positive">+12.5% <i class="fas fa-arrow-up"></i></div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">$124.5K</div>
+                <div class="stat-label">Fees (24h)</div>
+                <div class="stat-change change-positive">+8.2% <i class="fas fa-arrow-up"></i></div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">1,842</div>
+                <div class="stat-label">Liquidity Providers</div>
+                <div class="stat-change change-positive">+86 <i class="fas fa-arrow-up"></i></div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-placeholder">
+                <i class="fas fa-chart-line"></i> Liquidity & Volume Chart
+            </div>
+        </div>
+        
+        <div class="pools-grid">
+            <div class="pool-card">
+                <div class="pool-header">
+                    <div class="pool-tokens">
+                        <div class="token-pair">
+                            <div class="token-badge btc-badge">
+                                <i class="fab fa-bitcoin"></i>
+                            </div>
+                            <div class="token-badge strk-badge">S</div>
+                        </div>
+                        <h3 class="pool-title">BTC-STRK</h3>
+                    </div>
+                    <span class="detail-value">#1</span>
+                </div>
+                
+                <div class="pool-apr">24.8% APR</div>
+                <p>The largest pool for trading between Bitcoin and Starknet tokens</p>
+                
+                <div class="pool-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Liquidity:</span>
+                        <span class="detail-value">$8.4M</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Volume (24h):</span>
+                        <span class="detail-value">$642K</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Fees (24h):</span>
+                        <span class="detail-value">$3,842</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Your Share:</span>
+                        <span class="detail-value">$12,450 (0.15%)</span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Liquidity
+                </button>
+            </div>
+            
+            <div class="pool-card">
+                <div class="pool-header">
+                    <div class="pool-tokens">
+                        <div class="token-pair">
+                            <div class="token-badge btc-badge">
+                                <i class="fab fa-bitcoin"></i>
+                            </div>
+                            <div class="token-badge eth-badge">
+                                <i class="fab fa-ethereum"></i>
+                            </div>
+                        </div>
+                        <h3 class="pool-title">BTC-ETH</h3>
+                    </div>
+                    <span class="detail-value">#2</span>
+                </div>
+                
+                <div class="pool-apr">18.2% APR</div>
+                <p>Trade between Bitcoin and Ethereum with minimal slippage</p>
+                
+                <div class="pool-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Liquidity:</span>
+                        <span class="detail-value">$5.2M</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Volume (24h):</span>
+                        <span class="detail-value">$418K</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Fees (24h):</span>
+                        <span class="detail-value">$2,512</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Your Share:</span>
+                        <span class="detail-value">$8,120 (0.16%)</span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Liquidity
+                </button>
+            </div>
+            
+            <div class="pool-card">
+                <div class="pool-header">
+                    <div class="pool-tokens">
+                        <div class="token-pair">
+                            <div class="token-badge strk-badge">S</div>
+                            <div class="token-badge usdc-badge">U</div>
+                        </div>
+                        <h3 class="pool-title">STRK-USDC</h3>
+                    </div>
+                    <span class="detail-value">#3</span>
+                </div>
+                
+                <div class="pool-apr">15.7% APR</div>
+                <p>Stable trading pair for Starknet tokens and USDC stablecoin</p>
+                
+                <div class="pool-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Liquidity:</span>
+                        <span class="detail-value">$3.8M</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Volume (24h):</span>
+                        <span class="detail-value">$287K</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Fees (24h):</span>
+                        <span class="detail-value">$1,724</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Your Share:</span>
+                        <span class="detail-value">$0 (0%)</span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-outline">
+                    <i class="fas fa-plus"></i> Add Liquidity
+                </button>
+            </div>
+        </div>
+        
+        <div class="my-pools">
+            <h2 class="section-title">Your Liquidity Pools</h2>
+            
+            <table class="pools-table">
+                <thead>
+                    <tr>
+                        <th>Pool</th>
+                        <th>Your Liquidity</th>
+                        <th>APR</th>
+                        <th>Earned</th>
+                        <th>Share</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="pool-asset">
+                                <div class="token-pair">
+                                    <div class="token-badge btc-badge">
+                                        <i class="fab fa-bitcoin"></i>
+                                    </div>
+                                    <div class="token-badge strk-badge">S</div>
+                                </div>
+                                <span>BTC-STRK</span>
+                            </div>
+                        </td>
+                        <td class="pool-amount">$12,450</td>
+                        <td class="pool-apr-cell">24.8%</td>
+                        <td class="pool-amount">$342.50</td>
+                        <td class="pool-amount">0.15%</td>
+                        <td>
+                            <div class="pool-actions">
+                                <button class="action-btn"><i class="fas fa-plus"></i> Add</button>
+                                <button class="action-btn"><i class="fas fa-minus"></i> Remove</button>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="pool-asset">
+                                <div class="token-pair">
+                                    <div class="token-badge btc-badge">
+                                        <i class="fab fa-bitcoin"></i>
+                                    </div>
+                                    <div class="token-badge eth-badge">
+                                        <i class="fab fa-ethereum"></i>
+                                    </div>
+                                </div>
+                                <span>BTC-ETH</span>
+                            </div>
+                        </td>
+                        <td class="pool-amount">$8,120</td>
+                        <td class="pool-apr-cell">18.2%</td>
+                        <td class="pool-amount">$218.40</td>
+                        <td class="pool-amount">0.16%</td>
+                        <td>
+                            <div class="pool-actions">
+                                <button class="action-btn"><i class="fas fa-plus"></i> Add</button>
+                                <button class="action-btn"><i class="fas fa-minus"></i> Remove</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="rewards-section">
+            <h2 class="section-title">Your Pool Rewards</h2>
+            
+            <div class="rewards-card">
+                <div class="rewards-header">
+                    <h3>Available Rewards</h3>
+                    <div class="rewards-amount">$560.90</div>
+                </div>
+                
+                <div class="rewards-grid">
+                    <div class="reward-item">
+                        <div class="reward-value">$342.50</div>
+                        <div class="reward-label">BTC-STRK Pool</div>
+                    </div>
+                    
+                    <div class="reward-item">
+                        <div class="reward-value">$218.40</div>
+                        <div class="reward-label">BTC-ETH Pool</div>
+                    </div>
+                    
+                    <div class="reward-item">
+                        <div class="reward-value">$0.00</div>
+                        <div class="reward-label">STRK-USDC Pool</div>
+                    </div>
+                    
+                    <div class="reward-item">
+                        <div class="reward-value">$560.90</div>
+                        <div class="reward-label">Total Rewards</div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" style="margin-top: 20px;">
+                    <i class="fas fa-download"></i> Claim All Rewards
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notificationText"></span>
+    </div>
+    
+    <footer>
+        <p>© 2025 Bitcoin-Starknet Bridge. All rights reserved. | Security Audit Passed | v2.1.4</p>
+        <p>Impermanent loss warning: Providing liquidity may result in temporary losses due to price volatility</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const poolTabs = document.querySelectorAll('.pool-tab');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        
+        // Initialize the dashboard
+        function init() {
+            setupEventListeners();
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Tab switching
+            poolTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    poolTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    filterPools(this.textContent);
+                });
+            });
+            
+            // Pool buttons
+            const poolButtons = document.querySelectorAll('.btn-primary, .btn-outline, .action-btn');
+            poolButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.querySelector('i').className;
+                    const card = this.closest('.pool-card') || this.closest('tr');
+                    const title = card.querySelector('.pool-title')?.textContent || 
+                                 card.querySelector('.pool-asset span')?.textContent;
+                    
+                    if (action.includes('fa-plus')) {
+                        showNotification(`Adding liquidity to ${title} pool...`);
+                    } else if (action.includes('fa-minus')) {
+                        showNotification(`Removing liquidity from ${title} pool...`);
+                    } else if (action.includes('fa-download')) {
+                        showNotification('Claiming all pool rewards...');
+                    }
+                });
+            });
+        }
+        
+        // Filter pools based on selected tab
+        function filterPools(filter) {
+            console.log(`Filtering pools by: ${filter}`);
+            // In a real application, this would filter the displayed pools
+        }
+        
+        // Show notification
+        function showNotification(message, isError = false) {
+            notificationText.textContent = message;
+            
+            if (isError) {
+                notification.style.borderLeftColor = '#f44336';
+            } else {
+                notification.style.borderLeftColor = '#00d2ff';
+            }
+            
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Initialize the dashboard
+        init();
+    </script>
+</body>
+</html>

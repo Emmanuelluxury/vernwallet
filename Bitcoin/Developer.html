@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin-StarkNet Bridge Developer Dashboard</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/solidity.min.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #f39c12;
+            --success: #2ecc71;
+            --warning: #e74c3c;
+            --info: #9b59b6;
+            --light: #ecf0f1;
+            --dark: #1a202c;
+            --gray: #7f8c8d;
+            --bitcoin: #f7931a;
+            --starknet: #7a3cff;
+            --dark-bg: #1a202c;
+            --card-bg: #2d3748;
+            --border: #4a5568;
+            --code-bg: #282c34;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: #e2e8f0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--bitcoin), var(--starknet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logo-icon {
+            font-size: 32px;
+            color: var(--bitcoin);
+        }
+        
+        .starknet-icon {
+            color: var(--starknet);
+        }
+        
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-btn {
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #e2e8f0;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .header-btn:hover {
+            background: var(--secondary);
+            border-color: var(--secondary);
+        }
+        
+        .dev-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+        
+        .dev-tab {
+            padding: 12px 24px;
+            background: var(--card-bg);
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .dev-tab.active {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #a0aec0;
+        }
+        
+        .card-icon {
+            font-size: 24px;
+            color: var(--secondary);
+        }
+        
+        .stat {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: var(--success);
+        }
+        
+        .stat-change.negative {
+            color: var(--warning);
+        }
+        
+        .bridge-image {
+            height: 250px;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bridge-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, var(--bitcoin), var(--starknet));
+            opacity: 0.3;
+            z-index: -1;
+        }
+        
+        .bridge-image h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .bridge-image p {
+            max-width: 600px;
+            color: #e2e8f0;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .code-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+        }
+        
+        .code-block {
+            background: var(--code-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        
+        .code-block pre {
+            margin: 0;
+        }
+        
+        .code-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .code-btn {
+            padding: 8px 16px;
+            background: var(--dark-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: #a0aec0;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .code-btn:hover {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+        
+        .api-endpoints {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .api-item {
+            background: var(--dark-bg);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .api-method {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            width: fit-content;
+        }
+        
+        .method-get {
+            background: var(--success);
+            color: white;
+        }
+        
+        .method-post {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .api-url {
+            font-family: monospace;
+            color: #a0aec0;
+            font-size: 14px;
+        }
+        
+        .api-desc {
+            font-size: 14px;
+            color: #a0aec0;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .tool-item {
+            background: var(--dark-bg);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .tool-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .tool-icon {
+            font-size: 32px;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+        
+        .tool-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .tool-desc {
+            font-size: 14px;
+            color: #a0aec0;
+        }
+        
+        .connections-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .connection-node {
+            background: var(--dark-bg);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .connection-node:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .node-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--secondary);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(52, 152, 219, 0.1);
+        }
+        
+        .node-title {
+            font-size: 14px;
+            color: #a0aec0;
+            margin-bottom: 5px;
+        }
+        
+        .node-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #a0aec0;
+            font-size: 14px;
+            border-top: 1px solid var(--border);
+        }
+        
+        @media (max-width: 1200px) {
+            .dashboard {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .connections-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .connections-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .dev-tabs {
+                overflow-x: auto;
+                padding-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fab fa-bitcoin logo-icon"></i>
+                <i class="fas fa-exchange-alt starknet-icon"></i>
+                <h1>Bitcoin-StarkNet Bridge Developer Dashboard</h1>
+            </div>
+            <div class="header-controls">
+                <button class="header-btn">
+                    <i class="fab fa-github"></i> GitHub
+                </button>
+                <button class="header-btn">
+                    <i class="fas fa-book"></i> Docs
+                </button>
+                <button class="header-btn">
+                    <i class="fas fa-terminal"></i> CLI
+                </button>
+            </div>
+        </header>
+        
+        <div class="dev-tabs">
+            <div class="dev-tab active">API Reference</div>
+            <div class="dev-tab">SDK</div>
+            <div class="dev-tab">Smart Contracts</div>
+            <div class="dev-tab">Testing</div>
+            <div class="dev-tab">Deployment</div>
+            <div class="dev-tab">Monitoring</div>
+        </div>
+        
+        <div class="bridge-image">
+            <h2>Developer Tools & Resources</h2>
+            <p>Everything you need to build, test, and deploy on the Bitcoin-StarkNet bridge</p>
+        </div>
+        
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">API Requests (24h)</div>
+                    <i class="fas fa-code card-icon"></i>
+                </div>
+                <div class="stat">42,819</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+12.7% since yesterday</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Active Developers</div>
+                    <i class="fas fa-users card-icon"></i>
+                </div>
+                <div class="stat">248</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+18 since yesterday</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Avg. Response Time</div>
+                    <i class="fas fa-clock card-icon"></i>
+                </div>
+                <div class="stat">128ms</div>
+                <div class="stat-change negative">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+5ms since yesterday</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="connections-grid">
+            <div class="connection-node">
+                <div class="node-icon">
+                    <i class="fas fa-code-branch"></i>
+                </div>
+                <div class="node-title">GitHub Repos</div>
+                <div class="node-value">12</div>
+            </div>
+            
+            <div class="connection-node">
+                <div class="node-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="node-title">API Endpoints</div>
+                <div class="node-value">24</div>
+            </div>
+            
+            <div class="connection-node">
+                <div class="node-icon">
+                    <i class="fas fa-cube"></i>
+                </div>
+                <div class="node-title">Smart Contracts</div>
+                <div class="node-value">8</div>
+            </div>
+            
+            <div class="connection-node">
+                <div class="node-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div class="node-title">Test Cases</div>
+                <div class="node-value">142</div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="code-section">
+                <div class="section-header">
+                    <h2 class="section-title">API Example Code</h2>
+                    <div class="code-actions">
+                        <button class="code-btn">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <button class="code-btn">
+                            <i class="fas fa-play"></i> Run
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="code-block">
+                    <pre><code class="language-javascript">
+// Initialize Bitcoin-StarkNet Bridge SDK
+const { BridgeSDK } = require('btc-starknet-bridge-sdk');
+
+// Create bridge instance
+const bridge = new BridgeSDK({
+  network: 'mainnet',
+  apiKey: process.env.BRIDGE_API_KEY,
+});
+
+// Transfer BTC to StarkNet
+async function transferBTCtoStarkNet(amount, recipient) {
+  try {
+    const transaction = await bridge.transfer({
+      from: 'bitcoin',
+      to: 'starknet',
+      amount: amount,
+      recipient: recipient,
+      currency: 'BTC'
+    });
+    
+    console.log('Transaction initiated:', transaction.id);
+    console.log('BTC deposit address:', transaction.depositAddress);
+    
+    return transaction;
+  } catch (error) {
+    console.error('Transfer failed:', error.message);
+  }
+}
+
+// Execute transfer
+transferBTCtoStarkNet(0.1, '0x1234...abcd');
+                    </code></pre>
+                </div>
+                
+                <div class="section-header">
+                    <h2 class="section-title">Smart Contract Example</h2>
+                    <div class="code-actions">
+                        <button class="code-btn">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <button class="code-btn">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="code-block">
+                    <pre><code class="language-solidity">
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract BitcoinStarkNetBridge is ReentrancyGuard, Ownable {
+    // Bridge state variables
+    mapping(bytes32 => bool) public processedTransactions;
+    uint256 public minTransferAmount;
+    uint256 public maxTransferAmount;
+    uint256 public totalTransferred;
+    
+    // Events
+    event BridgeInitialized(uint256 minAmount, uint256 maxAmount);
+    event BTCReceived(address indexed recipient, uint256 amount, bytes32 btcTxHash);
+    event BTCSent(address indexed sender, uint256 amount, string btcAddress);
+    
+    constructor(uint256 _minTransferAmount, uint256 _maxTransferAmount) {
+        minTransferAmount = _minTransferAmount;
+        maxTransferAmount = _maxTransferAmount;
+        emit BridgeInitialized(_minTransferAmount, _maxTransferAmount);
+    }
+    
+    // Lock BTC for StarkNet transfer
+    function lockBTC(uint256 amount, string calldata btcAddress) 
+        external 
+        payable 
+        nonReentrant 
+    {
+        require(amount >= minTransferAmount, "Amount below minimum");
+        require(amount <= maxTransferAmount, "Amount exceeds maximum");
+        require(msg.value == amount, "Incorrect BTC amount");
+        
+        // Process the lock
+        totalTransferred += amount;
+        emit BTCSent(msg.sender, amount, btcAddress);
+    }
+    
+    // Release BTC from StarkNet
+    function releaseBTC(
+        address recipient, 
+        uint256 amount, 
+        bytes32 btcTxHash,
+        bytes calldata signature
+    ) external nonReentrant onlyOwner {
+        require(!processedTransactions[btcTxHash], "Transaction already processed");
+        require(amount > 0, "Invalid amount");
+        
+        // Verify the transaction signature
+        bytes32 messageHash = keccak256(abi.encodePacked(recipient, amount, btcTxHash));
+        address signer = recoverSigner(messageHash, signature);
+        require(signer == owner(), "Invalid signature");
+        
+        // Mark transaction as processed
+        processedTransactions[btcTxHash] = true;
+        
+        // Transfer funds to recipient
+        payable(recipient).transfer(amount);
+        emit BTCReceived(recipient, amount, btcTxHash);
+    }
+    
+    // Helper function to recover signer
+    function recoverSigner(bytes32 messageHash, bytes memory signature) 
+        internal 
+        pure 
+        returns (address) 
+    {
+        (bytes32 r, bytes32 s, uint8 v) = splitSignature(signature);
+        return ecrecover(messageHash, v, r, s);
+    }
+    
+    // Helper function to split signature
+    function splitSignature(bytes memory signature)
+        internal
+        pure
+        returns (bytes32 r, bytes32 s, uint8 v)
+    {
+        require(signature.length == 65, "Invalid signature length");
+        assembly {
+            r := mload(add(signature, 32))
+            s := mload(add(signature, 64))
+            v := byte(0, mload(add(signature, 96)))
+        }
+    }
+}
+                    </code></pre>
+                </div>
+            </div>
+            
+            <div class="code-section">
+                <div class="section-header">
+                    <h2 class="section-title">API Endpoints</h2>
+                    <div class="code-actions">
+                        <button class="code-btn">
+                            <i class="fas fa-list"></i> View All
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="api-endpoints">
+                    <div class="api-item">
+                        <div class="api-method method-get">GET</div>
+                        <div class="api-url">/api/v1/balance/{address}</div>
+                        <div class="api-desc">Get balance for a specific address</div>
+                    </div>
+                    
+                    <div class="api-item">
+                        <div class="api-method method-post">POST</div>
+                        <div class="api-url">/api/v1/transfer</div>
+                        <div class="api-desc">Initiate a transfer between networks</div>
+                    </div>
+                    
+                    <div class="api-item">
+                        <div class="api-method method-get">GET</div>
+                        <div class="api-url">/api/v1/transaction/{id}</div>
+                        <div class="api-desc">Get transaction status by ID</div>
+                    </div>
+                    
+                    <div class="api-item">
+                        <div class="api-method method-get">GET</div>
+                        <div class="api-url">/api/v1/network/stats</div>
+                        <div class="api-desc">Get network statistics</div>
+                    </div>
+                    
+                    <div class="api-item">
+                        <div class="api-method method-get">GET</div>
+                        <div class="api-url">/api/v1/gas/estimate</div>
+                        <div class="api-desc">Estimate gas fees for a transaction</div>
+                    </div>
+                </div>
+                
+                <div class="section-header">
+                    <h2 class="section-title">Developer Tools</h2>
+                    <div class="code-actions">
+                        <button class="code-btn">
+                            <i class="fas fa-tools"></i> All Tools
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="tools-grid">
+                    <div class="tool-item">
+                        <div class="tool-icon">
+                            <i class="fas fa-terminal"></i>
+                        </div>
+                        <div class="tool-title">CLI Tool</div>
+                        <div class="tool-desc">Command-line interface for bridge operations</div>
+                    </div>
+                    
+                    <div class="tool-item">
+                        <div class="tool-icon">
+                            <i class="fas fa-vial"></i>
+                        </div>
+                        <div class="tool-title">Test Suite</div>
+                        <div class="tool-desc">Comprehensive testing framework</div>
+                    </div>
+                    
+                    <div class="tool-item">
+                        <div class="tool-icon">
+                            <i class="fas fa-plug"></i>
+                        </div>
+                        <div class="tool-title">API Explorer</div>
+                        <div class="tool-desc">Interactive API documentation</div>
+                    </div>
+                    
+                    <div class="tool-item">
+                        <div class="tool-icon">
+                            <i class="fas fa-bug"></i>
+                        </div>
+                        <div class="tool-title">Debugger</div>
+                        <div class="tool-desc">Step-through transaction debugger</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Bitcoin-StarkNet Bridge Developer Dashboard v2.1.4 | API Version: v1.2.3</p>
+            <p>© 2025 Blockchain Bridge Technologies. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize syntax highlighting
+        hljs.highlightAll();
+        
+        // Simulate live data updates
+        function updateData() {
+            // Update connection nodes with random data to simulate live changes
+            const connections = document.querySelectorAll('.connection-node .node-value');
+            connections[0].textContent = Math.floor(Math.random() * 3 + 12);
+            connections[1].textContent = Math.floor(Math.random() * 5 + 24);
+            
+            // Update stats with random data
+            const stats = document.querySelectorAll('.stat');
+            stats[0].textContent = (Math.floor(Math.random() * 5000) + 40000).toLocaleString();
+            stats[1].textContent = Math.floor(Math.random() * 20 + 240);
+            stats[2].textContent = Math.floor(Math.random() * 50 + 100) + 'ms';
+        }
+        
+        // Update data every 5 seconds
+        setInterval(updateData, 5000);
+        
+        // Add interactivity to tabs
+        const tabs = document.querySelectorAll('.dev-tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+        
+        // Add copy functionality to code buttons
+        const copyButtons = document.querySelectorAll('.code-btn');
+        copyButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (button.querySelector('.fa-copy')) {
+                    const codeBlock = button.closest('.code-section').querySelector('code');
+                    navigator.clipboard.writeText(codeBlock.textContent);
+                    
+                    // Show feedback
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                    }, 2000);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

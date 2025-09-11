@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin-Starknet Bridge | Bitcoin Dashboard</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #f2a900;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #f2a900, #ffcc00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            color: #f2a900;
+        }
+        
+        .dashboard-title {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            background: linear-gradient(to right, #f2a900, #ffcc00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #f2a900;
+        }
+        
+        .card-icon {
+            font-size: 1.8rem;
+            color: #f2a900;
+        }
+        
+        .balance {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 15px 0;
+            background: linear-gradient(to right, #f2a900, #ffcc00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .currency {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .balance-change {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .change-positive {
+            color: #4caf50;
+        }
+        
+        .change-negative {
+            color: #f44336;
+        }
+        
+        .address-box {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .address-value {
+            font-family: monospace;
+            word-break: break-all;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #f2a900;
+        }
+        
+        .address-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .icon-btn:hover {
+            background: rgba(242, 169, 0, 0.2);
+        }
+        
+        .qr-container {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .qr-placeholder {
+            width: 150px;
+            height: 150px;
+            background: conic-gradient(at 50% 50%, #0f2027 0% 25%, #f2a900 25% 50%, #0f2027 50% 75%, #ffcc00 75% 100%);
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .qr-placeholder::before, .qr-placeholder::after {
+            content: '';
+            position: absolute;
+            background: #0f2027;
+            border-radius: 4px;
+        }
+        
+        .qr-placeholder::before {
+            width: 40px;
+            height: 40px;
+            top: 0;
+            left: 0;
+        }
+        
+        .qr-placeholder::after {
+            width: 40px;
+            height: 40px;
+            bottom: 0;
+            right: 0;
+        }
+        
+        .btc-price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 15px 0;
+            background: linear-gradient(to right, #f2a900, #ffcc00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .price-change {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .price-info {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            font-size: 0.9rem;
+        }
+        
+        .price-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .bridge-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #f2a900, #ffcc00);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #f2a900;
+            color: #f2a900;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(242, 169, 0, 0.3);
+        }
+        
+        .transactions-container {
+            margin-top: 40px;
+        }
+        
+        .transactions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #f2a900;
+        }
+        
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .transactions-table th, .transactions-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .transactions-table th {
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            color: #f2a900;
+        }
+        
+        .transactions-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .tx-type {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .type-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .type-receive {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .type-send {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+        
+        .type-bridge {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+        
+        .tx-amount {
+            font-weight: 600;
+        }
+        
+        .tx-amount.receive {
+            color: #4caf50;
+        }
+        
+        .tx-amount.send {
+            color: #f44336;
+        }
+        
+        .tx-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-confirmed {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .status-pending {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+        }
+        
+        .status-processing {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+
+        .layer-group {
+            color: #ff2c6e;
+        }
+        
+        .bridge-visual {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+        }
+        
+        .chain {
+            text-align: center;
+            padding: 15px;
+            flex: 1;
+        }
+        
+        .chain-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #2196f3;
+        }
+        
+        .bitcoin {
+            color: #f2a900;
+        }
+        
+        .starknet {
+            color: #ff2c6e;
+        }
+        
+        .bridge-arrow {
+            font-size: 2rem;
+            color: #00d2ff;
+            padding: 0 15px;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: rgba(0, 0, 0, 0.7);
+            border-left: 4px solid #f2a900;
+            border-radius: 5px;
+            display: none;
+            animation: slideIn 0.3s forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 30px 0;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            nav ul {
+                gap: 15px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .bridge-visual {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .transactions-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"><i class="fab fa-bitcoin"></i></div>
+                <div class="logo-text">Bitcoin-Starknet Bridge</div>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="../Bitcoin/Blocks.html">Dashboard</a></li>
+                    <li><a href="#" class="active">Bitcoin</a></li>
+                    <li><a href="../Wallet/Starknet.html">Starknet</a></li>
+                    <li><a href="../Wallet/Bridge.html">Bridge</a></li>
+                    <li><a href="../Wallet/Earn.html">Earn</a></li>
+                    <li><a href="../Wallet/History.html">History</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <h1 class="dashboard-title">Bitcoin Dashboard</h1>
+        <p class="subtitle">Manage your Bitcoin assets and bridge operations</p>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Bitcoin Balance</h2>
+                    <div class="card-icon"><i class="fab fa-bitcoin"></i></div>
+                </div>
+                <div class="balance">1.254873 <span class="currency">BTC</span></div>
+                <div class="balance-change change-positive">
+                    <i class="fas fa-arrow-up"></i> +0.125 BTC (24h)
+                </div>
+                
+                <div class="address-box">
+                    <div class="address-value">bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq</div>
+                    <div class="address-actions">
+                        <button class="icon-btn"><i class="fas fa-copy"></i></button>
+                        <button class="icon-btn"><i class="fas fa-qrcode"></i></button>
+                        <button class="icon-btn"><i class="fas fa-share-alt"></i></button>
+                    </div>
+                </div>
+                
+                <div class="bridge-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-bridge"></i> Bridge to Starknet
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-exchange-alt"></i> Swap Bitcoin
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Receive Bitcoin</h2>
+                    <div class="card-icon"><i class="fas fa-qrcode"></i></div>
+                </div>
+                
+                <div class="qr-container">
+                    <div class="qr-placeholder"></div>
+                </div>
+                
+                <p style="text-align: center; margin-bottom: 20px;">Scan QR code to receive Bitcoin</p>
+                
+                <div class="bridge-actions">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-download"></i> Save QR Code
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-sync-alt"></i> Generate New Address
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Bitcoin Price</h2>
+                    <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                </div>
+                
+                <div class="btc-price">$34,218.50</div>
+                <div class="price-change change-positive">
+                    <i class="fas fa-arrow-up"></i> +2.4% (24h)
+                </div>
+                
+                <div class="price-info">
+                    <span class="price-label">24h Low:</span>
+                    <span class="price-value">$33,450.20</span>
+                </div>
+                <div class="price-info">
+                    <span class="price-label">24h High:</span>
+                    <span class="price-value">$34,520.80</span>
+                </div>
+                <div class="price-info">
+                    <span class="price-label">Market Cap:</span>
+                    <span class="price-value">$668B</span>
+                </div>
+                
+                <div class="bridge-visual">
+                    <div class="chain">
+                        <div class="chain-icon"><i class="fab fa-bitcoin bitcoin"></i></div>
+                        <h3>Bitcoin</h3>
+                        <p>Mainnet</p>
+                    </div>
+                    
+                    <div class="bridge-arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                    
+                    <div class="chain">
+                        <div class="chain-icon"><i class="fa-solid fa-layer-group"></i></div>
+                        <h3>Starknet</h3>
+                        <p>Layer 2</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="transactions-container">
+            <div class="transactions-header">
+                <h2 class="section-title">Recent Bitcoin Transactions</h2>
+                <button class="btn btn-outline">
+                    <i class="fas fa-history"></i> View All
+                </button>
+            </div>
+            
+            <table class="transactions-table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Address</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="tx-type">
+                                <div class="type-icon type-receive">
+                                    <i class="fas fa-arrow-down"></i>
+                                </div>
+                                <span>Receive</span>
+                            </div>
+                        </td>
+                        <td class="tx-amount receive">+0.125 BTC</td>
+                        <td>Oct 28, 2023 14:23</td>
+                        <td style="font-family: monospace; font-size: 0.8rem;">bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq</td>
+                        <td><span class="tx-status status-confirmed">Confirmed</span></td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="tx-type">
+                                <div class="type-icon type-bridge">
+                                    <i class="fas fa-bridge"></i>
+                                </div>
+                                <span>Bridge</span>
+                            </div>
+                        </td>
+                        <td class="tx-amount send">-0.500 BTC</td>
+                        <td>Oct 27, 2023 09:47</td>
+                        <td style="font-family: monospace; font-size: 0.8rem;">0x1234567890abcdef1234567890abcdef12345678</td>
+                        <td><span class="tx-status status-confirmed">Completed</span></td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="tx-type">
+                                <div class="type-icon type-send">
+                                    <i class="fas fa-arrow-up"></i>
+                                </div>
+                                <span>Send</span>
+                            </div>
+                        </td>
+                        <td class="tx-amount send">-0.100 BTC</td>
+                        <td>Oct 26, 2023 18:15</td>
+                        <td style="font-family: monospace; font-size: 0.8rem;">bc1q9z4m9s5vner4nj24cnv3xdrp5p6c0v0y3j5g4z</td>
+                        <td><span class="tx-status status-confirmed">Confirmed</span></td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="tx-type">
+                                <div class="type-icon type-bridge">
+                                    <i class="fas fa-bridge"></i>
+                                </div>
+                                <span>Bridge</span>
+                            </div>
+                        </td>
+                        <td class="tx-amount send">-0.200 BTC</td>
+                        <td>Oct 25, 2023 11:32</td>
+                        <td style="font-family: monospace; font-size: 0.8rem;">0xabcdef1234567890abcdef1234567890abcdef12</td>
+                        <td><span class="tx-status status-processing">Processing</span></td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="tx-type">
+                                <div class="type-icon type-receive">
+                                    <i class="fas fa-arrow-down"></i>
+                                </div>
+                                <span>Receive</span>
+                            </div>
+                        </td>
+                        <td class="tx-amount receive">+0.750 BTC</td>
+                        <td>Oct 24, 2023 16:45</td>
+                        <td style="font-family: monospace; font-size: 0.8rem;">bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq</td>
+                        <td><span class="tx-status status-pending">Pending</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notificationText"></span>
+    </div>
+    
+    <footer>
+        <p>© 2025 Bitcoin-Starknet Bridge. All rights reserved. | Security Audit Passed | v2.1.4</p>
+        <p>Bitcoin network status: Operational • Average confirmation time: 10 minutes</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const copyButton = document.querySelector('.icon-btn');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        
+        // Initialize the dashboard
+        function init() {
+            setupEventListeners();
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Copy address button
+            copyButton.addEventListener('click', copyAddressToClipboard);
+            
+            // Bridge action buttons
+            const actionButtons = document.querySelectorAll('.btn');
+            actionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.textContent.trim();
+                    handleAction(action);
+                });
+            });
+        }
+        
+        // Copy address to clipboard
+        function copyAddressToClipboard() {
+            const address = document.querySelector('.address-value').textContent;
+            navigator.clipboard.writeText(address)
+                .then(() => {
+                    showNotification('Bitcoin address copied to clipboard!');
+                })
+                .catch(err => {
+                    showNotification('Failed to copy address', true);
+                    console.error('Failed to copy: ', err);
+                });
+        }
+        
+        // Handle action button clicks
+        function handleAction(action) {
+            if (action.includes('Bridge to Starknet')) {
+                showNotification('Preparing to bridge Bitcoin to Starknet...');
+            } else if (action.includes('Swap Bitcoin')) {
+                showNotification('Opening swap interface...');
+            } else if (action.includes('Save QR Code')) {
+                showNotification('QR code saved to your downloads folder!');
+            } else if (action.includes('Generate New Address')) {
+                showNotification('New Bitcoin address generated!');
+            } else if (action.includes('View All')) {
+                showNotification('Loading all transactions...');
+            }
+        }
+        
+        // Show notification
+        function showNotification(message, isError = false) {
+            notificationText.textContent = message;
+            
+            if (isError) {
+                notification.style.borderLeftColor = '#f44336';
+            } else {
+                notification.style.borderLeftColor = '#f2a900';
+            }
+            
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Initialize the dashboard
+        init();
+    </script>
+</body>
+</html>

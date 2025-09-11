@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connections Bitcoin-StarkNet Bridge Dashboard</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #f39c12;
+            --success: #2ecc71;
+            --warning: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --gray: #7f8c8d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #1a202c;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #2d3748;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #3498db, #f39c12);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logo-icon {
+            font-size: 32px;
+            color: #3498db;
+        }
+        
+        .network-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #2d3748;
+            padding: 10px 20px;
+            border-radius: 30px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: #2d3748;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #a0aec0;
+        }
+        
+        .card-icon {
+            font-size: 24px;
+            color: var(--secondary);
+        }
+        
+        .stat {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: var(--success);
+        }
+        
+        .stat-change.negative {
+            color: var(--warning);
+        }
+        
+        .bridge-image {
+            height: 200px;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .bridge-image h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .bridge-image p {
+            max-width: 600px;
+            color: #e2e8f0;
+            font-size: 16px;
+        }
+        
+        .transactions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        .transaction-card {
+            background: #2d3748;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .transaction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .transaction-id {
+            font-family: monospace;
+            color: var(--secondary);
+            font-size: 14px;
+        }
+        
+        .transaction-amount {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .transaction-details {
+            display: flex;
+            justify-content: space-between;
+            color: #a0aec0;
+            font-size: 14px;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: #4a5568;
+            border-radius: 3px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: var(--secondary);
+            border-radius: 3px;
+            width: 75%;
+        }
+        
+        .chart-container {
+            height: 250px;
+            margin-top: 20px;
+        }
+        
+        .connections-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .connection-node {
+            background: #2d3748;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .connection-node:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .node-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+        
+        .node-title {
+            font-size: 14px;
+            color: #a0aec0;
+            margin-bottom: 5px;
+        }
+        
+        .node-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #a0aec0;
+            font-size: 14px;
+            border-top: 1px solid #2d3748;
+        }
+        
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .transactions {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .connections-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-bridge logo-icon"></i>
+                <h1>Connections Bitcoin-StarkNet Bridge Dashboard</h1>
+            </div>
+            <div class="network-status">
+                <div class="status-indicator"></div>
+                <span>Network Operational</span>
+            </div>
+        </header>
+        
+        <div class="bridge-image">
+            <h2>Cross-Chain Bridge Monitoring</h2>
+            <p>Real-time monitoring of transactions between Bitcoin and StarkNet networks. Track transfers, liquidity, and network status.</p>
+        </div>
+        
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Total BTC Locked</div>
+                    <i class="fab fa-btc card-icon"></i>
+                </div>
+                <div class="stat">1,248.75 BTC</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+5.2% in 24h</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">STRK Transactions</div>
+                    <i class="fas fa-exchange-alt card-icon"></i>
+                </div>
+                <div class="stat">42,819</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+12.7% in 24h</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Avg. Transfer Time</div>
+                    <i class="fas fa-clock card-icon"></i>
+                </div>
+                <div class="stat">18 min</div>
+                <div class="stat-change negative">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>-2.4% in 24h</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="connections-grid">
+            <div class="connection-node">
+                <i class="fas fa-link node-icon"></i>
+                <div class="node-title">Active Connections</div>
+                <div class="node-value">42</div>
+            </div>
+            
+            <div class="connection-node">
+                <i class="fas fa-server node-icon"></i>
+                <div class="node-title">Nodes Online</div>
+                <div class="node-value">16/16</div>
+            </div>
+            
+            <div class="connection-node">
+                <i class="fas fa-bolt node-icon"></i>
+                <div class="node-title">Current TPS</div>
+                <div class="node-value">132</div>
+            </div>
+            
+            <div class="connection-node">
+                <i class="fas fa-shield-alt node-icon"></i>
+                <div class="node-title">Security Score</div>
+                <div class="node-value">98.7%</div>
+            </div>
+        </div>
+        
+        <h2 style="margin: 40px 0 20px; font-size: 24px;">Recent Transactions</h2>
+        
+        <div class="transactions">
+            <div class="transaction-card">
+                <div class="transaction-header">
+                    <div class="transaction-id">TXID: 7B83F...C92E1</div>
+                    <div class="transaction-status">Completed</div>
+                </div>
+                <div class="transaction-amount">₿ 2.45 BTC</div>
+                <div class="progress-bar">
+                    <div class="progress"></div>
+                </div>
+                <div class="transaction-details">
+                    <div>From: Bitcoin</div>
+                    <div>To: StarkNet</div>
+                </div>
+            </div>
+            
+            <div class="transaction-card">
+                <div class="transaction-header">
+                    <div class="transaction-id">TXID: A29CE...D87F2</div>
+                    <div class="transaction-status">Processing</div>
+                </div>
+                <div class="transaction-amount">₿ 0.87 BTC</div>
+                <div class="progress-bar">
+                    <div class="progress" style="width: 45%;"></div>
+                </div>
+                <div class="transaction-details">
+                    <div>From: StarkNet</div>
+                    <div>To: Bitcoin</div>
+                </div>
+            </div>
+            
+            <div class="transaction-card">
+                <div class="transaction-header">
+                    <div class="transaction-id">TXID: F56A2...E98B3</div>
+                    <div class="transaction-status">Completed</div>
+                </div>
+                <div class="transaction-amount">₿ 5.12 BTC</div>
+                <div class="progress-bar">
+                    <div class="progress"></div>
+                </div>
+                <div class="transaction-details">
+                    <div>From: Bitcoin</div>
+                    <div>To: StarkNet</div>
+                </div>
+            </div>
+            
+            <div class="transaction-card">
+                <div class="transaction-header">
+                    <div class="transaction-id">TXID: C34DF...G76H2</div>
+                    <div class="transaction-status">Pending</div>
+                </div>
+                <div class="transaction-amount">₿ 1.23 BTC</div>
+                <div class="progress-bar">
+                    <div class="progress" style="width: 20%;"></div>
+                </div>
+                <div class="transaction-details">
+                    <div>From: Bitcoin</div>
+                    <div>To: StarkNet</div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Bitcoin-StarkNet Bridge Dashboard v2.1.4 | Monitoring the cross-chain bridge 24/7</p>
+            <p>© 2025 Blockchain Bridge Technologies. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Simulate live data updates
+        function updateData() {
+            // Update connection nodes with random data to simulate live changes
+            document.querySelector('[title="Active Connections"]').innerHTML = Math.floor(Math.random() * 10 + 40);
+            document.querySelector('[title="Current TPS"]').innerHTML = Math.floor(Math.random() * 50 + 100);
+            
+            // Randomly update status indicators
+            if (Math.random() > 0.9) {
+                const indicator = document.querySelector('.status-indicator');
+                indicator.style.backgroundColor = '#e74c3c';
+                indicator.style.boxShadow = '0 0 10px #e74c3c';
+                document.querySelector('.network-status span').textContent = 'Network Issues';
+            }
+        }
+        
+        // Update data every 5 seconds
+        setInterval(updateData, 5000);
+        
+        // Add hover effects to cards
+        const cards = document.querySelectorAll('.card, .connection-node');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-5px)';
+                card.style.boxShadow = '0 15px 30px rgba(0, 0, 0, 0.2)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.3)';
+            });
+        });
+    </script>
+</body>
+</html>

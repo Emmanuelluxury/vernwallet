@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin-Starknet Bridge | API Status</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #00d2ff;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            color: #00d2ff;
+        }
+        
+        .dashboard-title {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+        
+        .overview-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .overview-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        
+        .overview-card h3 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 15px;
+        }
+        
+        .overview-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .overview-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 5px;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .status-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .status-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #00d2ff;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-operational {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border: 1px solid #4caf50;
+        }
+        
+        .status-down {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid #f44336;
+        }
+        
+        .status-maintenance {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+            border: 1px solid #ff9800;
+        }
+        
+        .status-info {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+        
+        .status-info-item {
+            text-align: center;
+        }
+        
+        .info-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .info-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        
+        .status-history {
+            margin-top: 20px;
+        }
+        
+        .history-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #00d2ff;
+        }
+        
+        .history-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        
+        .history-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+        
+        .history-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .uptime-chart {
+            margin-top: 40px;
+        }
+        
+        .chart-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 40px;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #00d2ff;
+        }
+        
+        .chart-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chart-btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .chart-btn.active {
+            background: #00d2ff;
+        }
+        
+        .chart-canvas {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .incident-list {
+            margin-top: 40px;
+        }
+        
+        .incident-item {
+            display: flex;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .incident-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 15px;
+            margin-top: 5px;
+        }
+        
+        .incident-resolved {
+            background: #4caf50;
+        }
+        
+        .incident-investigating {
+            background: #ff9800;
+        }
+        
+        .incident-content {
+            flex: 1;
+        }
+        
+        .incident-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .incident-description {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 10px;
+        }
+        
+        .incident-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 30px 0;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .status-grid, .overview-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            nav ul {
+                gap: 15px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .chart-actions {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-link"></i></div>
+                <div class="logo-text">Bitcoin-Starknet Bridge</div>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="../Bitstark/ApiDocs.html">Dashboard</a></li>
+                    <li><a href="../Wallet/Bridge.html">Bridge</a></li>
+                    <li><a href="../Bitstark/Transactions.html">Transactions</a></li>
+                    <li><a href="#" class="active">API Status</a></li>
+                    <li><a href="../Bitstark/Security.html">Security</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <h1 class="dashboard-title">API Status Dashboard</h1>
+        <p class="subtitle">Real-time monitoring of Bitcoin-Starknet bridge services</p>
+        
+        <div class="overview-cards">
+            <div class="overview-card">
+                <h3>Overall API Status</h3>
+                <div class="overview-value">100%</div>
+                <div class="overview-label">Uptime last 30 days</div>
+            </div>
+            
+            <div class="overview-card">
+                <h3>API Response Time</h3>
+                <div class="overview-value">128ms</div>
+                <div class="overview-label">Average latency</div>
+            </div>
+            
+            <div class="overview-card">
+                <h3>Total Requests</h3>
+                <div class="overview-value">2.4M</div>
+                <div class="overview-label">Last 30 days</div>
+            </div>
+            
+            <div class="overview-card">
+                <h3>Error Rate</h3>
+                <div class="overview-value">0.02%</div>
+                <div class="overview-label">Last 30 days</div>
+            </div>
+        </div>
+        
+        <div class="status-grid">
+            <div class="status-card">
+                <div class="status-header">
+                    <h2 class="status-title">Bitcoin Node API</h2>
+                    <span class="status-badge status-operational">Operational</span>
+                </div>
+                <p>Connection to Bitcoin blockchain nodes</p>
+                
+                <div class="status-info">
+                    <div class="status-info-item">
+                        <div class="info-label">Response Time</div>
+                        <div class="info-value">86ms</div>
+                    </div>
+                    <div class="status-info-item">
+                        <div class="info-label">Uptime</div>
+                        <div class="info-value">99.99%</div>
+                    </div>
+                    <div class="status-info-item">
+                        <div class="info-label">Version</div>
+                        <div class="info-value">v2.4.1</div>
+                    </div>
+                </div>
+                
+                <div class="status-history">
+                    <div class="history-title">Last 24 hours</div>
+                    <div class="history-bar">
+                        <div class="history-fill" style="width: 100%; background: #4caf50;"></div>
+                    </div>
+                    <div class="history-labels">
+                        <span>12am</span>
+                        <span>Now</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-card">
+                <div class="status-header">
+                    <h2 class="status-title">Starknet Node API</h2>
+                    <span class="status-badge status-operational">Operational</span>
+                </div>
+                <p>Connection to Starknet blockchain nodes</p>
+                
+                <div class="status-info">
+                    <div class="status-info-item">
+                        <div class="info-label">Response Time</div>
+                        <div class="info-value">142ms</div>
+                    </div>
+                    <div class="status-info-item">
+                        <div class="info-label">Uptime</div>
+                        <div class="info-value">99.97%</div>
+                    </div>
+                    <div class="status-info-item">
+                        <div class="info-label">Version</div>
+                        <div class="info-value">v3.0.2</div>
+                    </div>
+                </div>
+                
+                <div class="status-history">
+                    <div class="history-title">Last 24 hours</div>
+                    <div class="history-bar">
+                        <div class="history-fill" style="width: 98%; background: #4caf50;"></div>
+                    </div>
+                    <div class="history-labels">
+                        <span>12am</span>
+                        <span>Now</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-card">
+                <div class="status-header">
+                    <h2 class="status-title">Bridge Service</h2>
+                    <span class="status-badge status-operational">Operational</span>
+                </div>
+                <p>Core bridge logic and transaction processing</p>
+                
+                <div class="status-info">
+                    <div class="status-info-item">
+                        <div class="info-label">Response Time</div>
+                        <div class="info-value">204ms</div>
+                    </div>
+                    <div class="status-info-item">
+                        <div class="info-label">Uptime</div>
+                        <div class="info-value">100%</div>
+                    </div>
+                    <div class="status-info-item">
+                        <div class="info-label">Version</div>
+                        <div class="info-value">v4.1.0</div>
+                    </div>
+                </div>
+                
+                <div class="status-history">
+                    <div class="history-title">Last 24 hours</div>
+                    <div class="history-bar">
+                        <div class="history-fill" style="width: 100%; background: #4caf50;"></div>
+                    </div>
+                    <div class="history-labels">
+                        <span>12am</span>
+                        <span>Now</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-card">
+                <div class="status-header">
+                    <h2 class="status-title">Data API</h2>
+                    <span class="status-badge status-maintenance">Maintenance</span>
+                </div>
+                <p>Historical data and analytics endpoints</p>
+                
+                <div class="status-info">
+                    <div class="status-info-item">
+                        <div class="info-label">Response Time</div>
+                        <div class="info-value">318ms</div>
+                    </div>
+                    <div class="status-info-item">
+                        <div class="info-label">Uptime</div>
+                        <div class="info-value">99.82%</div>
+                    </div>
+                    <div class="status-info-item">
+                        <div class="info-label">Version</div>
+                        <div class="info-value">v2.7.3</div>
+                    </div>
+                </div>
+                
+                <div class="status-history">
+                    <div class="history-title">Last 24 hours</div>
+                    <div class="history-bar">
+                        <div class="history-fill" style="width: 85%; background: #ff9800;"></div>
+                    </div>
+                    <div class="history-labels">
+                        <span>12am</span>
+                        <span>Now</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-header">
+                <h2 class="chart-title">API Uptime History</h2>
+                <div class="chart-actions">
+                    <button class="chart-btn active">24 Hours</button>
+                    <button class="chart-btn">7 Days</button>
+                    <button class="chart-btn">30 Days</button>
+                </div>
+            </div>
+            <div class="chart-canvas" id="uptimeChart">
+                <!-- Chart will be rendered by JavaScript -->
+                <canvas id="statusChart" width="600" height="300"></canvas>
+            </div>
+        </div>
+        
+        <div class="incident-list">
+            <h2 class="chart-title">Recent Incidents</h2>
+            
+            <div class="incident-item">
+                <div class="incident-status incident-resolved"></div>
+                <div class="incident-content">
+                    <h3 class="incident-title">Data API Maintenance</h3>
+                    <p class="incident-description">Scheduled maintenance for database optimization. Some historical data endpoints may be slower than usual during this period.</p>
+                    <div class="incident-meta">
+                        <span>Oct 28, 2023</span>
+                        <span>Resolved</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="incident-item">
+                <div class="incident-status incident-resolved"></div>
+                <div class="incident-content">
+                    <h3 class="incident-title">Starknet Node Update</h3>
+                    <p class="incident-description">Deployed update to Starknet node connectors to improve performance and handle increased load.</p>
+                    <div class="incident-meta">
+                        <span>Oct 25, 2023</span>
+                        <span>Resolved</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="incident-item">
+                <div class="incident-status incident-resolved"></div>
+                <div class="incident-content">
+                    <h3 class="incident-title">Network Congestion</h3>
+                    <p class="incident-description">Temporary slowdown due to Bitcoin network congestion. Bridge transactions experienced delays of 15-20 minutes.</p>
+                    <div class="incident-meta">
+                        <span>Oct 20, 2023</span>
+                        <span>Resolved</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2025 Bitcoin-Starknet Bridge. All rights reserved. | Security Audit Passed | v2.1.4</p>
+        <p>Last updated: <span id="currentTime"></span></p>
+    </footer>
+
+    <script>
+        // Update current time
+        function updateCurrentTime() {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit',
+                timeZoneName: 'short'
+            };
+            document.getElementById('currentTime').textContent = now.toLocaleDateString('en-US', options);
+        }
+        
+        // Update time immediately and then every second
+        updateCurrentTime();
+        setInterval(updateCurrentTime, 1000);
+        
+        // Simulate status updates
+        function simulateStatusChanges() {
+            // Randomly change the status of the Data API to simulate maintenance
+            const dataApiStatus = document.querySelector('.status-card:nth-child(4) .status-badge');
+            const historyBar = document.querySelector('.status-card:nth-child(4) .history-fill');
+            
+            // 20% chance to change status every 30 seconds
+            if (Math.random() < 0.2) {
+                if (dataApiStatus.classList.contains('status-maintenance')) {
+                    dataApiStatus.className = 'status-badge status-operational';
+                    dataApiStatus.textContent = 'Operational';
+                    historyBar.style.width = '100%';
+                    historyBar.style.background = '#4caf50';
+                } else {
+                    dataApiStatus.className = 'status-badge status-maintenance';
+                    dataApiStatus.textContent = 'Maintenance';
+                    historyBar.style.width = '85%';
+                    historyBar.style.background = '#ff9800';
+                }
+            }
+        }
+        
+        // Run status simulation every 30 seconds
+        setInterval(simulateStatusChanges, 30000);
+        
+        // Chart.js implementation for uptime history
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('statusChart').getContext('2d');
+            
+            // Sample data for the chart
+            const data = {
+                labels: ['12am', '3am', '6am', '9am', '12pm', '3pm', '6pm', '9pm', 'Now'],
+                datasets: [
+                    {
+                        label: 'Bitcoin Node API',
+                        data: [100, 100, 100, 100, 100, 100, 100, 100, 100],
+                        borderColor: '#00d2ff',
+                        backgroundColor: 'rgba(0, 210, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Starknet Node API',
+                        data: [100, 100, 100, 100, 98, 100, 100, 100, 100],
+                        borderColor: '#ff2c6e',
+                        backgroundColor: 'rgba(255, 44, 110, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Bridge Service',
+                        data: [100, 100, 100, 100, 100, 100, 100, 100, 100],
+                        borderColor: '#4caf50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Data API',
+                        data: [100, 100, 100, 100, 85, 85, 85, 85, 85],
+                        borderColor: '#ff9800',
+                        backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            };
+            
+            // Chart configuration
+            const config = {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 80,
+                            max: 100,
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            };
+            
+            // Create the chart
+            new Chart(ctx, config);
+            
+            // Add click handlers for chart period buttons
+            const periodButtons = document.querySelectorAll('.chart-btn');
+            periodButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    periodButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

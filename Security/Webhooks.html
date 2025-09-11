@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin-Starknet Bridge | Webhooks Dashboard</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #00d2ff;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            color: #00d2ff;
+        }
+        
+        .dashboard-title {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+        
+        .actions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #00d2ff;
+            color: #00d2ff;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.3);
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #00d2ff;
+        }
+        
+        .card-icon {
+            font-size: 1.8rem;
+            color: #00d2ff;
+        }
+        
+        .webhook-list {
+            margin-top: 20px;
+        }
+        
+        .webhook-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #00d2ff;
+        }
+        
+        .webhook-info {
+            flex: 1;
+        }
+        
+        .webhook-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .webhook-url {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-family: monospace;
+            word-break: break-all;
+        }
+        
+        .webhook-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .status-active {
+            background: #4caf50;
+        }
+        
+        .status-inactive {
+            background: #f44336;
+        }
+        
+        .status-paused {
+            background: #ff9800;
+        }
+        
+        .webhook-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .icon-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .icon-btn:hover {
+            background: rgba(0, 210, 255, 0.2);
+        }
+        
+        .events-container {
+            margin-top: 40px;
+        }
+        
+        .events-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .events-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .events-table th, .events-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .events-table th {
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            color: #00d2ff;
+        }
+        
+        .events-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-delivered {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .status-failed {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+        
+        .status-pending {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-select {
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            min-width: 150px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a2a32, #2c3e50);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: #00d2ff;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #00d2ff;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .checkbox-item input {
+            width: auto;
+        }
+        
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 30px 0;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            nav ul {
+                gap: 15px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .webhook-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .webhook-actions {
+                align-self: flex-end;
+            }
+            
+            .filters {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-plug"></i></div>
+                <div class="logo-text">Bitcoin-Starknet Bridge</div>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="../Bitstark/ApiDocs.html">Dashboard</a></li>
+                    <li><a href="../Wallet/Bridge.html">Bridge</a></li>
+                    <li><a href="../Security/ApiStatus.html">API Status</a></li>
+                    <li><a href="#" class="active">Webhooks</a></li>
+                    <li><a href="../Bitstark/Security.html">Security</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <h1 class="dashboard-title">Webhooks Dashboard</h1>
+        <p class="subtitle">Manage your Bitcoin-Starknet bridge webhooks and monitor delivery status</p>
+        
+        <div class="actions-header">
+            <h2>Your Webhooks</h2>
+            <button class="btn btn-primary" id="createWebhookBtn">
+                <i class="fas fa-plus"></i> Create Webhook
+            </button>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Webhook Summary</h2>
+                    <div class="card-icon"><i class="fa-solid fa-list"></i></div>
+                </div>
+                
+                <div class="webhook-list">
+                    <div class="webhook-item">
+                        <div class="webhook-info">
+                            <div class="webhook-name">Transaction Notifications</div>
+                            <div class="webhook-url">https://api.myapp.com/webhooks/transactions</div>
+                            <div class="webhook-status">
+                                <div class="status-indicator status-active"></div>
+                                <span>Active • Last delivery: Today 14:23</span>
+                            </div>
+                        </div>
+                        <div class="webhook-actions">
+                            <button class="icon-btn"><i class="fas fa-pause"></i></button>
+                            <button class="icon-btn"><i class="fas fa-edit"></i></button>
+                            <button class="icon-btn"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="webhook-item">
+                        <div class="webhook-info">
+                            <div class="webhook-name">Bridge Events</div>
+                            <div class="webhook-url">https://api.myapp.com/webhooks/bridge-events</div>
+                            <div class="webhook-status">
+                                <div class="status-indicator status-active"></div>
+                                <span>Active • Last delivery: Today 13:47</span>
+                            </div>
+                        </div>
+                        <div class="webhook-actions">
+                            <button class="icon-btn"><i class="fas fa-pause"></i></button>
+                            <button class="icon-btn"><i class="fas fa-edit"></i></button>
+                            <button class="icon-btn"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="webhook-item">
+                        <div class="webhook-info">
+                            <div class="webhook-name">Error Alerts</div>
+                            <div class="webhook-url">https://api.myapp.com/webhooks/errors</div>
+                            <div class="webhook-status">
+                                <div class="status-indicator status-paused"></div>
+                                <span>Paused • Last delivery: Yesterday 09:12</span>
+                            </div>
+                        </div>
+                        <div class="webhook-actions">
+                            <button class="icon-btn"><i class="fas fa-play"></i></button>
+                            <button class="icon-btn"><i class="fas fa-edit"></i></button>
+                            <button class="icon-btn"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Webhook Statistics</h2>
+                    <div class="card-icon"><i class="fa-solid fa-chart-pie"></i></div>
+                </div>
+                
+                <div class="stat">
+                    <span class="stat-label">Total Webhooks</span>
+                    <span class="stat-value">3</span>
+                </div>
+                
+                <div class="stat">
+                    <span class="stat-label">Active Webhooks</span>
+                    <span class="stat-value">2</span>
+                </div>
+                
+                <div class="stat">
+                    <span class="stat-label">Total Deliveries (7d)</span>
+                    <span class="stat-value">1,247</span>
+                </div>
+                
+                <div class="stat">
+                    <span class="stat-label">Success Rate</span>
+                    <span class="stat-value">99.2%</span>
+                </div>
+                
+                <div class="stat">
+                    <span class="stat-label">Avg Response Time</span>
+                    <span class="stat-value">218ms</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="events-container">
+            <div class="events-header">
+                <h2>Recent Webhook Events</h2>
+                
+                <div class="filters">
+                    <select class="filter-select" id="webhookFilter">
+                        <option value="all">All Webhooks</option>
+                        <option value="transactions">Transaction Notifications</option>
+                        <option value="bridge-events">Bridge Events</option>
+                        <option value="errors">Error Alerts</option>
+                    </select>
+                    
+                    <select class="filter-select" id="statusFilter">
+                        <option value="all">All Statuses</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="failed">Failed</option>
+                        <option value="pending">Pending</option>
+                    </select>
+                </div>
+            </div>
+            
+            <table class="events-table">
+                <thead>
+                    <tr>
+                        <th>Webhook</th>
+                        <th>Event</th>
+                        <th>Triggered</th>
+                        <th>Status</th>
+                        <th>Response</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Transaction Notifications</td>
+                        <td>transaction.completed</td>
+                        <td>Today 14:23:12</td>
+                        <td><span class="status-badge status-delivered">Delivered</span></td>
+                        <td>200 OK</td>
+                    </tr>
+                    <tr>
+                        <td>Bridge Events</td>
+                        <td>bridge.deposit</td>
+                        <td>Today 13:47:33</td>
+                        <td><span class="status-badge status-delivered">Delivered</span></td>
+                        <td>200 OK</td>
+                    </tr>
+                    <tr>
+                        <td>Transaction Notifications</td>
+                        <td>transaction.initiated</td>
+                        <td>Today 13:22:19</td>
+                        <td><span class="status-badge status-delivered">Delivered</span></td>
+                        <td>200 OK</td>
+                    </tr>
+                    <tr>
+                        <td>Bridge Events</td>
+                        <td>bridge.withdrawal</td>
+                        <td>Today 12:15:47</td>
+                        <td><span class="status-badge status-failed">Failed</span></td>
+                        <td>502 Bad Gateway</td>
+                    </tr>
+                    <tr>
+                        <td>Transaction Notifications</td>
+                        <td>transaction.confirmed</td>
+                        <td>Today 11:38:02</td>
+                        <td><span class="status-badge status-delivered">Delivered</span></td>
+                        <td>200 OK</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Create Webhook Modal -->
+    <div class="modal" id="createWebhookModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Create New Webhook</h2>
+                <button class="close-modal" id="closeCreateModal">&times;</button>
+            </div>
+            
+            <form id="webhookForm">
+                <div class="form-group">
+                    <label for="webhookName">Webhook Name</label>
+                    <input type="text" id="webhookName" placeholder="e.g., Transaction Notifications" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="webhookURL">Payload URL</label>
+                    <input type="url" id="webhookURL" placeholder="https://api.example.com/webhooks" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="webhookSecret">Secret (optional)</label>
+                    <input type="text" id="webhookSecret" placeholder="Enter secret for signing payloads">
+                </div>
+                
+                <div class="form-group">
+                    <label>Events to Subscribe To</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="event1" value="transaction.initiated">
+                            <label for="event1">Transaction Initiated</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="event2" value="transaction.completed">
+                            <label for="event2">Transaction Completed</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="event3" value="transaction.confirmed">
+                            <label for="event3">Transaction Confirmed</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="event4" value="bridge.deposit">
+                            <label for="event4">Bridge Deposit</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="event5" value="bridge.withdrawal">
+                            <label for="event5">Bridge Withdrawal</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="event6" value="bridge.completed">
+                            <label for="event6">Bridge Completed</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="event7" value="error.occurred">
+                            <label for="event7">Error Occurred</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="webhookStatus">Status</label>
+                    <select id="webhookStatus">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" id="cancelCreate">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Webhook</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2025 Bitcoin-Starknet Bridge. All rights reserved. | Security Audit Passed | v2.1.4</p>
+        <p>Webhook API Documentation | Last updated: <span id="currentTime"></span></p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const createWebhookBtn = document.getElementById('createWebhookBtn');
+        const createWebhookModal = document.getElementById('createWebhookModal');
+        const closeCreateModal = document.getElementById('closeCreateModal');
+        const cancelCreate = document.getElementById('cancelCreate');
+        const webhookForm = document.getElementById('webhookForm');
+        const currentTime = document.getElementById('currentTime');
+        
+        // Initialize the dashboard
+        function init() {
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+            setupEventListeners();
+        }
+        
+        // Update current time
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            currentTime.textContent = timeString;
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            createWebhookBtn.addEventListener('click', () => {
+                createWebhookModal.style.display = 'flex';
+            });
+            
+            closeCreateModal.addEventListener('click', () => {
+                createWebhookModal.style.display = 'none';
+            });
+            
+            cancelCreate.addEventListener('click', () => {
+                createWebhookModal.style.display = 'none';
+            });
+            
+            webhookForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                createWebhook();
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === createWebhookModal) {
+                    createWebhookModal.style.display = 'none';
+                }
+            });
+            
+            // Webhook action buttons
+            const actionButtons = document.querySelectorAll('.webhook-actions .icon-btn');
+            actionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const webhookItem = this.closest('.webhook-item');
+                    const webhookName = webhookItem.querySelector('.webhook-name').textContent;
+                    
+                    if (this.querySelector('.fa-pause')) {
+                        pauseWebhook(webhookName);
+                    } else if (this.querySelector('.fa-play')) {
+                        resumeWebhook(webhookName);
+                    } else if (this.querySelector('.fa-edit')) {
+                        editWebhook(webhookName);
+                    } else if (this.querySelector('.fa-trash')) {
+                        deleteWebhook(webhookName);
+                    }
+                });
+            });
+        }
+        
+        // Create a new webhook
+        function createWebhook() {
+            const name = document.getElementById('webhookName').value;
+            const url = document.getElementById('webhookURL').value;
+            
+            // In a real application, you would send this data to your API
+            console.log('Creating webhook:', { name, url });
+            
+            // Show success message (in a real app, you would handle this properly)
+            alert(`Webhook "${name}" created successfully!`);
+            
+            // Close the modal
+            createWebhookModal.style.display = 'none';
+            
+            // Reset the form
+            webhookForm.reset();
+        }
+        
+        // Pause a webhook
+        function pauseWebhook(name) {
+            console.log('Pausing webhook:', name);
+            // In a real application, you would call an API to pause the webhook
+            alert(`Webhook "${name}" has been paused.`);
+        }
+        
+        // Resume a webhook
+        function resumeWebhook(name) {
+            console.log('Resuming webhook:', name);
+            // In a real application, you would call an API to resume the webhook
+            alert(`Webhook "${name}" has been resumed.`);
+        }
+        
+        // Edit a webhook
+        function editWebhook(name) {
+            console.log('Editing webhook:', name);
+            // In a real application, you would open an edit modal with the webhook details
+            alert(`Edit functionality for "${name}" would open here.`);
+        }
+        
+        // Delete a webhook
+        function deleteWebhook(name) {
+            console.log('Deleting webhook:', name);
+            // In a real application, you would confirm before deleting
+            if (confirm(`Are you sure you want to delete the webhook "${name}"?`)) {
+                // Call API to delete the webhook
+                alert(`Webhook "${name}" has been deleted.`);
+            }
+        }
+        
+        // Initialize the dashboard
+        init();
+    </script>
+</body>
+</html>

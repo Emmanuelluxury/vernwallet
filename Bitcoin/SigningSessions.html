@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin-StarkNet Bridge - Signing Sessions</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/json.min.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #f39c12;
+            --success: #2ecc71;
+            --warning: #e74c3c;
+            --info: #9b59b6;
+            --light: #ecf0f1;
+            --dark: #1a202c;
+            --gray: #7f8c8d;
+            --bitcoin: #f7931a;
+            --starknet: #7a3cff;
+            --dark-bg: #1a202c;
+            --card-bg: #2d3748;
+            --border: #4a5568;
+            --code-bg: #282c34;
+            --signing-primary: #9b59b6;
+            --signing-secondary: #3498db;
+            --signing-accent: #f1c40f;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: #e2e8f0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--signing-primary), var(--signing-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logo-icon {
+            font-size: 32px;
+            color: var(--signing-primary);
+        }
+        
+        .starknet-icon {
+            color: var(--signing-secondary);
+        }
+        
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-btn {
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #e2e8f0;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .header-btn:hover {
+            background: var(--signing-primary);
+            border-color: var(--signing-primary);
+        }
+        
+        .signing-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            overflow-x: auto;
+        }
+        
+        .signing-tab {
+            padding: 12px 24px;
+            background: var(--card-bg);
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .signing-tab.active {
+            background: linear-gradient(90deg, var(--signing-primary), var(--signing-secondary));
+            color: white;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #a0aec0;
+        }
+        
+        .card-icon {
+            font-size: 24px;
+            color: var(--signing-primary);
+        }
+        
+        .stat {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--signing-primary), var(--signing-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: var(--success);
+        }
+        
+        .stat-change.negative {
+            color: var(--warning);
+        }
+        
+        .signing-image {
+            height: 280px;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .signing-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, var(--signing-primary), var(--signing-secondary));
+            opacity: 0.3;
+            z-index: -1;
+        }
+        
+        .signing-image h2 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .signing-image p {
+            max-width: 600px;
+            color: #e2e8f0;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .sessions-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            background: linear-gradient(90deg, var(--signing-primary), var(--signing-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .sessions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .session-item {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 15px;
+            padding: 20px;
+            background: var(--dark-bg);
+            border-radius: 12px;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--signing-primary);
+            cursor: pointer;
+        }
+        
+        .session-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .session-item.active {
+            border-left-color: var(--signing-accent);
+        }
+        
+        .session-item.completed {
+            border-left-color: var(--success);
+        }
+        
+        .session-item.expired {
+            border-left-color: var(--warning);
+        }
+        
+        .session-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .session-icon.active {
+            background: rgba(241, 196, 15, 0.2);
+            color: var(--signing-accent);
+        }
+        
+        .session-icon.completed {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+        }
+        
+        .session-icon.pending {
+            background: rgba(155, 89, 182, 0.2);
+            color: var(--signing-primary);
+        }
+        
+        .session-icon.expired {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--warning);
+        }
+        
+        .session-content {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .session-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .session-details {
+            font-size: 14px;
+            color: #a0aec0;
+            line-height: 1.5;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .session-hash {
+            font-family: monospace;
+        }
+        
+        .session-time {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+        
+        .session-status {
+            text-align: right;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            width: fit-content;
+            margin-left: auto;
+        }
+        
+        .status-active {
+            background: rgba(241, 196, 15, 0.2);
+            color: var(--signing-accent);
+        }
+        
+        .status-completed {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+        }
+        
+        .status-pending {
+            background: rgba(155, 89, 182, 0.2);
+            color: var(--signing-primary);
+        }
+        
+        .status-expired {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--warning);
+        }
+        
+        .signing-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .signing-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .signing-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .signing-icon {
+            font-size: 24px;
+            color: var(--signing-primary);
+        }
+        
+        .signing-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .signing-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(46, 204, 113, 0.2);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: var(--success);
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+        
+        .signing-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-label {
+            font-size: 14px;
+            color: #a0aec0;
+        }
+        
+        .form-input {
+            padding: 12px 15px;
+            background: var(--dark-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 14px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--signing-primary);
+        }
+        
+        .sign-btn {
+            padding: 12px 20px;
+            background: linear-gradient(90deg, var(--signing-primary), var(--signing-secondary));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .sign-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .session-detail {
+            background: var(--dark-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .detail-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .detail-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #a0aec0;
+        }
+        
+        .detail-value {
+            font-size: 14px;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        
+        .signers-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .signer-item {
+            background: var(--dark-bg);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .signer-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .signer-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--signing-primary);
+        }
+        
+        .signer-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .signer-status {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            width: fit-content;
+            margin: 0 auto;
+        }
+        
+        .signed {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+        }
+        
+        .pending {
+            background: rgba(241, 196, 15, 0.2);
+            color: var(--signing-accent);
+        }
+        
+        .progress-container {
+            margin-top: 15px;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .progress-label {
+            font-size: 12px;
+            color: #a0aec0;
+        }
+        
+        .progress-value {
+            font-size: 12px;
+            color: #a0aec0;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: var(--dark-bg);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--signing-primary), var(--signing-secondary));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .connections-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .connection-node {
+            background: var(--dark-bg);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .connection-node:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .node-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--signing-primary);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(155, 89, 182, 0.1);
+        }
+        
+        .node-title {
+            font-size: 14px;
+            color: #a0aec0;
+            margin-bottom: 5px;
+        }
+        
+        .node-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--signing-secondary);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #a0aec0;
+            font-size: 14px;
+            border-top: 1px solid var(--border);
+        }
+        
+        @media (max-width: 1200px) {
+            .dashboard {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .connections-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .detail-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .signers-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .connections-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .session-item {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .session-details {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-signature logo-icon"></i>
+                <i class="fas fa-bridge starknet-icon"></i>
+                <h1>Bitcoin-StarkNet Signing Sessions</h1>
+            </div>
+            <div class="header-controls">
+                <button class="header-btn">
+                    <i class="fas fa-plus"></i> New Session
+                </button>
+                <button class="header-btn">
+                    <i class="fas fa-key"></i> My Signatures
+                </button>
+                <button class="header-btn">
+                    <i class="fas fa-sliders-h"></i> Settings
+                </button>
+            </div>
+        </header>
+        
+        <div class="signing-tabs">
+            <div class="signing-tab active">Active Sessions</div>
+            <div class="signing-tab">Pending Approval</div>
+            <div class="signing-tab">Completed</div>
+            <div class="signing-tab">Multisig Wallets</div>
+            <div class="signing-tab">Signature Logs</div>
+            <div class="signing-tab">Settings</div>
+        </div>
+        
+        <div class="signing-image">
+            <h2>Multi-Signature Transaction Sessions</h2>
+            <p>Secure collaborative signing for Bitcoin-StarkNet bridge transactions with real-time status monitoring</p>
+        </div>
+        
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Active Sessions</div>
+                    <i class="fas fa-clock card-icon"></i>
+                </div>
+                <div class="stat">12</div>
+                <div class="stat-change negative">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+3 today</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Awaiting My Signature</div>
+                    <i class="fas fa-signature card-icon"></i>
+                </div>
+                <div class="stat">4</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>-2 since yesterday</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Avg. Completion Time</div>
+                    <i class="fas fa-bolt card-icon"></i>
+                </div>
+                <div class="stat">18m</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>-5m this week</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Success Rate</div>
+                    <i class="fas fa-chart-line card-icon"></i>
+                </div>
+                <div class="stat">99.2%</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+0.8% this month</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="connections-grid">
+            <div class="connection-node">
+                <div class="node-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="node-title">Active Signers</div>
+                <div class="node-value">24</div>
+            </div>
+            
+            <div class="connection-node">
+                <div class="node-icon">
+                    <i class="fas fa-file-contract"></i>
+                </div>
+                <div class="node-title">Sessions Today</div>
+                <div class="node-value">8</div>
+            </div>
+            
+            <div class="connection-node">
+                <div class="node-icon">
+                    <i class="fas fa-check-double"></i>
+                </div>
+                <div class="node-title">Signatures Today</div>
+                <div class="node-value">142</div>
+            </div>
+            
+            <div class="connection-node">
+                <div class="node-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="node-title">Security Score</div>
+                <div class="node-value">98.7%</div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="sessions-section">
+                <div class="section-header">
+                    <h2 class="section-title">Active Signing Sessions</h2>
+                    <button class="header-btn">
+                        <i class="fas fa-plus"></i> New Session
+                    </button>
+                </div>
+                
+                <div class="sessions-list">
+                    <div class="session-item active">
+                        <div class="session-icon active">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="session-content">
+                            <div class="session-title">BTC Bridge Transfer - 2.5 BTC</div>
+                            <div class="session-details">
+                                <span class="session-hash">Session: SESS-7832A1B</span>
+                                <span>Signers: 3/5 completed</span>
+                            </div>
+                            <div class="session-time">Expires in 1h 24m</div>
+                        </div>
+                        <div class="session-status status-active">Active</div>
+                    </div>
+                    
+                    <div class="session-detail">
+                        <div class="detail-header">
+                            <div class="detail-title">Session Details</div>
+                            <button class="header-btn">
+                                <i class="fas fa-times"></i> Close
+                            </button>
+                        </div>
+                        <div class="detail-content">
+                            <div class="detail-item">
+                                <div class="detail-label">Session ID</div>
+                                <div class="detail-value">SESS-7832A1B</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Transaction Type</div>
+                                <div class="detail-value">BTC to StarkNet Transfer</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Amount</div>
+                                <div class="detail-value">2.5 BTC</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Initiated By</div>
+                                <div class="detail-value">0x8f3a...c92e1</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Created</div>
+                                <div class="detail-value">2 hours ago</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Expires</div>
+                                <div class="detail-value">In 1h 24m</div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">Signing Progress</div>
+                                <div class="progress-value">3 of 5 signatures</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 60%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="section-header" style="margin-top: 20px;">
+                            <h2 class="section-title">Signers</h2>
+                        </div>
+                        
+                        <div class="signers-grid">
+                            <div class="signer-item">
+                                <div class="signer-icon">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                                <div class="signer-name">0x8f3a...c92e1</div>
+                                <div class="signer-status signed">Signed</div>
+                            </div>
+                            
+                            <div class="signer-item">
+                                <div class="signer-icon">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                                <div class="signer-name">0xa45b...d87f2</div>
+                                <div class="signer-status signed">Signed</div>
+                            </div>
+                            
+                            <div class="signer-item">
+                                <div class="signer-icon">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                                <div class="signer-name">0xc23d...e98b3</div>
+                                <div class="signer-status signed">Signed</div>
+                            </div>
+                            
+                            <div class="signer-item">
+                                <div class="signer-icon">
+                                    <i class="fas fa-user-clock"></i>
+                                </div>
+                                <div class="signer-name">0xd54e...f76h4</div>
+                                <div class="signer-status pending">Pending</div>
+                            </div>
+                            
+                            <div class="signer-item">
+                                <div class="signer-icon">
+                                    <i class="fas fa-user-clock"></i>
+                                </div>
+                                <div class="signer-name">0xe65f...g65i5</div>
+                                <div class="signer-status pending">Pending</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="session-item">
+                        <div class="session-icon pending">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <div class="session-content">
+                            <div class="session-title">Contract Upgrade - Governance</div>
+                            <div class="session-details">
+                                <span class="session-hash">Session: SESS-8913B2C</span>
+                                <span>Signers: 1/7 completed</span>
+                            </div>
+                            <div class="session-time">Expires in 3h 42m</div>
+                        </div>
+                        <div class="session-status status-pending">Pending</div>
+                    </div>
+                    
+                    <div class="session-item">
+                        <div class="session-icon active">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="session-content">
+                            <div class="session-title">StarkNet to BTC - 4.2 BTC</div>
+                            <div class="session-details">
+                                <span class="session-hash">Session: SESS-9824C3D</span>
+                                <span>Signers: 2/3 completed</span>
+                            </div>
+                            <div class="session-time">Expires in 42m</div>
+                        </div>
+                        <div class="session-status status-active">Active</div>
+                    </div>
+                    
+                    <div class="session-item completed">
+                        <div class="session-icon completed">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="session-content">
+                            <div class="session-title">Fee Structure Update</div>
+                            <div class="session-details">
+                                <span class="session-hash">Session: SESS-1245D4E</span>
+                                <span>Signers: 5/5 completed</span>
+                            </div>
+                            <div class="session-time">Completed 2 hours ago</div>
+                        </div>
+                        <div class="session-status status-completed">Completed</div>
+                    </div>
+                    
+                    <div class="session-item expired">
+                        <div class="session-icon expired">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="session-content">
+                            <div class="session-title">Security Parameter Update</div>
+                            <div class="session-details">
+                                <span class="session-hash">Session: SESS-2356E5F</span>
+                                <span>Signers: 2/4 completed</span>
+                            </div>
+                            <div class="session-time">Expired 1 day ago</div>
+                        </div>
+                        <div class="session-status status-expired">Expired</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="signing-sidebar">
+                <div class="signing-card">
+                    <div class="signing-header">
+                        <i class="fas fa-pen-fancy signing-icon"></i>
+                        <div class="signing-title">Sign Transaction</div>
+                    </div>
+                    
+                    <div class="signing-status">
+                        <div class="status-indicator"></div>
+                        <span>Signing System Operational</span>
+                    </div>
+                    
+                    <div class="signing-form">
+                        <div class="form-group">
+                            <label class="form-label">Session ID</label>
+                            <input type="text" class="form-input" placeholder="Enter session ID" value="SESS-7832A1B">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Signer Address</label>
+                            <input type="text" class="form-input" value="0xd54e...f76h4" readonly>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Verification Code</label>
+                            <input type="text" class="form-input" placeholder="Enter 2FA code">
+                        </div>
+                        
+                        <button class="sign-btn">
+                            <i class="fas fa-signature"></i> Sign Transaction
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="signing-card">
+                    <div class="signing-header">
+                        <i class="fas fa-chart-pie signing-icon"></i>
+                        <div class="signing-title">My Signing Stats</div>
+                    </div>
+                    
+                    <div class="progress-container">
+                        <div class="progress-header">
+                            <div class="progress-label">Sessions Signed</div>
+                            <div class="progress-value">42 of 48</div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 87%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-container" style="margin-top: 15px;">
+                        <div class="progress-header">
+                            <div class="progress-label">Avg. Response Time</div>
+                            <div class="progress-value">2.4 hours</div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 65%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-container" style="margin-top: 15px;">
+                        <div class="progress-header">
+                            <div class="progress-label">Security Score</div>
+                            <div class="progress-value">98%</div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 98%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Bitcoin-StarkNet Bridge Signing Sessions v1.5.2 | Secure multi-signature transaction management</p>
+            <p>© 2025 Blockchain Bridge Technologies. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize syntax highlighting
+        hljs.highlightAll();
+        
+        // Simulate live data updates
+        function updateData() {
+            // Update connection nodes with random data to simulate live changes
+            const connections = document.querySelectorAll('.connection-node .node-value');
+            connections[1].textContent = Math.floor(Math.random() * 3) + 8;
+            connections[2].textContent = Math.floor(Math.random() * 10) + 140;
+            
+            // Update stats with random data
+            const stats = document.querySelectorAll('.stat');
+            stats[0].textContent = Math.floor(Math.random() * 3) + 12;
+            stats[1].textContent = Math.floor(Math.random() * 2) + 3;
+            
+            // Update session timers
+            const sessionTimes = document.querySelectorAll('.session-time');
+            sessionTimes.forEach(time => {
+                if (time.textContent.includes('Expires')) {
+                    const match = time.textContent.match(/Expires in (\d+)h (\d+)m/);
+                    if (match) {
+                        let hours = parseInt(match[1]);
+                        let minutes = parseInt(match[2]);
+                        
+                        minutes -= 1;
+                        if (minutes < 0) {
+                            minutes = 59;
+                            hours -= 1;
+                        }
+                        
+                        if (hours >= 0) {
+                            time.textContent = `Expires in ${hours}h ${minutes}m`;
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Update data every minute
+        setInterval(updateData, 60000);
+        
+        // Add interactivity to tabs
+        const tabs = document.querySelectorAll('.signing-tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+        
+        // Add session detail toggle
+        const sessionItems = document.querySelectorAll('.session-item');
+        sessionItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const detail = item.nextElementSibling;
+                if (detail && detail.classList.contains('session-detail')) {
+                    // Hide all other details
+                    document.querySelectorAll('.session-detail').forEach(d => {
+                        if (d !== detail) d.style.display = 'none';
+                    });
+                    
+                    // Toggle this detail
+                    detail.style.display = detail.style.display === 'none' || !detail.style.display ? 'block' : 'none';
+                }
+            });
+        });
+        
+        // Add close button functionality for details
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('fa-times')) {
+                e.target.closest('.session-detail').style.display = 'none';
+            }
+        });
+        
+        // Add signing form submission
+        const signBtn = document.querySelector('.sign-btn');
+        signBtn.addEventListener('click', () => {
+            const codeInput = document.querySelector('.form-input[placeholder="Enter 2FA code"]');
+            if (codeInput.value.trim() === '') {
+                codeInput.style.borderColor = 'var(--warning)';
+                return;
+            }
+            
+            signBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing...';
+            
+            setTimeout(() => {
+                signBtn.innerHTML = '<i class="fas fa-check-circle"></i> Signed!';
+                signBtn.style.background = 'linear-gradient(90deg, var(--success), var(--success))';
+                
+                setTimeout(() => {
+                    signBtn.innerHTML = '<i class="fas fa-signature"></i> Sign Transaction';
+                    signBtn.style.background = 'linear-gradient(90deg, var(--signing-primary), var(--signing-secondary))';
+                    codeInput.value = '';
+                    
+                    // Update UI to reflect successful signing
+                    const pendingSigners = document.querySelectorAll('.signer-status.pending');
+                    if (pendingSigners.length > 0) {
+                        pendingSigners[0].className = 'signer-status signed';
+                        pendingSigners[0].innerHTML = 'Signed';
+                        
+                        const signerIcons = document.querySelectorAll('.signer-icon');
+                        signerIcons.forEach(icon => {
+                            if (icon.nextElementSibling.textContent === '0xd54e...f76h4') {
+                                icon.innerHTML = '<i class="fas fa-user-check"></i>';
+                            }
+                        });
+                        
+                        // Update progress bar
+                        const progressBar = document.querySelector('.progress');
+                        progressBar.style.width = '80%';
+                        
+                        const progressValue = document.querySelector('.progress-value');
+                        progressValue.textContent = '4 of 5 signatures';
+                    }
+                }, 2000);
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

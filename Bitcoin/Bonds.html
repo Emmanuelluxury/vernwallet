@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin-StarkNet Bridge - Bonds Dashboard</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/json.min.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #f39c12;
+            --success: #2ecc71;
+            --warning: #e74c3c;
+            --info: #9b59b6;
+            --light: #ecf0f1;
+            --dark: #1a202c;
+            --gray: #7f8c8d;
+            --bitcoin: #f7931a;
+            --starknet: #7a3cff;
+            --dark-bg: #1a202c;
+            --card-bg: #2d3748;
+            --border: #4a5568;
+            --code-bg: #282c34;
+            --bond-primary: #f39c12;
+            --bond-secondary: #2ecc71;
+            --bond-accent: #e67e22;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: #e2e8f0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--bond-primary), var(--bond-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logo-icon {
+            font-size: 32px;
+            color: var(--bond-primary);
+        }
+        
+        .starknet-icon {
+            color: var(--bond-secondary);
+        }
+        
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-btn {
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #e2e8f0;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .header-btn:hover {
+            background: var(--bond-primary);
+            border-color: var(--bond-primary);
+        }
+        
+        .bonds-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            overflow-x: auto;
+        }
+        
+        .bonds-tab {
+            padding: 12px 24px;
+            background: var(--card-bg);
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .bonds-tab.active {
+            background: linear-gradient(90deg, var(--bond-primary), var(--bond-secondary));
+            color: white;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #a0aec0;
+        }
+        
+        .card-icon {
+            font-size: 24px;
+            color: var(--bond-primary);
+        }
+        
+        .stat {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--bond-primary), var(--bond-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: var(--success);
+        }
+        
+        .stat-change.negative {
+            color: var(--warning);
+        }
+        
+        .bonds-image {
+            height: 280px;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bonds-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, var(--bond-primary), var(--bond-secondary));
+            opacity: 0.3;
+            z-index: -1;
+        }
+        
+        .bonds-image h2 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .bonds-image p {
+            max-width: 600px;
+            color: #e2e8f0;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .bonds-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            background: linear-gradient(90deg, var(--bond-primary), var(--bond-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .bonds-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .bond-item {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 15px;
+            padding: 20px;
+            background: var(--dark-bg);
+            border-radius: 12px;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--bond-primary);
+            cursor: pointer;
+        }
+        
+        .bond-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .bond-item.active {
+            border-left-color: var(--bond-accent);
+        }
+        
+        .bond-item.mature {
+            border-left-color: var(--success);
+        }
+        
+        .bond-item.risky {
+            border-left-color: var(--warning);
+        }
+        
+        .bond-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .bond-icon.active {
+            background: rgba(243, 156, 18, 0.2);
+            color: var(--bond-primary);
+        }
+        
+        .bond-icon.mature {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+        }
+        
+        .bond-icon.risky {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--warning);
+        }
+        
+        .bond-content {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .bond-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .bond-details {
+            font-size: 14px;
+            color: #a0aec0;
+            line-height: 1.5;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .bond-hash {
+            font-family: monospace;
+        }
+        
+        .bond-time {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+        
+        .bond-status {
+            text-align: right;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            width: fit-content;
+            margin-left: auto;
+        }
+        
+        .status-active {
+            background: rgba(243, 156, 18, 0.2);
+            color: var(--bond-primary);
+        }
+        
+        .status-mature {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+        }
+        
+        .status-risky {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--warning);
+        }
+        
+        .bonds-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .bond-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .bond-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .bond-icon-sm {
+            font-size: 24px;
+            color: var(--bond-primary);
+        }
+        
+        .bond-title-sm {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .bond-status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(46, 204, 113, 0.2);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: var(--success);
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+        
+        .bond-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-label {
+            font-size: 14px;
+            color: #a0aec0;
+        }
+        
+        .form-input {
+            padding: 12px 15px;
+            background: var(--dark-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 14px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--bond-primary);
+        }
+        
+        .bond-btn {
+            padding: 12px 20px;
+            background: linear-gradient(90deg, var(--bond-primary), var(--bond-secondary));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .bond-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .bond-detail {
+            background: var(--dark-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .detail-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .detail-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #a0aec0;
+        }
+        
+        .detail-value {
+            font-size: 14px;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        
+        .yield-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .yield-item {
+            background: var(--dark-bg);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .yield-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .yield-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--bond-primary);
+        }
+        
+        .yield-value {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--bond-secondary);
+        }
+        
+        .yield-label {
+            font-size: 12px;
+            color: #a0aec0;
+        }
+        
+        .progress-container {
+            margin-top: 15px;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .progress-label {
+            font-size: 12px;
+            color: #a0aec0;
+        }
+        
+        .progress-value {
+            font-size: 12px;
+            color: #a0aec0;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: var(--dark-bg);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--bond-primary), var(--bond-secondary));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .connections-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .connection-node {
+            background: var(--dark-bg);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .connection-node:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .set {
+            text-decoration: none;
+        }
+        
+        .node-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--bond-primary);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(243, 156, 18, 0.1);
+        }
+        
+        .node-title {
+            font-size: 14px;
+            color: #a0aec0;
+            margin-bottom: 5px;
+        }
+        
+        .node-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--bond-secondary);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #a0aec0;
+            font-size: 14px;
+            border-top: 1px solid var(--border);
+        }
+        
+        @media (max-width: 1200px) {
+            .dashboard {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .connections-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .detail-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .yield-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .connections-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .bond-item {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .bond-details {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-handshake logo-icon"></i>
+                <i class="fas fa-bridge starknet-icon"></i>
+                <h1>Bitcoin-StarkNet Bridge Bonds</h1>
+            </div>
+            <div class="header-controls">
+                <button class="header-btn">
+                    <i class="fas fa-plus"></i> Issue Bond
+                </button>
+                <button class="header-btn">
+                    <i class="fas fa-coins"></i> My Bonds
+                </button>
+                <a href="../Bitstark/Settings.html" class="set">
+                <button class="header-btn">
+                    <i class="fas fa-sliders-h"></i> Settings
+                </button>
+                </a>
+            </div>
+        </header>
+        
+        <div class="bonds-tabs">
+            <div class="bonds-tab active">Active Bonds</div>
+            <div class="bonds-tab">Bond Marketplace</div>
+            <div class="bonds-tab">Yield Farming</div>
+            <div class="bonds-tab">Risk Management</div>
+            <div class="bonds-tab">Bond History</div>
+            <div class="bonds-tab">Analytics</div>
+        </div>
+        
+        <div class="bonds-image">
+            <h2>Bridge Bond Management System</h2>
+            <p>Secure bonding mechanism for Bitcoin-StarkNet bridge operations with yield optimization</p>
+        </div>
+        
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Total Bond Value</div>
+                    <i class="fas fa-coins card-icon"></i>
+                </div>
+                <div class="stat">$42.8M</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+$2.4M this month</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Active Bonds</div>
+                    <i class="fas fa-handshake card-icon"></i>
+                </div>
+                <div class="stat">128</div>
+                <div class="stat-change negative">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+12 this week</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Avg. Yield Rate</div>
+                    <i class="fas fa-percentage card-icon"></i>
+                </div>
+                <div class="stat">8.4%</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+0.6% this month</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Default Rate</div>
+                    <i class="fas fa-shield-alt card-icon"></i>
+                </div>
+                <div class="stat">0.2%</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>-0.1% this quarter</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="connections-grid">
+            <div class="connection-node">
+                <div class="node-icon">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="node-title">Active Bonders</div>
+                <div class="node-value">84</div>
+            </div>
+            
+            <div class="connection-node">
+                <div class="node-icon">
+                    <i class="fas fa-file-contract"></i>
+                </div>
+                <div class="node-title">Bonds Today</div>
+                <div class="node-value">12</div>
+            </div>
+            
+            <div class="connection-node">
+                <div class="node-icon">
+                    <i class="fas fa-check-double"></i>
+                </div>
+                <div class="node-title">Bonds Redeemed</div>
+                <div class="node-value">42</div>
+            </div>
+            
+            <div class="connection-node">
+                <div class="node-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="node-title">Collateral Ratio</div>
+                <div class="node-value">145%</div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="bonds-section">
+                <div class="section-header">
+                    <h2 class="section-title">Active Bonds</h2>
+                    <button class="header-btn">
+                        <i class="fas fa-plus"></i> New Bond
+                    </button>
+                </div>
+                
+                <div class="bonds-list">
+                    <div class="bond-item active">
+                        <div class="bond-icon active">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="bond-content">
+                            <div class="bond-title">BTC Bridge Bond - 8.5% APY</div>
+                            <div class="bond-details">
+                                <span class="bond-hash">BOND-BTC-7832A1B</span>
+                                <span>Value: $250,000</span>
+                            </div>
+                            <div class="bond-time">Matures in 90 days</div>
+                        </div>
+                        <div class="bond-status status-active">Active</div>
+                    </div>
+                    
+                    <div class="bond-detail">
+                        <div class="detail-header">
+                            <div class="detail-title">Bond Details</div>
+                            <button class="header-btn">
+                                <i class="fas fa-times"></i> Close
+                            </button>
+                        </div>
+                        <div class="detail-content">
+                            <div class="detail-item">
+                                <div class="detail-label">Bond ID</div>
+                                <div class="detail-value">BOND-BTC-7832A1B</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Bond Type</div>
+                                <div class="detail-value">BTC Bridge Security Bond</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Face Value</div>
+                                <div class="detail-value">$250,000</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Purchase Price</div>
+                                <div class="detail-value">$245,000</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Yield Rate</div>
+                                <div class="detail-value">8.5% APY</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Issued</div>
+                                <div class="detail-value">15 days ago</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Maturity Date</div>
+                                <div class="detail-value">Dec 15, 2023</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Collateral</div>
+                                <div class="detail-value">5.2 BTC</div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">Time to Maturity</div>
+                                <div class="progress-value">75 of 90 days</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 83%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="yield-grid">
+                            <div class="yield-item">
+                                <div class="yield-icon">
+                                    <i class="fas fa-coins"></i>
+                                </div>
+                                <div class="yield-value">$4,250</div>
+                                <div class="yield-label">Total Yield</div>
+                            </div>
+                            
+                            <div class="yield-item">
+                                <div class="yield-icon">
+                                    <i class="fas fa-calendar"></i>
+                                </div>
+                                <div class="yield-value">$46.89</div>
+                                <div class="yield-label">Daily Yield</div>
+                            </div>
+                            
+                            <div class="yield-item">
+                                <div class="yield-icon">
+                                    <i class="fas fa-percentage"></i>
+                                </div>
+                                <div class="yield-value">8.5%</div>
+                                <div class="yield-label">APY</div>
+                            </div>
+                            
+                            <div class="yield-item">
+                                <div class="yield-icon">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div class="yield-value">150%</div>
+                                <div class="yield-label">Collateralization</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bond-item">
+                        <div class="bond-icon active">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="bond-content">
+                            <div class="bond-title">STRK Liquidity Bond - 7.2% APY</div>
+                            <div class="bond-details">
+                                <span class="bond-hash">BOND-STRK-8913B2C</span>
+                                <span>Value: $120,000</span>
+                            </div>
+                            <div class="bond-time">Matures in 45 days</div>
+                        </div>
+                        <div class="bond-status status-active">Active</div>
+                    </div>
+                    
+                    <div class="bond-item mature">
+                        <div class="bond-icon mature">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="bond-content">
+                            <div class="bond-title">Bridge Insurance Bond - 9.1% APY</div>
+                            <div class="bond-details">
+                                <span class="bond-hash">BOND-INS-9824C3D</span>
+                                <span>Value: $85,000</span>
+                            </div>
+                            <div class="bond-time">Matured 5 days ago</div>
+                        </div>
+                        <div class="bond-status status-mature">Mature</div>
+                    </div>
+                    
+                    <div class="bond-item risky">
+                        <div class="bond-icon risky">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="bond-content">
+                            <div class="bond-title">High-Yield Bridge Bond - 12.5% APY</div>
+                            <div class="bond-details">
+                                <span class="bond-hash">BOND-HY-1245D4E</span>
+                                <span>Value: $65,000</span>
+                            </div>
+                            <div class="bond-time">Matures in 12 days</div>
+                        </div>
+                        <div class="bond-status status-risky">Risky</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bonds-sidebar">
+                <div class="bond-card">
+                    <div class="bond-header">
+                        <i class="fas fa-plus-circle bond-icon-sm"></i>
+                        <div class="bond-title-sm">Issue New Bond</div>
+                    </div>
+                    
+                    <div class="bond-status-indicator">
+                        <div class="status-indicator"></div>
+                        <span>Bond issuance active</span>
+                    </div>
+                    
+                    <div class="bond-form">
+                        <div class="form-group">
+                            <label class="form-label">Bond Type</label>
+                            <select class="form-input">
+                                <option>BTC Bridge Security Bond</option>
+                                <option>STRK Liquidity Bond</option>
+                                <option>Bridge Insurance Bond</option>
+                                <option>High-Yield Bridge Bond</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Bond Value ($)</label>
+                            <input type="text" class="form-input" placeholder="Enter bond value">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Term (days)</label>
+                            <select class="form-input">
+                                <option>30 days</option>
+                                <option>60 days</option>
+                                <option>90 days</option>
+                                <option>180 days</option>
+                                <option>360 days</option>
+                            </select>
+                        </div>
+                        
+                        <button class="bond-btn">
+                            <i class="fas fa-handshake"></i> Issue Bond
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bond-card">
+                    <div class="bond-header">
+                        <i class="fas fa-chart-pie bond-icon-sm"></i>
+                        <div class="bond-title-sm">My Bond Portfolio</div>
+                    </div>
+                    
+                    <div class="progress-container">
+                        <div class="progress-header">
+                            <div class="progress-label">Portfolio Value</div>
+                            <div class="progress-value">$425,000</div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 65%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-container" style="margin-top: 15px;">
+                        <div class="progress-header">
+                            <div class="progress-label">Estimated Yield</div>
+                            <div class="progress-value">$32,800</div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 80%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-container" style="margin-top: 15px;">
+                        <div class="progress-header">
+                            <div class="progress-label">Risk Score</div>
+                            <div class="progress-value">Medium</div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 40%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Bitcoin-StarkNet Bridge Bonds v1.3.5 | Secure bonding for bridge operations</p>
+            <p>© 2025 Blockchain Bridge Technologies. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize syntax highlighting
+        hljs.highlightAll();
+        
+        // Simulate live data updates
+        function updateData() {
+            // Update connection nodes with random data to simulate live changes
+            const connections = document.querySelectorAll('.connection-node .node-value');
+            connections[1].textContent = Math.floor(Math.random() * 5) + 10;
+            connections[2].textContent = Math.floor(Math.random() * 3) + 40;
+            
+            // Update stats with random data
+            const stats = document.querySelectorAll('.stat');
+            const totalValue = parseFloat(stats[0].textContent.replace('$', '').replace('M', ''));
+            stats[0].textContent = '$' + (totalValue + (Math.random() * 0.1)).toFixed(1) + 'M';
+            
+            // Update bond timers
+            const bondTimes = document.querySelectorAll('.bond-time');
+            bondTimes.forEach(time => {
+                if (time.textContent.includes('Matures in')) {
+                    const match = time.textContent.match(/Matures in (\d+) days/);
+                    if (match) {
+                        let days = parseInt(match[1]);
+                        if (days > 0) {
+                            days -= 1;
+                            time.textContent = `Matures in ${days} days`;
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Update data every minute
+        setInterval(updateData, 60000);
+        
+        // Add interactivity to tabs
+        const tabs = document.querySelectorAll('.bonds-tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+        
+        // Add bond detail toggle
+        const bondItems = document.querySelectorAll('.bond-item');
+        bondItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const detail = item.nextElementSibling;
+                if (detail && detail.classList.contains('bond-detail')) {
+                    // Hide all other details
+                    document.querySelectorAll('.bond-detail').forEach(d => {
+                        if (d !== detail) d.style.display = 'none';
+                    });
+                    
+                    // Toggle this detail
+                    detail.style.display = detail.style.display === 'none' || !detail.style.display ? 'block' : 'none';
+                }
+            });
+        });
+        
+        // Add close button functionality for details
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('fa-times')) {
+                e.target.closest('.bond-detail').style.display = 'none';
+            }
+        });
+        
+        // Add bond issuance form submission
+        const bondBtn = document.querySelector('.bond-btn');
+        bondBtn.addEventListener('click', () => {
+            const valueInput = document.querySelector('.form-input[placeholder="Enter bond value"]');
+            if (valueInput.value.trim() === '') {
+                valueInput.style.borderColor = 'var(--warning)';
+                return;
+            }
+            
+            bondBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            setTimeout(() => {
+                bondBtn.innerHTML = '<i class="fas fa-check-circle"></i> Bond Issued!';
+                bondBtn.style.background = 'linear-gradient(90deg, var(--success), var(--success))';
+                
+                setTimeout(() => {
+                    bondBtn.innerHTML = '<i class="fas fa-handshake"></i> Issue Bond';
+                    bondBtn.style.background = 'linear-gradient(90deg, var(--bond-primary), var(--bond-secondary))';
+                    valueInput.value = '';
+                    
+                    // Add new bond to the list
+                    const bondsList = document.querySelector('.bonds-list');
+                    const newBond = document.querySelector('.bond-item').cloneNode(true);
+                    
+                    // Update bond details
+                    newBond.querySelector('.bond-title').textContent = 'New Bridge Bond - 8.2% APY';
+                    newBond.querySelector('.bond-hash').textContent = 'BOND-NEW-' + Math.random().toString(36).substring(2, 9).toUpperCase();
+                    newBond.querySelector('.bond-details span:last-child').textContent = 'Value: $' + (Math.floor(Math.random() * 100) + 50) + ',000';
+                    newBond.querySelector('.bond-time').textContent = 'Matures in 90 days';
+                    
+                    bondsList.prepend(newBond);
+                    
+                    // Show animation for new bond
+                    newBond.style.opacity = '0';
+                    newBond.style.transform = 'translateY(-20px)';
+                    
+                    setTimeout(() => {
+                        newBond.style.transition = 'all 0.5s ease';
+                        newBond.style.opacity = '1';
+                        newBond.style.transform = 'translateY(0)';
+                    }, 100);
+                }, 2000);
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

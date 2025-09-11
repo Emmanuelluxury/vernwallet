@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin-Starknet Bridge | Earn Dashboard</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #00d2ff;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            color: #00d2ff;
+        }
+        
+        .dashboard-title {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+        
+        .earn-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .earn-tab {
+            padding: 12px 25px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .earn-tab:hover, .earn-tab.active {
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            transform: translateY(-2px);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .stat-change {
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .change-positive {
+            color: #4caf50;
+        }
+        
+        .change-negative {
+            color: #f44336;
+        }
+        
+        .opportunities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .opportunity-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .opportunity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .opportunity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .opportunity-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #00d2ff;
+        }
+        
+        .opportunity-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge-primary {
+            background: rgba(0, 210, 255, 0.2);
+            color: #00d2ff;
+        }
+        
+        .badge-success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .badge-warning {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+        }
+        
+        .opportunity-apr {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 15px 0;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .opportunity-details {
+            margin: 20px 0;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+        
+        .detail-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .detail-value {
+            font-weight: 500;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #00d2ff;
+            color: #00d2ff;
+        }
+        
+        .btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.3);
+        }
+        
+        .my-investments {
+            margin-top: 50px;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: #00d2ff;
+        }
+        
+        .investments-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .investments-table th, .investments-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .investments-table th {
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            color: #00d2ff;
+        }
+        
+        .investments-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .investment-asset {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .asset-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .icon-btc {
+            background: #f2a900;
+        }
+        
+        .icon-strk {
+            background: #ff2c6e;
+        }
+        
+        .icon-eth {
+            background: #627eea;
+        }
+        
+        .icon-lp {
+            background: linear-gradient(45deg, #00d2ff, #ff2c6e);
+        }
+        
+        .investment-amount {
+            font-weight: 600;
+        }
+        
+        .investment-apr {
+            color: #4caf50;
+            font-weight: 600;
+        }
+        
+        .investment-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: rgba(0, 210, 255, 0.2);
+        }
+        
+        .rewards-section {
+            margin-top: 50px;
+        }
+        
+        .rewards-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .rewards-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .rewards-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .rewards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .reward-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .reward-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .reward-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: rgba(0, 0, 0, 0.7);
+            border-left: 4px solid #00d2ff;
+            border-radius: 5px;
+            display: none;
+            animation: slideIn 0.3s forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 30px 0;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .earn-actions {
+                flex-direction: column;
+            }
+            
+            .earn-tab {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .opportunities-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .investments-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .investment-actions {
+                flex-direction: column;
+            }
+            
+            .rewards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-coins"></i></div>
+                <div class="logo-text">Bitcoin-Starknet Bridge</div>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="../Bitstark/Wallet.html">Dashboard</a></li>
+                    <li><a href="../Wallet/Send.html">Send</a></li>
+                    <li><a href="../Wallet/Swap.html">Swap</a></li>
+                    <li><a href="#" class="active">Earn</a></li>
+                    <li><a href="../Wallet/History.html">History</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <h1 class="dashboard-title">Earn Dashboard</h1>
+        <p class="subtitle">Grow your crypto assets with yield farming and staking opportunities</p>
+        
+        <div class="earn-actions">
+            <div class="earn-tab active">All Opportunities</div>
+            <div class="earn-tab">Staking</div>
+            <div class="earn-tab">Yield Farming</div>
+            <div class="earn-tab">Liquidity Pools</div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">$12.4M</div>
+                <div class="stat-label">Total Value Locked</div>
+                <div class="stat-change change-positive">+5.2% <i class="fas fa-arrow-up"></i></div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">18.24%</div>
+                <div class="stat-label">Average APY</div>
+                <div class="stat-change change-positive">+0.8% <i class="fas fa-arrow-up"></i></div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">$342.50</div>
+                <div class="stat-label">Your Earnings</div>
+                <div class="stat-change change-positive">+$24.30 <i class="fas fa-arrow-up"></i></div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">2,458</div>
+                <div class="stat-label">Active Users</div>
+                <div class="stat-change change-positive">+124 <i class="fas fa-arrow-up"></i></div>
+            </div>
+        </div>
+        
+        <div class="opportunities-grid">
+            <div class="opportunity-card">
+                <div class="opportunity-header">
+                    <h3 class="opportunity-title">BTC Staking</h3>
+                    <span class="opportunity-badge badge-primary">STAKING</span>
+                </div>
+                
+                <div class="opportunity-apr">14.5% APY</div>
+                <p>Stake your Bitcoin and earn rewards without locking your funds</p>
+                
+                <div class="opportunity-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Minimum Stake:</span>
+                        <span class="detail-value">0.001 BTC</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Your Stake:</span>
+                        <span class="detail-value">1.25 BTC</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Total Staked:</span>
+                        <span class="detail-value">245.8 BTC</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Lock Period:</span>
+                        <span class="detail-value">None</span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Stake BTC
+                </button>
+            </div>
+            
+            <div class="opportunity-card">
+                <div class="opportunity-header">
+                    <h3 class="opportunity-title">BTC-STRK LP</h3>
+                    <span class="opportunity-badge badge-success">FARMING</span>
+                </div>
+                
+                <div class="opportunity-apr">23.8% APY</div>
+                <p>Provide liquidity for BTC-STRK pairs and earn trading fees</p>
+                
+                <div class="opportunity-details">
+                    <div class="detail-item">
+                        <span class="detail-label">TVL:</span>
+                        <span class="detail-value">$4.2M</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Your Share:</span>
+                        <span class="detail-value">$12,450</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Volume (24h):</span>
+                        <span class="detail-value">$1.4M</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Rewards:</span>
+                        <span class="detail-value">BTC + STRK</span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Liquidity
+                </button>
+            </div>
+            
+            <div class="opportunity-card">
+                <div class="opportunity-header">
+                    <h3 class="opportunity-title">STRK Staking</h3>
+                    <span class="opportunity-badge badge-warning">HIGH APR</span>
+                </div>
+                
+                <div class="opportunity-apr">28.3% APY</div>
+                <p>Stake STRK tokens to secure the network and earn high yields</p>
+                
+                <div class="opportunity-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Minimum Stake:</span>
+                        <span class="detail-value">50 STRK</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Your Stake:</span>
+                        <span class="detail-value">1,240 STRK</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Total Staked:</span>
+                        <span class="detail-value">4.5M STRK</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Lock Period:</span>
+                        <span class="detail-value">7-90 days</span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Stake STRK
+                </button>
+            </div>
+        </div>
+        
+        <div class="my-investments">
+            <h2 class="section-title">Your Investments</h2>
+            
+            <table class="investments-table">
+                <thead>
+                    <tr>
+                        <th>Asset</th>
+                        <th>Amount</th>
+                        <th>APR</th>
+                        <th>Value</th>
+                        <th>Earnings</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="investment-asset">
+                                <div class="asset-icon icon-btc">
+                                    <i class="fab fa-bitcoin"></i>
+                                </div>
+                                <span>BTC Staking</span>
+                            </div>
+                        </td>
+                        <td class="investment-amount">1.25 BTC</td>
+                        <td class="investment-apr">14.5%</td>
+                        <td>$42,350</td>
+                        <td class="investment-apr">+0.042 BTC</td>
+                        <td>
+                            <div class="investment-actions">
+                                <button class="action-btn"><i class="fas fa-plus"></i> Add</button>
+                                <button class="action-btn"><i class="fas fa-minus"></i> Remove</button>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="investment-asset">
+                                <div class="asset-icon icon-lp">LP</div>
+                                <span>BTC-STRK LP</span>
+                            </div>
+                        </td>
+                        <td class="investment-amount">$12,450</td>
+                        <td class="investment-apr">23.8%</td>
+                        <td>$12,450</td>
+                        <td class="investment-apr">+$342.50</td>
+                        <td>
+                            <div class="investment-actions">
+                                <button class="action-btn"><i class="fas fa-plus"></i> Add</button>
+                                <button class="action-btn"><i class="fas fa-minus"></i> Remove</button>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="investment-asset">
+                                <div class="asset-icon icon-strk">S</div>
+                                <span>STRK Staking</span>
+                            </div>
+                        </td>
+                        <td class="investment-amount">1,240 STRK</td>
+                        <td class="investment-apr">28.3%</td>
+                        <td>$3,472</td>
+                        <td class="investment-apr">+86.5 STRK</td>
+                        <td>
+                            <div class="investment-actions">
+                                <button class="action-btn"><i class="fas fa-plus"></i> Add</button>
+                                <button class="action-btn"><i class="fas fa-minus"></i> Remove</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="rewards-section">
+            <h2 class="section-title">Your Rewards</h2>
+            
+            <div class="rewards-card">
+                <div class="rewards-header">
+                    <h3>Available Rewards</h3>
+                    <div class="rewards-amount">$342.50</div>
+                </div>
+                
+                <div class="rewards-grid">
+                    <div class="reward-item">
+                        <div class="reward-value">0.042 BTC</div>
+                        <div class="reward-label">BTC Rewards</div>
+                    </div>
+                    
+                    <div class="reward-item">
+                        <div class="reward-value">86.5 STRK</div>
+                        <div class="reward-label">STRK Rewards</div>
+                    </div>
+                    
+                    <div class="reward-item">
+                        <div class="reward-value">$124.30</div>
+                        <div class="reward-label">Trading Fees</div>
+                    </div>
+                    
+                    <div class="reward-item">
+                        <div class="reward-value">$218.20</div>
+                        <div class="reward-label">Farming Rewards</div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" style="margin-top: 20px;">
+                    <i class="fas fa-download"></i> Claim All Rewards
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notificationText"></span>
+    </div>
+    
+    <footer>
+        <p>© 2025 Bitcoin-Starknet Bridge. All rights reserved. | Security Audit Passed | v2.1.4</p>
+        <p>APY rates are estimates and may change based on market conditions</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const earnTabs = document.querySelectorAll('.earn-tab');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        
+        // Initialize the dashboard
+        function init() {
+            setupEventListeners();
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Tab switching
+            earnTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    earnTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    filterOpportunities(this.textContent);
+                });
+            });
+            
+            // Investment buttons
+            const investmentButtons = document.querySelectorAll('.btn-primary, .action-btn');
+            investmentButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.querySelector('i').className;
+                    const card = this.closest('.opportunity-card') || this.closest('tr');
+                    const title = card.querySelector('.opportunity-title')?.textContent || 
+                                 card.querySelector('.investment-asset span')?.textContent;
+                    
+                    if (action.includes('fa-plus')) {
+                        showNotification(`Adding funds to ${title}...`);
+                    } else if (action.includes('fa-minus')) {
+                        showNotification(`Removing funds from ${title}...`);
+                    } else if (action.includes('fa-download')) {
+                        showNotification('Claiming all rewards...');
+                    }
+                });
+            });
+        }
+        
+        // Filter opportunities based on selected tab
+        function filterOpportunities(filter) {
+            console.log(`Filtering opportunities by: ${filter}`);
+            // In a real application, this would filter the displayed opportunities
+        }
+        
+        // Show notification
+        function showNotification(message, isError = false) {
+            notificationText.textContent = message;
+            
+            if (isError) {
+                notification.style.borderLeftColor = '#f44336';
+            } else {
+                notification.style.borderLeftColor = '#00d2ff';
+            }
+            
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Initialize the dashboard
+        init();
+    </script>
+</body>
+</html>

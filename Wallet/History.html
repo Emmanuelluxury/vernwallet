@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin-Starknet Bridge | Transaction History</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #00d2ff;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            color: #00d2ff;
+        }
+        
+        .dashboard-title {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+        
+        .history-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-select {
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            min-width: 150px;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-input {
+            padding: 10px 15px 10px 40px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 250px;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .export-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: rgba(0, 210, 255, 0.2);
+            border: 1px solid #00d2ff;
+            color: #00d2ff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .export-btn:hover {
+            background: rgba(0, 210, 255, 0.3);
+        }
+        
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .history-table-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 40px;
+            overflow-x: auto;
+        }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .history-table th, .history-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .history-table th {
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            color: #00d2ff;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .history-table th:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .history-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .history-table tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        
+        .tx-type {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .type-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .type-deposit {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .type-withdraw {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+        
+        .type-swap {
+            background: rgba(156, 39, 176, 0.2);
+            color: #9c27b0;
+        }
+        
+        .tx-amount {
+            font-weight: 600;
+        }
+        
+        .tx-amount.positive {
+            color: #4caf50;
+        }
+        
+        .tx-amount.negative {
+            color: #f44336;
+        }
+        
+        .tx-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .status-completed {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .status-pending {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+        }
+        
+        .status-processing {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+        
+        .status-failed {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+        
+        .tx-address {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #00d2ff;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .page-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .page-btn.active {
+            background: rgba(0, 210, 255, 0.2);
+            border-color: #00d2ff;
+            color: #00d2ff;
+        }
+        
+        .page-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .page-info {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .transaction-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a2a32, #2c3e50);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: #00d2ff;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .tx-details {
+            margin: 20px 0;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .detail-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .detail-value {
+            font-weight: 500;
+            text-align: right;
+            max-width: 300px;
+            word-break: break-all;
+        }
+        
+        .detail-value.address {
+            font-family: monospace;
+            color: #00d2ff;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #00d2ff;
+            color: #00d2ff;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.3);
+        }
+        
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 30px 0;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .history-actions {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .filters {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .filter-select {
+                flex: 1;
+                min-width: unset;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .search-input {
+                width: 100%;
+            }
+            
+            .export-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .stats-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .history-table {
+                min-width: 800px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <div class="logo-text">Bitcoin-Starknet Bridge</div>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="../Bitstark/Wallet.html">Dashboard</a></li>
+                    <li><a href="../Wallet/Deposit.html">Deposit</a></li>
+                    <li><a href="../Wallet/Withdraw.html">Withdraw</a></li>
+                    <li><a href="../Wallet/Swap.html">Swap</a></li>
+                    <li><a href="#" class="active">History</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <h1 class="dashboard-title">Transaction History</h1>
+        <p class="subtitle">View and manage your Bitcoin-Starknet bridge transactions</p>
+        
+        <div class="history-actions">
+            <div class="filters">
+                <select class="filter-select" id="typeFilter">
+                    <option value="all">All Types</option>
+                    <option value="deposit">Deposits</option>
+                    <option value="withdraw">Withdrawals</option>
+                    <option value="swap">Swaps</option>
+                </select>
+                
+                <select class="filter-select" id="statusFilter">
+                    <option value="all">All Statuses</option>
+                    <option value="completed">Completed</option>
+                    <option value="pending">Pending</option>
+                    <option value="processing">Processing</option>
+                    <option value="failed">Failed</option>
+                </select>
+                
+                <select class="filter-select" id="timeFilter">
+                    <option value="7">Last 7 Days</option>
+                    <option value="30" selected>Last 30 Days</option>
+                    <option value="90">Last 90 Days</option>
+                    <option value="365">Last Year</option>
+                    <option value="all">All Time</option>
+                </select>
+            </div>
+            
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Search transactions..." id="searchInput">
+            </div>
+            
+            <button class="export-btn" id="exportBtn">
+                <i class="fas fa-download"></i> Export CSV
+            </button>
+        </div>
+        
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-value">47</div>
+                <div class="stat-label">Total Transactions</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">12.84 BTC</div>
+                <div class="stat-label">Total Volume</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">0.042 BTC</div>
+                <div class="stat-label">Total Fees</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">94%</div>
+                <div class="stat-label">Success Rate</div>
+            </div>
+        </div>
+        
+        <div class="history-table-container">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th data-sort="type">Type <i class="fas fa-sort"></i></th>
+                        <th data-sort="amount">Amount <i class="fas fa-sort"></i></th>
+                        <th data-sort="date">Date <i class="fas fa-sort"></i></th>
+                        <th data-sort="status">Status <i class="fas fa-sort"></i></th>
+                        <th>From/To</th>
+                        <th>Transaction ID</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="tx-type">
+                                <div class="type-icon type-deposit">
+                                    <i class="fas fa-arrow-down"></i>
+                                </div>
+                                <span>Deposit</span>
+                            </div>
+                        </td>
+                        <td class="tx-amount positive">+0.125 BTC</td>
+                        <td>Oct 28, 2023 14:23</td>
+                        <td><span class="tx-status status-completed">Completed</span></td>
+                        <td class="tx-address">bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq</td>
+                        <td class="tx-address">0x8a34f7d0d2c5e1b9a3c8f7a6b5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5</td>
+                        <td>
+                            <button class="action-btn view-details" data-txid="tx1">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="tx-type">
+                                <div class="type-icon type-withdraw">
+                                    <i class="fas fa-arrow-up"></i>
+                                </div>
+                                <span>Withdrawal</span>
+                            </div>
+                        </td>
+                        <td class="tx-amount negative">-0.500 BTC</td>
+                        <td>Oct 27, 2023 09:47</td>
+                        <td><span class="tx-status status-completed">Completed</span></td>
+                        <td class="tx-address">bc1q9z4m9s5vner4nj24cnv3xdrp5p6c0v0y3j5g4z</td>
+                        <td class="tx-address">0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef</td>
+                        <td>
+                            <button class="action-btn view-details" data-txid="tx2">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="tx-type">
+                                <div class="type-icon type-swap">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </div>
+                                <span>Swap</span>
+                            </div>
+                        </td>
+                        <td class="tx-amount negative">-0.100 BTC</td>
+                        <td>Oct 26, 2023 18:15</td>
+                        <td><span class="tx-status status-completed">Completed</span></td>
+                        <td class="tx-address">BTC → STRK</td>
+                        <td class="tx-address">0xf2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e58a34f7d0d2c5e1b9a3c8f7a6b5d4e3</td>
+                        <td>
+                            <button class="action-btn view-details" data-txid="tx3">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="tx-type">
+                                <div class="type-icon type-deposit">
+                                    <i class="fas fa-arrow-down"></i>
+                                </div>
+                                <span>Deposit</span>
+                            </div>
+                        </td>
+                        <td class="tx-amount positive">+0.750 BTC</td>
+                        <td>Oct 25, 2023 11:32</td>
+                        <td><span class="tx-status status-processing">Processing</span></td>
+                        <td class="tx-address">bc1q3k4j5h6g7f8d9s0a1z2x3c4v5b6n7m8q9w0e1r2t3y4u5i6o7p8</td>
+                        <td class="tx-address">0xd2e1f0a9b8c7d6e58a34f7d0d2c5e1b9a3c8f7a6b5d4e3f2a1b0c9d8e7f6a5b4c3</td>
+                        <td>
+                            <button class="action-btn view-details" data-txid="tx4">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="tx-type">
+                                <div class="type-icon type-withdraw">
+                                    <i class="fas fa-arrow-up"></i>
+                                </div>
+                                <span>Withdrawal</span>
+                            </div>
+                        </td>
+                        <td class="tx-amount negative">-0.200 BTC</td>
+                        <td>Oct 24, 2023 16:45</td>
+                        <td><span class="tx-status status-pending">Pending</span></td>
+                        <td class="tx-address">bc1q0p1o2i3u4y5t6r7e8w9q0w1e2r3t4y5u6i7o8p9a0s1d2f3g4h5j</td>
+                        <td class="tx-address">0xa1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2</td>
+                        <td>
+                            <button class="action-btn view-details" data-txid="tx5">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="tx-type">
+                                <div class="type-icon type-swap">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </div>
+                                <span>Swap</span>
+                            </div>
+                        </td>
+                        <td class="tx-amount positive">+1,250.50 STRK</td>
+                        <td>Oct 23, 2023 10:12</td>
+                        <td><span class="tx-status status-failed">Failed</span></td>
+                        <td class="tx-address">BTC → STRK</td>
+                        <td class="tx-address">0xc1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3</td>
+                        <td>
+                            <button class="action-btn view-details" data-txid="tx6">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="pagination">
+            <button class="page-btn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <span class="page-info">...</span>
+            <button class="page-btn">8</button>
+            <button class="page-btn">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Transaction Details Modal -->
+    <div class="transaction-modal" id="transactionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Transaction Details</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            
+            <div class="tx-details">
+                <div class="detail-row">
+                    <span class="detail-label">Transaction ID:</span>
+                    <span class="detail-value address" id="detail-id">0x8a34f7d0d2c5e1b9a3c8f7a6b5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Type:</span>
+                    <span class="detail-value" id="detail-type">Deposit</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Status:</span>
+                    <span class="detail-value" id="detail-status">Completed</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Amount:</span>
+                    <span class="detail-value" id="detail-amount">+0.125 BTC</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Date & Time:</span>
+                    <span class="detail-value" id="detail-date">Oct 28, 2023 14:23:16 UTC</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">From Address:</span>
+                    <span class="detail-value address" id="detail-from">bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">To Address:</span>
+                    <span class="detail-value address" id="detail-to">0x1234567890abcdef1234567890abcdef1234567890abcdef</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Network Fee:</span>
+                    <span class="detail-value" id="detail-fee">0.00015 BTC</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Bridge Fee:</span>
+                    <span class="detail-value" id="detail-bridge-fee">0.0005 BTC</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Total Fee:</span>
+                    <span class="detail-value" id="detail-total-fee">0.00065 BTC</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Confirmations:</span>
+                    <span class="detail-value" id="detail-confirmations">24</span>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn btn-outline" id="viewOnExplorer">
+                    <i class="fas fa-external-link-alt"></i> View on Explorer
+                </button>
+                <button class="btn btn-primary" id="closeDetails">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2025 Bitcoin-Starknet Bridge. All rights reserved. | Security Audit Passed | v2.1.4</p>
+        <p>Need help with a transaction? Contact our support team</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const typeFilter = document.getElementById('typeFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const timeFilter = document.getElementById('timeFilter');
+        const searchInput = document.getElementById('searchInput');
+        const exportBtn = document.getElementById('exportBtn');
+        const viewButtons = document.querySelectorAll('.view-details');
+        const transactionModal = document.getElementById('transactionModal');
+        const closeModal = document.getElementById('closeModal');
+        const closeDetails = document.getElementById('closeDetails');
+        const viewOnExplorer = document.getElementById('viewOnExplorer');
+        
+        // Sample transaction data
+        const transactions = [
+            {
+                id: 'tx1',
+                type: 'deposit',
+                amount: '+0.125 BTC',
+                numericAmount: 0.125,
+                date: 'Oct 28, 2023 14:23',
+                status: 'completed',
+                from: 'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq',
+                to: '0x1234567890abcdef1234567890abcdef1234567890abcdef',
+                txId: '0x8a34f7d0d2c5e1b9a3c8f7a6b5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5',
+                fee: '0.00015 BTC',
+                bridgeFee: '0.0005 BTC',
+                totalFee: '0.00065 BTC',
+                confirmations: 24
+            },
+            {
+                id: 'tx2',
+                type: 'withdraw',
+                amount: '-0.500 BTC',
+                numericAmount: 0.5,
+                date: 'Oct 27, 2023 09:47',
+                status: 'completed',
+                from: '0x1234567890abcdef1234567890abcdef1234567890abcdef',
+                to: 'bc1q9z4m9s5vner4nj24cnv3xdrp5p6c0v0y3j5g4z',
+                txId: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+                fee: '0.00012 BTC',
+                bridgeFee: '0.0005 BTC',
+                totalFee: '0.00062 BTC',
+                confirmations: 48
+            },
+            {
+                id: 'tx3',
+                type: 'swap',
+                amount: '-0.100 BTC',
+                numericAmount: 0.1,
+                date: 'Oct 26, 2023 18:15',
+                status: 'completed',
+                from: 'BTC',
+                to: 'STRK',
+                txId: '0xf2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e58a34f7d0d2c5e1b9a3c8f7a6b5d4e3',
+                fee: '0.00018 BTC',
+                bridgeFee: '0.0005 BTC',
+                totalFee: '0.00068 BTC',
+                confirmations: 36
+            },
+            {
+                id: 'tx4',
+                type: 'deposit',
+                amount: '+0.750 BTC',
+                numericAmount: 0.75,
+                date: 'Oct 25, 2023 11:32',
+                status: 'processing',
+                from: 'bc1q3k4j5h6g7f8d9s0a1z2x3c4v5b6n7m8q9w0e1r2t3y4u5i6o7p8',
+                to: '0x1234567890abcdef1234567890abcdef1234567890abcdef',
+                txId: '0xd2e1f0a9b8c7d6e58a34f7d0d2c5e1b9a3c8f7a6b5d4e3f2a1b0c9d8e7f6a5b4c3',
+                fee: '0.00021 BTC',
+                bridgeFee: '0.0005 BTC',
+                totalFee: '0.00071 BTC',
+                confirmations: 2
+            },
+            {
+                id: 'tx5',
+                type: 'withdraw',
+                amount: '-0.200 BTC',
+                numericAmount: 0.2,
+                date: 'Oct 24, 2023 16:45',
+                status: 'pending',
+                from: '0x1234567890abcdef1234567890abcdef1234567890abcdef',
+                to: 'bc1q0p1o2i3u4y5t6r7e8w9q0w1e2r3t4y5u6i7o8p9a0s1d2f3g4h5j',
+                txId: '0xa1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2',
+                fee: '0.00015 BTC',
+                bridgeFee: '0.0005 BTC',
+                totalFee: '0.00065 BTC',
+                confirmations: 0
+            },
+            {
+                id: 'tx6',
+                type: 'swap',
+                amount: '+1,250.50 STRK',
+                numericAmount: 1250.5,
+                date: 'Oct 23, 2023 10:12',
+                status: 'failed',
+                from: 'BTC',
+                to: 'STRK',
+                txId: '0xc1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3',
+                fee: '0.00000 BTC',
+                bridgeFee: '0.00000 BTC',
+                totalFee: '0.00000 BTC',
+                confirmations: 0
+            }
+        ];
+        
+        // Initialize the dashboard
+        function init() {
+            setupEventListeners();
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Filter events
+            typeFilter.addEventListener('change', filterTransactions);
+            statusFilter.addEventListener('change', filterTransactions);
+            timeFilter.addEventListener('change', filterTransactions);
+            searchInput.addEventListener('input', filterTransactions);
+            
+            // Export button
+            exportBtn.addEventListener('click', exportToCSV);
+            
+            // View details buttons
+            viewButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const txId = this.getAttribute('data-txid');
+                    showTransactionDetails(txId);
+                });
+            });
+            
+            // Modal events
+            closeModal.addEventListener('click', () => {
+                transactionModal.style.display = 'none';
+            });
+            
+            closeDetails.addEventListener('click', () => {
+                transactionModal.style.display = 'none';
+            });
+            
+            viewOnExplorer.addEventListener('click', () => {
+                const txId = document.getElementById('detail-id').textContent;
+                window.open(`https://explorer.bitcoin-starknet-bridge.com/tx/${txId}`, '_blank');
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === transactionModal) {
+                    transactionModal.style.display = 'none';
+                }
+            });
+            
+            // Table sorting
+            const tableHeaders = document.querySelectorAll('.history-table th');
+            tableHeaders.forEach(header => {
+                header.addEventListener('click', function() {
+                    const sortBy = this.getAttribute('data-sort');
+                    if (sortBy) {
+                        sortTransactions(sortBy);
+                    }
+                });
+            });
+        }
+        
+        // Filter transactions based on selected filters
+        function filterTransactions() {
+            const typeValue = typeFilter.value;
+            const statusValue = statusFilter.value;
+            const searchValue = searchInput.value.toLowerCase();
+            
+            console.log('Filtering transactions:', { typeValue, statusValue, searchValue });
+            // In a real application, this would filter the displayed transactions
+        }
+        
+        // Sort transactions by column
+        function sortTransactions(column) {
+            console.log('Sorting transactions by:', column);
+            // In a real application, this would sort the transactions table
+        }
+        
+        // Show transaction details in modal
+        function showTransactionDetails(txId) {
+            const transaction = transactions.find(tx => tx.id === txId);
+            if (!transaction) return;
+            
+            // Populate modal with transaction details
+            document.getElementById('detail-id').textContent = transaction.txId;
+            document.getElementById('detail-type').textContent = transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1);
+            document.getElementById('detail-status').textContent = transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1);
+            document.getElementById('detail-amount').textContent = transaction.amount;
+            document.getElementById('detail-date').textContent = transaction.date + ':16 UTC';
+            document.getElementById('detail-from').textContent = transaction.from;
+            document.getElementById('detail-to').textContent = transaction.to;
+            document.getElementById('detail-fee').textContent = transaction.fee;
+            document.getElementById('detail-bridge-fee').textContent = transaction.bridgeFee;
+            document.getElementById('detail-total-fee').textContent = transaction.totalFee;
+            document.getElementById('detail-confirmations').textContent = transaction.confirmations;
+            
+            // Show the modal
+            transactionModal.style.display = 'flex';
+        }
+        
+        // Export transactions to CSV
+        function exportToCSV() {
+            console.log('Exporting transactions to CSV');
+            // In a real application, this would generate and download a CSV file
+            
+            // Show success message
+            alert('Transaction history exported successfully!');
+        }
+        
+        // Initialize the dashboard
+        init();
+    </script>
+</body>
+</html>

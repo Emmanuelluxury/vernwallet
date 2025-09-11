@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Dashboard - Bitcoin-Starknet Bridge</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #10b981; /* Security green */
+            --primary-dark: #0d966c;
+            --secondary: #1f2937;
+            --dark: #0f172a;
+            --light: #f9fafb;
+            --gray: #9ca3af;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bitcoin: #f7931a;
+            --starknet: #7c3aed;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #0f172a;
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 260px;
+            background: rgba(31, 41, 55, 0.8);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: white;
+        }
+        
+        .logo-icon {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--gray);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: white;
+            border-left-color: var(--primary);
+        }
+        
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .header-title i {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(31, 41, 55, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.1);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .stat-title {
+            font-size: 0.9rem;
+            color: var(--gray);
+            font-weight: 600;
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--primary);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-change {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .positive {
+            color: var(--primary);
+        }
+        
+        .negative {
+            color: var(--danger);
+        }
+        
+        /* Cards */
+        .card {
+            background: rgba(31, 41, 55, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .card-title i {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+        }
+        
+        /* Tables */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th {
+            text-align: left;
+            padding: 12px 15px;
+            font-size: 0.9rem;
+            color: var(--gray);
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-secure {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--primary);
+        }
+        
+        .status-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+        
+        .status-critical {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+        
+        .status-pending {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+        
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        /* Progress bars */
+        .progress-container {
+            margin: 15px 0;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .progress-label {
+            font-size: 0.9rem;
+        }
+        
+        .progress-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: var(--primary);
+        }
+        
+        /* Security events */
+        .security-event {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .security-event:last-child {
+            border-bottom: none;
+        }
+        
+        .event-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--danger);
+            flex-shrink: 0;
+        }
+        
+        .event-icon.warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+        
+        .event-icon.info {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+        
+        .event-details {
+            flex: 1;
+        }
+        
+        .event-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .event-description {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+        
+        .event-meta {
+            font-size: 0.7rem;
+            color: var(--gray);
+        }
+        
+        /* Alerts */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .alert-info {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 4px solid var(--info);
+        }
+        
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.2);
+            border-left: 4px solid var(--warning);
+        }
+        
+        .alert-critical {
+            background: rgba(239, 68, 68, 0.2);
+            border-left: 4px solid var(--danger);
+        }
+        
+        .alert-icon {
+            font-size: 1.2rem;
+        }
+        
+        .alert-content {
+            flex: 1;
+        }
+        
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .alert-description {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        /* Bond visualization */
+        .bond-meter {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .bond-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: var(--bitcoin);
+        }
+        
+        /* Security score */
+        .security-score {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(var(--primary) 80%, rgba(255, 255, 255, 0.1) 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .security-score-inner {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .score-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .score-label {
+            font-size: 0.7rem;
+            color: var(--gray);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                width: 80px;
+            }
+            
+            .nav-item span {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Animation for critical alerts */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        
+        .critical {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <i class="fas fa-shield-alt logo-icon"></i>
+                    <span>Security</span>
+                </a>
+            </div>
+            
+            <a href="Dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="Security.html" class="nav-item active">
+                <i class="fas fa-shield-alt"></i>
+                <span>Security</span>
+            </a>
+            
+            <a href="../Security/Alerts.html" class="nav-item">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Alerts</span>
+            </a>
+            
+            <a href="Operators.html" class="nav-item">
+                <i class="fas fa-user-shield"></i>
+                <span>Operators</span>
+            </a>
+            
+            <a href="../Bitcoin/Bonds.html" class="nav-item">
+                <i class="fas fa-coins"></i>
+                <span>Bonds</span>
+            </a>
+            
+            <a href="../Security/Slashing.html" class="nav-item">
+                <i class="fas fa-ban"></i>
+                <span>Slashing</span>
+            </a>
+            
+            <a href="Settings.html" class="nav-item">
+                <i class="fas fa-cogs"></i>
+                <span>Settings</span>
+            </a>
+            
+            <div style="flex: 1;"></div>
+            
+            <a href="../Bitstark/Dashboard.html" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="header-title"><i class="fas fa-shield-alt"></i> Security Dashboard</h1>
+                <div class="header-actions">
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                    <button class="btn">
+                        <i class="fas fa-bell"></i>
+                        Mute Alerts
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">SECURITY SCORE</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">92%</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +2% today
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">TOTAL BOND</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">18.5 BTC</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +2.5 BTC
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">SLASHING EVENTS</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-ban"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">2</div>
+                    <div class="stat-change">
+                        <i class="fas fa-minus"></i>
+                        0 this month
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">ACTIVE ALERTS</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">3</div>
+                    <div class="stat-change negative">
+                        <i class="fas fa-arrow-up"></i>
+                        +1 today
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Alerts Section -->
+            <div class="alert alert-critical critical">
+                <div class="alert-icon">
+                    <i class="fas fa-radiation"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">Critical: Operator Misbehavior Detected</div>
+                    <div class="alert-description">Operator 03 failed to respond to signing request. Slashing condition met.</div>
+                </div>
+            </div>
+            
+            <div class="alert alert-warning">
+                <div class="alert-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">Warning: Bond Level Below Average</div>
+                    <div class="alert-description">Operator 07 bond is 15% below network average.</div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Left Column -->
+                <div>
+                    <!-- Security Score Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-chart-pie"></i> Security Health</h2>
+                            <div class="card-actions">
+                                <button class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-history"></i>
+                                    View History
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="security-score">
+                            <div class="security-score-inner">
+                                <div class="score-value">92%</div>
+                                <div class="score-label">SECURE</div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">Bond Coverage</div>
+                                <div class="progress-value">95%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 95%;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">Uptime</div>
+                                <div class="progress-value">99.8%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 99.8%;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">Response Rate</div>
+                                <div class="progress-value">98.5%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 98.5%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Security Events Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-list"></i> Recent Security Events</h2>
+                            <div class="card-actions">
+                                <button class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-download"></i>
+                                    Export
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="security-event">
+                            <div class="event-icon">
+                                <i class="fas fa-radiation"></i>
+                            </div>
+                            <div class="event-details">
+                                <div class="event-title">Slashing Condition Met</div>
+                                <div class="event-description">Operator 03 failed to respond to signing request within timeout period.</div>
+                                <div class="event-meta">10 minutes ago • High Severity</div>
+                            </div>
+                        </div>
+                        
+                        <div class="security-event">
+                            <div class="event-icon warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="event-details">
+                                <div class="event-title">Bond Level Warning</div>
+                                <div class="event-description">Operator 07 bond is 1.2 BTC (15% below network average).</div>
+                                <div class="event-meta">3 hours ago • Medium Severity</div>
+                            </div>
+                        </div>
+                        
+                        <div class="security-event">
+                            <div class="event-icon info">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="event-details">
+                                <div class="event-title">New Operator Added</div>
+                                <div class="event-description">Operator 10 joined the network with 2.1 BTC bond.</div>
+                                <div class="event-meta">12 hours ago • Low Severity</div>
+                            </div>
+                        </div>
+                        
+                        <div class="security-event">
+                            <div class="event-icon">
+                                <i class="fas fa-ban"></i>
+                            </div>
+                            <div class="event-details">
+                                <div class="event-title">Slashing Executed</div>
+                                <div class="event-description">Operator 05 slashed for 0.5 BTC due to consensus failure.</div>
+                                <div class="event-meta">2 days ago • High Severity</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Slashing History Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-ban"></i> Slashing History</h2>
+                            <div class="card-actions">
+                                <button class="btn btn-sm">
+                                    <i class="fas fa-file-alt"></i>
+                                    Report
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Operator</th>
+                                    <th>Amount</th>
+                                    <th>Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2023-10-15</td>
+                                    <td>Operator 05</td>
+                                    <td>0.5 BTC</td>
+                                    <td>Consensus failure</td>
+                                </tr>
+                                <tr>
+                                    <td>2023-09-22</td>
+                                    <td>Operator 02</td>
+                                    <td>0.3 BTC</td>
+                                    <td>Late response</td>
+                                </tr>
+                                <tr>
+                                    <td>2023-08-05</td>
+                                    <td>Operator 08</td>
+                                    <td>1.2 BTC</td>
+                                    <td>Double signing attempt</td>
+                                </tr>
+                                <tr>
+                                    <td>2023-07-18</td>
+                                    <td>Operator 03</td>
+                                    <td>0.7 BTC</td>
+                                    <td>Node offline</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Right Column -->
+                <div>
+                    <!-- Operator Bonds Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-coins"></i> Operator Bonds</h2>
+                            <div class="card-actions">
+                                <button class="btn btn-sm">
+                                    <i class="fas fa-plus"></i>
+                                    Add Bond
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Operator</th>
+                                    <th>Bond Amount</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Operator 01</td>
+                                    <td>2.5 BTC</td>
+                                    <td>
+                                        <span class="status-badge status-secure">
+                                            <i class="fas fa-check-circle"></i>
+                                            Secure
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-secondary">
+                                            <i class="fas fa-eye"></i>
+                                            View
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Operator 02</td>
+                                    <td>2.0 BTC</td>
+                                    <td>
+                                        <span class="status-badge status-secure">
+                                            <i class="fas fa-check-circle"></i>
+                                            Secure
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-secondary">
+                                            <i class="fas fa-eye"></i>
+                                            View
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Operator 03</td>
+                                    <td>1.8 BTC</td>
+                                    <td>
+                                        <span class="status-badge status-critical">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            Critical
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-danger">
+                                            <i class="fas fa-ban"></i>
+                                            Slash
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Operator 07</td>
+                                    <td>1.2 BTC</td>
+                                    <td>
+                                        <span class="status-badge status-warning">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            Warning
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning">
+                                            <i class="fas fa-bell"></i>
+                                            Notify
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Security Configuration Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-cogs"></i> Security Configuration</h2>
+                        </div>
+                        
+                        <table class="table">
+                            <tr>
+                                <td>Minimum Bond</td>
+                                <td>1.5 BTC</td>
+                            </tr>
+                            <tr>
+                                <td>Slashing Percentage</td>
+                                <td>20%</td>
+                            </tr>
+                            <tr>
+                                <td>Response Timeout</td>
+                                <td>30 seconds</td>
+                            </tr>
+                            <tr>
+                                <td>Max Offline Time</td>
+                                <td>15 minutes</td>
+                            </tr>
+                            <tr>
+                                <td>Double Signing Penalty</td>
+                                <td>100%</td>
+                            </tr>
+                            <tr>
+                                <td>Alert Threshold</td>
+                                <td>Medium</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <!-- Actions Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-play-circle"></i> Security Actions</h2>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <button class="btn btn-success">
+                                <i class="fas fa-shield-alt"></i>
+                                Run Audit
+                            </button>
+                            <button class="btn btn-warning">
+                                <i class="fas fa-bell"></i>
+                                Test Alerts
+                            </button>
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-history"></i>
+                                Check Logs
+                            </button>
+                            <button class="btn btn-danger">
+                                <i class="fas fa-ban"></i>
+                                Emergency Stop
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- System Resources Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-tachometer-alt"></i> System Resources</h2>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">CPU Usage</div>
+                                <div class="progress-value">42%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 42%; background: var(--info);"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">Memory Usage</div>
+                                <div class="progress-value">64%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 64%; background: var(--warning);"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">Network I/O</div>
+                                <div class="progress-value">78%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 78%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple interactivity for demonstration
+        document.addEventListener('DOMContentLoaded', function() {
+            // Refresh button animation
+            const refreshBtn = document.querySelector('.header-actions .btn-secondary');
+            refreshBtn.addEventListener('click', function() {
+                this.querySelector('i').classList.add('fa-spin');
+                setTimeout(() => {
+                    this.querySelector('i').classList.remove('fa-spin');
+                }, 1000);
+            });
+            
+            // Simulate live updates for security events
+            setInterval(() => {
+                const securityScore = document.querySelector('.score-value');
+                if (securityScore && parseInt(securityScore.textContent) < 95) {
+                    securityScore.textContent = '93%';
+                    securityScore.style.color = '#10b981';
+                }
+            }, 8000);
+        });
+    </script>
+</body>
+</html>
