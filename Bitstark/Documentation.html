@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - Bitcoin-Starknet Bridge</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --primary-light: #a78bfa;
+            --bitcoin: #f7931a;
+            --starknet: #ff6b35;
+            --dark: #0f172a;
+            --darker: #0d1318;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --gray-dark: #475569;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--darker);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header with navigation */
+        .header {
+            background: rgba(26, 31, 46, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: white;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 5px;
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .nav-btn:hover {
+            background: rgba(124, 58, 237, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title-main {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary), var(--bitcoin));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .title-sub {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Documentation Sections */
+        .doc-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        .section-title i {
+            font-size: 1.2rem;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(26, 31, 46, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            background: rgba(124, 58, 237, 0.2);
+            color: var(--primary);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .card-content {
+            color: var(--gray);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .card-link:hover {
+            text-decoration: underline;
+        }
+
+        .card-tag {
+            background: rgba(124, 58, 237, 0.2);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Code snippet */
+        .code-snippet {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            border-left: 4px solid var(--primary);
+        }
+
+        .code-comment {
+            color: #6b7280;
+        }
+
+        .code-keyword {
+            color: #f472b6;
+        }
+
+        .code-function {
+            color: #60a5fa;
+        }
+
+        .code-string {
+            color: #34d399;
+        }
+
+        .code-number {
+            color: #fbbf24;
+        }
+
+        /* API Reference */
+        .api-endpoint {
+            background: rgba(26, 31, 46, 0.6);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--info);
+        }
+
+        .api-method {
+            display: inline-block;
+            padding: 5px 12px;
+            background: var(--info);
+            color: white;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-right: 10px;
+        }
+
+        .api-path {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            color: var(--light);
+        }
+
+        .api-description {
+            margin: 15px 0;
+            color: var(--gray);
+        }
+
+        .api-parameters {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .api-parameters th {
+            text-align: left;
+            padding: 12px 15px;
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+            font-weight: 600;
+        }
+
+        .api-parameters td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Quick Start Guide */
+        .step-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .step-card {
+            display: flex;
+            gap: 20px;
+            padding: 25px;
+            background: rgba(26, 31, 46, 0.4);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(26, 31, 46, 0.8);
+            padding: 30px;
+            text-align: center;
+            margin-top: 50px;
+            border-top: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .footer-link {
+            color: var(--gray);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-link:hover {
+            color: var(--primary);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .title-main {
+                font-size: 2rem;
+            }
+            
+            .step-card {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <!-- Header with navigation -->
+    <div class="header">
+        <a href="#" class="logo">
+            <i class="fas fa-book logo-icon"></i>
+            <span>Bitcoin-Starknet Bridge Docs</span>
+        </a>
+        
+        <div class="nav-links">
+            <a href="LearnMore.html" class="nav-btn">
+                <i class="fas fa-graduation-cap"></i>
+                Learn More
+            </a>
+            <a href="../Security/Privacy-Policy.html" class="nav-btn">
+                <i class="fas fa-user-shield"></i>
+                Privacy Policy
+            </a>
+            <a href="#" class="nav-btn active">
+                <i class="fas fa-book"></i>
+                Documentation
+            </a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-title">
+            <h1 class="title-main">Bitcoin-Starknet Bridge Documentation</h1>
+            <p class="title-sub">Complete technical documentation for developers integrating with the Bitcoin-Starknet bridge</p>
+        </div>
+        
+        <!-- Quick Start Guide -->
+        <div class="doc-section">
+            <h2 class="section-title"><i class="fas fa-rocket"></i> Quick Start Guide</h2>
+            
+            <div class="step-cards">
+                <div class="step-card animate-in">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Set Up Your Environment</h3>
+                        <p>Install the required dependencies and configure your development environment to interact with the Bitcoin-Starknet bridge.</p>
+                        <div class="code-snippet">
+                            <span class="code-comment"># Install bridge SDK</span><br>
+                            <span class="code-keyword">npm</span> install @starknet-bridge/sdk<br>
+                            <span class="code-comment"># Or with Yarn</span><br>
+                            <span class="code-keyword">yarn</span> add @starknet-bridge/sdk
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step-card animate-in delay-1">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Connect to the Bridge</h3>
+                        <p>Initialize the bridge client with your node configuration and network settings.</p>
+                        <div class="code-snippet">
+                            <span class="code-keyword">import</span> { BridgeClient } <span class="code-keyword">from</span> <span class="code-string">'@starknet-bridge/sdk'</span>;<br>
+                            <br>
+                            <span class="code-keyword">const</span> client = <span class="code-keyword">new</span> BridgeClient({<br>
+                            &nbsp;&nbsp;network: <span class="code-string">'mainnet'</span>,<br>
+                            &nbsp;&nbsp;bitcoinNode: <span class="code-string">'your-bitcoin-node-url'</span>,<br>
+                            &nbsp;&nbsp;starknetNode: <span class="code-string">'your-starknet-node-url'</span><br>
+                            });
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step-card animate-in delay-2">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Perform Your First Transfer</h3>
+                        <p>Use the bridge to transfer Bitcoin to Starknet and back with simple function calls.</p>
+                        <div class="code-snippet">
+                            <span class="code-comment">// Transfer Bitcoin to Starknet</span><br>
+                            <span class="code-keyword">const</span> result = <span class="code-keyword">await</span> client.deposit(<br>
+                            &nbsp;&nbsp;amount: <span class="code-number">0.1</span>, <span class="code-comment">// BTC</span><br>
+                            &nbsp;&nbsp;recipient: <span class="code-string">'starknet-address'</span><br>
+                            );<br>
+                            <br>
+                            <span class="code-comment">// Transfer back to Bitcoin</span><br>
+                            <span class="code-keyword">const</span> withdrawal = <span class="code-keyword">await</span> client.withdraw(<br>
+                            &nbsp;&nbsp;amount: <span class="code-number">0.1</span>, <span class="code-comment">// BTC</span><br>
+                            &nbsp;&nbsp;bitcoinAddress: <span class="code-string">'bitcoin-address'</span><br>
+                            );
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Core Concepts -->
+        <div class="doc-section">
+            <h2 class="section-title"><i class="fas fa-cube"></i> Core Concepts</h2>
+            
+            <div class="card-grid">
+                <div class="card animate-in">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-link"></i>
+                        </div>
+                        <h3 class="card-title">Bridge Architecture</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Learn how the Bitcoin-Starknet bridge operates, including its security model, transaction flow, and component interactions.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="card-link">Read More <i class="fas fa-arrow-right"></i></a>
+                        <span class="card-tag">Guide</span>
+                    </div>
+                </div>
+                
+                <div class="card animate-in delay-1">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <h3 class="card-title">wBTC on Starknet</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Understand how Bitcoin is represented on Starknet as wBTC, including token standards, minting, and burning processes.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="card-link">Read More <i class="fas fa-arrow-right"></i></a>
+                        <span class="card-tag">Technical</span>
+                    </div>
+                </div>
+                
+                <div class="card animate-in delay-2">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="card-title">Security Model</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Explore the cryptographic proofs, multisig mechanisms, and economic incentives that secure the bridge.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="card-link">Read More <i class="fas fa-arrow-right"></i></a>
+                        <span class="card-tag">Security</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- API Reference -->
+        <div class="doc-section">
+            <h2 class="section-title"><i class="fas fa-code"></i> API Reference</h2>
+            
+            <div class="api-endpoint animate-in">
+                <div>
+                    <span class="api-method">POST</span>
+                    <span class="api-path">/api/v1/deposit</span>
+                </div>
+                <p class="api-description">Initiate a Bitcoin deposit to Starknet. This creates a transaction that locks Bitcoin on the Bitcoin chain and mints equivalent wBTC on Starknet.</p>
+                
+                <table class="api-parameters">
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>amount</td>
+                        <td>number</td>
+                        <td>Amount of Bitcoin to deposit (in BTC)</td>
+                    </tr>
+                    <tr>
+                        <td>recipient</td>
+                        <td>string</td>
+                        <td>Starknet address to receive wBTC</td>
+                    </tr>
+                    <tr>
+                        <td>callbackUrl</td>
+                        <td>string (optional)</td>
+                        <td>URL to receive confirmation webhook</td>
+                    </tr>
+                </table>
+                
+                <div class="code-snippet">
+                    <span class="code-comment">// Example request</span><br>
+                    {<br>
+                    &nbsp;&nbsp;<span class="code-string">"amount"</span>: <span class="code-number">0.5</span>,<br>
+                    &nbsp;&nbsp;<span class="code-string">"recipient"</span>: <span class="code-string">"0x072d30f36bd2e90d...f3ca5a7c771641e8e7"</span>,<br>
+                    &nbsp;&nbsp;<span class="code-string">"callbackUrl"</span>: <span class="code-string">"https://your-app.com/webhooks/deposit"</span><br>
+                    }
+                </div>
+            </div>
+            
+            <div class="api-endpoint animate-in delay-1">
+                <div>
+                    <span class="api-method">POST</span>
+                    <span class="api-path">/api/v1/withdraw</span>
+                </div>
+                <p class="api-description">Initiate a withdrawal from Starknet back to Bitcoin. This burns wBTC on Starknet and unlocks Bitcoin on the Bitcoin chain.</p>
+                
+                <table class="api-parameters">
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>amount</td>
+                        <td>number</td>
+                        <td>Amount of wBTC to withdraw (in BTC)</td>
+                    </tr>
+                    <tr>
+                        <td>bitcoinAddress</td>
+                        <td>string</td>
+                        <td>Bitcoin address to receive unlocked Bitcoin</td>
+                    </tr>
+                    <tr>
+                        <td>priority</td>
+                        <td>string (optional)</td>
+                        <td>Transaction priority: "low", "medium", or "high"</td>
+                    </tr>
+                </table>
+                
+                <div class="code-snippet">
+                    <span class="code-comment">// Example request</span><br>
+                    {<br>
+                    &nbsp;&nbsp;<span class="code-string">"amount"</span>: <span class="code-number">0.3</span>,<br>
+                    &nbsp;&nbsp;<span class="code-string">"bitcoinAddress"</span>: <span class="code-string">"bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq"</span>,<br>
+                    &nbsp;&nbsp;<span class="code-string">"priority"</span>: <span class="code-string">"medium"</span><br>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <!-- SDK Documentation -->
+        <div class="doc-section">
+            <h2 class="section-title"><i class="fas fa-cube"></i> SDK Documentation</h2>
+            
+            <div class="card-grid">
+                <div class="card animate-in">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fab fa-js"></i>
+                        </div>
+                        <h3 class="card-title">JavaScript/TypeScript SDK</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Complete reference for the JavaScript/TypeScript SDK, including installation, initialization, and all available methods.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="card-link">View Documentation <i class="fas fa-arrow-right"></i></a>
+                        <span class="card-tag">SDK</span>
+                    </div>
+                </div>
+                
+                <div class="card animate-in delay-1">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fab fa-python"></i>
+                        </div>
+                        <h3 class="card-title">Python SDK</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Reference for the Python SDK with examples for common operations and integration patterns.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="card-link">View Documentation <i class="fas fa-arrow-right"></i></a>
+                        <span class="card-tag">SDK</span>
+                    </div>
+                </div>
+                
+                <div class="card animate-in delay-2">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-plug"></i>
+                        </div>
+                        <h3 class="card-title">API Integration</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Guide for direct API integration without SDKs, including authentication, request signing, and error handling.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="card-link">View Guide <i class="fas fa-arrow-right"></i></a>
+                        <span class="card-tag">API</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Smart Contracts -->
+        <div class="doc-section">
+            <h2 class="section-title"><i class="fas fa-file-contract"></i> Smart Contracts</h2>
+            
+            <div class="card-grid">
+                <div class="card animate-in">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <h3 class="card-title">wBTC Contract</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Technical details of the wBTC contract on Starknet, including interface, methods, and integration examples.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="card-link">View Contract <i class="fas fa-arrow-right"></i></a>
+                        <span class="card-tag">Cairo</span>
+                    </div>
+                </div>
+                
+                <div class="card animate-in delay-1">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-bridge"></i>
+                        </div>
+                        <h3 class="card-title">Bridge Contract</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Reference for the main bridge contract handling deposits, withdrawals, and proof verification.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="card-link">View Contract <i class="fas fa-arrow-right"></i></a>
+                        <span class="card-tag">Cairo</span>
+                    </div>
+                </div>
+                
+                <div class="card animate-in delay-2">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h3 class="card-title">Governance Contract</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Details of the governance contract that manages bridge parameters, upgrades, and security configurations.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="card-link">View Contract <i class="fas fa-arrow-right"></i></a>
+                        <span class="card-tag">Cairo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-links">
+            <a href="../Bitstark/LandingPage.html" class="footer-link">Home</a>
+            <a href="#" class="footer-link">Documentation</a>
+            <a href="../Security/Privacy-Policy.html" class="footer-link">Privacy Policy</a>
+            <a href="../Security/Terms-of-Service.html" class="footer-link">Terms of Service</a>
+            <a href="../Security/Contact.html" class="footer-link">Contact</a>
+        </div>
+        <p>© 2025 Bitcoin-Starknet Bridge. All rights reserved.</p>
+    </div>
+
+    <script>
+        // Documentation Page - Interactive Elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Card click functionality
+            document.querySelectorAll('.card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (!e.target.classList.contains('card-link')) {
+                        const link = this.querySelector('.card-link');
+                        if (link) {
+                            alert(`Navigating to: ${link.textContent}\n(This is a simulation - in a real application, this would open the documentation page)`);
+                        }
+                    }
+                });
+            });
+            
+            // Animation on scroll
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all cards and sections for animation
+            document.querySelectorAll('.card, .api-endpoint, .step-card').forEach(item => {
+                item.style.opacity = 0;
+                item.style.transform = 'translateY(20px)';
+                item.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                observer.observe(item);
+            });
+        });
+    </script>
+</body>
+</html>

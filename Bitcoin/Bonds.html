@@ -677,28 +677,268 @@
             }
         }
         
+        /* Enhanced Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        /* Loading states */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(243, 156, 18, 0.2), transparent);
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Enhanced hover effects */
+        .bond-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .bond-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .yield-item:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .connection-node:hover {
+            transform: translateY(-5px) rotate(2deg);
+        }
+
+        /* Button states */
+        .header-btn:disabled,
+        .bond-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .header-btn:active,
+        .bond-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Form enhancements */
+        .form-input:focus {
+            box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-input.error {
+            border-color: var(--warning);
+            animation: shake 0.5s ease;
+        }
+
+        .form-input.success {
+            border-color: var(--success);
+        }
+
+        /* Progress bar animations */
+        .progress {
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Tab animations */
+        .bonds-tab {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bonds-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .bonds-tab:hover::before {
+            left: 100%;
+        }
+
+        /* Notification animations */
+        .notification {
+            animation: slideInLeft 0.5s ease;
+        }
+
+        /* Card entrance animations */
+        .card {
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card:nth-child(4) { animation-delay: 0.4s; }
+
+        /* Bond item entrance animations */
+        .bond-item {
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .bond-item:nth-child(1) { animation-delay: 0.1s; }
+        .bond-item:nth-child(2) { animation-delay: 0.2s; }
+        .bond-item:nth-child(3) { animation-delay: 0.3s; }
+        .bond-item:nth-child(4) { animation-delay: 0.4s; }
+
+        /* Connection node animations */
+        .connection-node {
+            animation: bounceIn 0.6s ease;
+        }
+
+        .connection-node:nth-child(1) { animation-delay: 0.1s; }
+        .connection-node:nth-child(2) { animation-delay: 0.2s; }
+        .connection-node:nth-child(3) { animation-delay: 0.3s; }
+        .connection-node:nth-child(4) { animation-delay: 0.4s; }
+
+        /* Enhanced responsive design */
         @media (max-width: 768px) {
             .dashboard {
                 grid-template-columns: 1fr;
             }
-            
+
             .connections-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             header {
                 flex-direction: column;
                 gap: 15px;
             }
-            
+
             .bond-item {
                 grid-template-columns: 1fr;
                 text-align: center;
             }
-            
+
             .bond-details {
                 flex-direction: column;
                 gap: 5px;
+            }
+
+            .bonds-tabs {
+                overflow-x: auto;
+                padding-bottom: 5px;
+            }
+
+            .bonds-tab {
+                white-space: nowrap;
+                min-width: 120px;
+            }
+        }
+
+        /* Dark mode enhancements */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --dark-bg: #0f1419;
+                --card-bg: #1a202c;
+                --border: #2d3748;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .header-controls,
+            .bonds-tabs,
+            .bond-form,
+            .header-btn {
+                display: none !important;
+            }
+
+            .card,
+            .bond-item {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ccc;
             }
         }
     </style>
@@ -727,12 +967,40 @@
         </header>
         
         <div class="bonds-tabs">
-            <div class="bonds-tab active">Active Bonds</div>
-            <div class="bonds-tab">Bond Marketplace</div>
-            <div class="bonds-tab">Yield Farming</div>
-            <div class="bonds-tab">Risk Management</div>
-            <div class="bonds-tab">Bond History</div>
-            <div class="bonds-tab">Analytics</div>
+            <div class="bonds-tab active" data-tab="active">Active Bonds</div>
+            <div class="bonds-tab" data-tab="marketplace">Bond Marketplace</div>
+            <div class="bonds-tab" data-tab="farming">Yield Farming</div>
+            <div class="bonds-tab" data-tab="risk">Risk Management</div>
+            <div class="bonds-tab" data-tab="history">Bond History</div>
+            <div class="bonds-tab" data-tab="analytics">Analytics</div>
+        </div>
+
+        <!-- Filter and Sort Controls -->
+        <div class="filter-controls" style="display: flex; gap: 15px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
+            <div class="filter-group">
+                <label style="font-size: 14px; color: #a0aec0; margin-right: 8px;">Filter:</label>
+                <select class="form-input filter-select" style="width: 120px; padding: 8px 12px;">
+                    <option value="all">All Bonds</option>
+                    <option value="active">Active</option>
+                    <option value="mature">Mature</option>
+                    <option value="risky">Risky</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label style="font-size: 14px; color: #a0aec0; margin-right: 8px;">Sort by:</label>
+                <select class="form-input sort-select" style="width: 140px; padding: 8px 12px;">
+                    <option value="maturity">Maturity Date</option>
+                    <option value="value">Bond Value</option>
+                    <option value="yield">Yield Rate</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <button class="header-btn refresh-btn" style="padding: 8px 16px;">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
         </div>
         
         <div class="bonds-image">
@@ -1074,116 +1342,931 @@
     </div>
 
     <script>
-        // Initialize syntax highlighting
-        hljs.highlightAll();
-        
-        // Simulate live data updates
-        function updateData() {
-            // Update connection nodes with random data to simulate live changes
-            const connections = document.querySelectorAll('.connection-node .node-value');
-            connections[1].textContent = Math.floor(Math.random() * 5) + 10;
-            connections[2].textContent = Math.floor(Math.random() * 3) + 40;
-            
-            // Update stats with random data
-            const stats = document.querySelectorAll('.stat');
-            const totalValue = parseFloat(stats[0].textContent.replace('$', '').replace('M', ''));
-            stats[0].textContent = '$' + (totalValue + (Math.random() * 0.1)).toFixed(1) + 'M';
-            
-            // Update bond timers
-            const bondTimes = document.querySelectorAll('.bond-time');
-            bondTimes.forEach(time => {
-                if (time.textContent.includes('Matures in')) {
-                    const match = time.textContent.match(/Matures in (\d+) days/);
-                    if (match) {
-                        let days = parseInt(match[1]);
-                        if (days > 0) {
-                            days -= 1;
-                            time.textContent = `Matures in ${days} days`;
-                        }
+        // Enhanced Bonds Dashboard Interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize syntax highlighting
+            if (typeof hljs !== 'undefined') {
+                hljs.highlightAll();
+            }
+
+            // Mock bond data
+            let bondsData = [
+                {
+                    id: 'BOND-BTC-7832A1B',
+                    title: 'BTC Bridge Bond - 8.5% APY',
+                    type: 'BTC Bridge Security Bond',
+                    value: 250000,
+                    purchasePrice: 245000,
+                    yieldRate: 8.5,
+                    issued: '15 days ago',
+                    maturity: 'Dec 15, 2023',
+                    collateral: '5.2 BTC',
+                    status: 'active',
+                    daysToMaturity: 75,
+                    totalDays: 90,
+                    icon: 'fas fa-clock'
+                },
+                {
+                    id: 'BOND-STRK-8913B2C',
+                    title: 'STRK Liquidity Bond - 7.2% APY',
+                    type: 'STRK Liquidity Bond',
+                    value: 120000,
+                    purchasePrice: 118000,
+                    yieldRate: 7.2,
+                    issued: '8 days ago',
+                    maturity: 'Nov 20, 2023',
+                    collateral: '2.8 STRK',
+                    status: 'active',
+                    daysToMaturity: 35,
+                    totalDays: 45,
+                    icon: 'fas fa-clock'
+                },
+                {
+                    id: 'BOND-INS-9824C3D',
+                    title: 'Bridge Insurance Bond - 9.1% APY',
+                    type: 'Bridge Insurance Bond',
+                    value: 85000,
+                    purchasePrice: 83000,
+                    yieldRate: 9.1,
+                    issued: '25 days ago',
+                    maturity: 'Oct 25, 2023',
+                    collateral: '1.7 BTC',
+                    status: 'mature',
+                    daysToMaturity: 0,
+                    totalDays: 30,
+                    icon: 'fas fa-check-circle'
+                },
+                {
+                    id: 'BOND-HY-1245D4E',
+                    title: 'High-Yield Bridge Bond - 12.5% APY',
+                    type: 'High-Yield Bridge Bond',
+                    value: 65000,
+                    purchasePrice: 63000,
+                    yieldRate: 12.5,
+                    issued: '3 days ago',
+                    maturity: 'Nov 5, 2023',
+                    collateral: '1.3 BTC',
+                    status: 'risky',
+                    daysToMaturity: 8,
+                    totalDays: 12,
+                    icon: 'fas fa-exclamation-circle'
+                }
+            ];
+
+            let currentTab = 'Active Bonds';
+            let filterStatus = 'all';
+            let sortBy = 'maturity';
+            let searchQuery = '';
+
+            // Generate bond ID
+            function generateBondId(type) {
+                const prefix = type.split(' ')[0].toUpperCase();
+                return `BOND-${prefix}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+            }
+
+            // Format currency
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }).format(amount);
+            }
+
+            // Update dashboard stats
+            function updateDashboardStats() {
+                const totalValue = bondsData.reduce((sum, bond) => sum + bond.value, 0);
+                const activeBonds = bondsData.filter(bond => bond.status === 'active').length;
+                const avgYield = bondsData.reduce((sum, bond) => sum + bond.yieldRate, 0) / bondsData.length;
+                const defaultRate = 0.2 + Math.random() * 0.3;
+
+                document.querySelectorAll('.stat')[0].textContent = formatCurrency(totalValue).replace('$', '$').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+                document.querySelectorAll('.stat')[1].textContent = activeBonds;
+                document.querySelectorAll('.stat')[2].textContent = avgYield.toFixed(1) + '%';
+                document.querySelectorAll('.stat')[3].textContent = defaultRate.toFixed(1) + '%';
+            }
+
+            // Update connection nodes
+            function updateConnectionNodes() {
+                const nodes = document.querySelectorAll('.connection-node .node-value');
+                nodes[0].textContent = Math.floor(Math.random() * 10) + 80; // Active Bonders
+                nodes[1].textContent = Math.floor(Math.random() * 5) + 8; // Bonds Today
+                nodes[2].textContent = Math.floor(Math.random() * 5) + 35; // Bonds Redeemed
+                nodes[3].textContent = (140 + Math.random() * 20).toFixed(0) + '%'; // Collateral Ratio
+            }
+
+            // Animate counters
+            function animateCounter(element, target, duration = 1000) {
+                const start = parseFloat(element.textContent.replace(/[^\d.-]/g, '')) || 0;
+                const increment = (target - start) / (duration / 16);
+                let current = start;
+
+                const timer = setInterval(() => {
+                    current += increment;
+                    if ((increment > 0 && current >= target) || (increment < 0 && current <= target)) {
+                        current = target;
+                        clearInterval(timer);
                     }
-                }
-            });
-        }
-        
-        // Update data every minute
-        setInterval(updateData, 60000);
-        
-        // Add interactivity to tabs
-        const tabs = document.querySelectorAll('.bonds-tab');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-            });
-        });
-        
-        // Add bond detail toggle
-        const bondItems = document.querySelectorAll('.bond-item');
-        bondItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const detail = item.nextElementSibling;
-                if (detail && detail.classList.contains('bond-detail')) {
-                    // Hide all other details
-                    document.querySelectorAll('.bond-detail').forEach(d => {
-                        if (d !== detail) d.style.display = 'none';
+                    element.textContent = typeof target === 'number' && target % 1 !== 0 ?
+                        current.toFixed(1) : Math.round(current);
+                }, 16);
+            }
+
+            // Render bonds list
+            function renderBondsList() {
+                const bondsList = document.querySelector('.bonds-list');
+                bondsList.innerHTML = '';
+
+                let filteredBonds = bondsData.filter(bond => {
+                    const matchesStatus = filterStatus === 'all' || bond.status === filterStatus;
+                    const matchesSearch = searchQuery === '' ||
+                        bond.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        bond.id.toLowerCase().includes(searchQuery.toLowerCase());
+                    return matchesStatus && matchesSearch;
+                });
+
+                // Sort bonds
+                filteredBonds.sort((a, b) => {
+                    switch (sortBy) {
+                        case 'maturity':
+                            return a.daysToMaturity - b.daysToMaturity;
+                        case 'value':
+                            return b.value - a.value;
+                        case 'yield':
+                            return b.yieldRate - a.yieldRate;
+                        default:
+                            return 0;
+                    }
+                });
+
+                filteredBonds.forEach(bond => {
+                    const bondItem = document.createElement('div');
+                    bondItem.className = `bond-item ${bond.status}`;
+                    bondItem.innerHTML = `
+                        <div class="bond-icon ${bond.status}">
+                            <i class="${bond.icon}"></i>
+                        </div>
+                        <div class="bond-content">
+                            <div class="bond-title">${bond.title}</div>
+                            <div class="bond-details">
+                                <span class="bond-hash">${bond.id}</span>
+                                <span>Value: ${formatCurrency(bond.value)}</span>
+                            </div>
+                            <div class="bond-time">${bond.daysToMaturity > 0 ? `Matures in ${bond.daysToMaturity} days` : 'Matured'}</div>
+                        </div>
+                        <div class="bond-status status-${bond.status}">${bond.status.charAt(0).toUpperCase() + bond.status.slice(1)}</div>
+                    `;
+
+                    const bondDetail = document.createElement('div');
+                    bondDetail.className = 'bond-detail';
+                    bondDetail.innerHTML = `
+                        <div class="detail-header">
+                            <div class="detail-title">Bond Details</div>
+                            <button class="header-btn">
+                                <i class="fas fa-times"></i> Close
+                            </button>
+                        </div>
+                        <div class="detail-content">
+                            <div class="detail-item">
+                                <div class="detail-label">Bond ID</div>
+                                <div class="detail-value">${bond.id}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Bond Type</div>
+                                <div class="detail-value">${bond.type}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Face Value</div>
+                                <div class="detail-value">${formatCurrency(bond.value)}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Purchase Price</div>
+                                <div class="detail-value">${formatCurrency(bond.purchasePrice)}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Yield Rate</div>
+                                <div class="detail-value">${bond.yieldRate}% APY</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Issued</div>
+                                <div class="detail-value">${bond.issued}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Maturity Date</div>
+                                <div class="detail-value">${bond.maturity}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Collateral</div>
+                                <div class="detail-value">${bond.collateral}</div>
+                            </div>
+                        </div>
+
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">Time to Maturity</div>
+                                <div class="progress-value">${bond.totalDays - bond.daysToMaturity} of ${bond.totalDays} days</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: ${((bond.totalDays - bond.daysToMaturity) / bond.totalDays * 100).toFixed(1)}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="yield-grid">
+                            <div class="yield-item">
+                                <div class="yield-icon">
+                                    <i class="fas fa-coins"></i>
+                                </div>
+                                <div class="yield-value">${formatCurrency((bond.value * bond.yieldRate / 100) * (bond.totalDays / 365))}</div>
+                                <div class="yield-label">Total Yield</div>
+                            </div>
+
+                            <div class="yield-item">
+                                <div class="yield-icon">
+                                    <i class="fas fa-calendar"></i>
+                                </div>
+                                <div class="yield-value">${formatCurrency((bond.value * bond.yieldRate / 100) / 365)}</div>
+                                <div class="yield-label">Daily Yield</div>
+                            </div>
+
+                            <div class="yield-item">
+                                <div class="yield-icon">
+                                    <i class="fas fa-percentage"></i>
+                                </div>
+                                <div class="yield-value">${bond.yieldRate}%</div>
+                                <div class="yield-label">APY</div>
+                            </div>
+
+                            <div class="yield-item">
+                                <div class="yield-icon">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div class="yield-value">${(140 + Math.random() * 20).toFixed(0)}%</div>
+                                <div class="yield-label">Collateralization</div>
+                            </div>
+                        </div>
+                    `;
+
+                    bondsList.appendChild(bondItem);
+                    bondsList.appendChild(bondDetail);
+                });
+
+                // Add click handlers for new bonds
+                addBondClickHandlers();
+            }
+
+            // Add bond click handlers
+            function addBondClickHandlers() {
+                document.querySelectorAll('.bond-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const detail = this.nextElementSibling;
+                        if (detail && detail.classList.contains('bond-detail')) {
+                            // Hide all other details
+                            document.querySelectorAll('.bond-detail').forEach(d => {
+                                if (d !== detail) d.style.display = 'none';
+                            });
+
+                            // Toggle this detail
+                            detail.style.display = detail.style.display === 'none' || !detail.style.display ? 'block' : 'none';
+
+                            // Animate progress bars in detail
+                            setTimeout(() => {
+                                detail.querySelectorAll('.progress').forEach(progress => {
+                                    const width = progress.style.width;
+                                    progress.style.width = '0%';
+                                    setTimeout(() => {
+                                        progress.style.transition = 'width 1s ease';
+                                        progress.style.width = width;
+                                    }, 100);
+                                });
+                            }, 100);
+                        }
                     });
-                    
-                    // Toggle this detail
-                    detail.style.display = detail.style.display === 'none' || !detail.style.display ? 'block' : 'none';
+                });
+            }
+
+            // Tab switching functionality
+            function switchTab(tabName) {
+                currentTab = tabName;
+                document.querySelectorAll('.bonds-tab').forEach(tab => {
+                    tab.classList.toggle('active', tab.textContent === tabName);
+                });
+
+                // Update content based on tab
+                const mainContent = document.querySelector('.main-content');
+                const sectionTitle = document.querySelector('.section-title');
+                const filterControls = document.querySelector('.filter-controls');
+
+                switch (tabName) {
+                    case 'Active Bonds':
+                        sectionTitle.textContent = 'Active Bonds';
+                        filterStatus = 'active';
+                        filterControls.style.display = 'flex';
+                        renderBondsList();
+                        break;
+                    case 'Bond Marketplace':
+                        sectionTitle.textContent = 'Bond Marketplace';
+                        filterControls.style.display = 'none';
+                        showMarketplaceContent();
+                        break;
+                    case 'Yield Farming':
+                        sectionTitle.textContent = 'Yield Farming';
+                        filterControls.style.display = 'none';
+                        showYieldFarmingContent();
+                        break;
+                    case 'Risk Management':
+                        sectionTitle.textContent = 'Risk Management';
+                        filterControls.style.display = 'none';
+                        showRiskManagementContent();
+                        break;
+                    case 'Bond History':
+                        sectionTitle.textContent = 'Bond History';
+                        filterStatus = 'all';
+                        filterControls.style.display = 'flex';
+                        renderBondsList();
+                        break;
+                    case 'Analytics':
+                        sectionTitle.textContent = 'Bond Analytics';
+                        filterControls.style.display = 'none';
+                        showAnalyticsContent();
+                        break;
                 }
-            });
-        });
-        
-        // Add close button functionality for details
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('fa-times')) {
-                e.target.closest('.bond-detail').style.display = 'none';
             }
-        });
-        
-        // Add bond issuance form submission
-        const bondBtn = document.querySelector('.bond-btn');
-        bondBtn.addEventListener('click', () => {
-            const valueInput = document.querySelector('.form-input[placeholder="Enter bond value"]');
-            if (valueInput.value.trim() === '') {
-                valueInput.style.borderColor = 'var(--warning)';
-                return;
+
+            // Show marketplace content
+            function showMarketplaceContent() {
+                const bondsSection = document.querySelector('.bonds-section');
+                bondsSection.innerHTML = `
+                    <div class="section-header">
+                        <h2 class="section-title">Bond Marketplace</h2>
+                        <button class="header-btn">
+                            <i class="fas fa-plus"></i> List Bond
+                        </button>
+                    </div>
+
+                    <div class="marketplace-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div class="card marketplace-item" style="cursor: pointer;">
+                            <div class="card-header">
+                                <div class="card-title">BTC Bridge Bond - 9.2% APY</div>
+                                <i class="fas fa-shopping-cart card-icon"></i>
+                            </div>
+                            <div class="stat">$150,000</div>
+                            <div class="bond-details" style="margin: 15px 0;">
+                                <span>Available: $50,000</span>
+                                <span>Min Purchase: $10,000</span>
+                            </div>
+                            <button class="bond-btn" style="width: 100%; margin-top: 15px;">Purchase Bond</button>
+                        </div>
+
+                        <div class="card marketplace-item" style="cursor: pointer;">
+                            <div class="card-header">
+                                <div class="card-title">STRK Liquidity Bond - 8.7% APY</div>
+                                <i class="fas fa-shopping-cart card-icon"></i>
+                            </div>
+                            <div class="stat">$200,000</div>
+                            <div class="bond-details" style="margin: 15px 0;">
+                                <span>Available: $75,000</span>
+                                <span>Min Purchase: $25,000</span>
+                            </div>
+                            <button class="bond-btn" style="width: 100%; margin-top: 15px;">Purchase Bond</button>
+                        </div>
+
+                        <div class="card marketplace-item" style="cursor: pointer;">
+                            <div class="card-header">
+                                <div class="card-title">High-Yield Bond - 11.5% APY</div>
+                                <i class="fas fa-shopping-cart card-icon"></i>
+                            </div>
+                            <div class="stat">$100,000</div>
+                            <div class="bond-details" style="margin: 15px 0;">
+                                <span>Available: $25,000</span>
+                                <span>Min Purchase: $5,000</span>
+                            </div>
+                            <button class="bond-btn" style="width: 100%; margin-top: 15px;">Purchase Bond</button>
+                        </div>
+                    </div>
+                `;
             }
-            
-            bondBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-            
-            setTimeout(() => {
-                bondBtn.innerHTML = '<i class="fas fa-check-circle"></i> Bond Issued!';
-                bondBtn.style.background = 'linear-gradient(90deg, var(--success), var(--success))';
-                
-                setTimeout(() => {
-                    bondBtn.innerHTML = '<i class="fas fa-handshake"></i> Issue Bond';
-                    bondBtn.style.background = 'linear-gradient(90deg, var(--bond-primary), var(--bond-secondary))';
-                    valueInput.value = '';
-                    
-                    // Add new bond to the list
-                    const bondsList = document.querySelector('.bonds-list');
-                    const newBond = document.querySelector('.bond-item').cloneNode(true);
-                    
-                    // Update bond details
-                    newBond.querySelector('.bond-title').textContent = 'New Bridge Bond - 8.2% APY';
-                    newBond.querySelector('.bond-hash').textContent = 'BOND-NEW-' + Math.random().toString(36).substring(2, 9).toUpperCase();
-                    newBond.querySelector('.bond-details span:last-child').textContent = 'Value: $' + (Math.floor(Math.random() * 100) + 50) + ',000';
-                    newBond.querySelector('.bond-time').textContent = 'Matures in 90 days';
-                    
-                    bondsList.prepend(newBond);
-                    
-                    // Show animation for new bond
-                    newBond.style.opacity = '0';
-                    newBond.style.transform = 'translateY(-20px)';
-                    
+
+            // Show yield farming content
+            function showYieldFarmingContent() {
+                const bondsSection = document.querySelector('.bonds-section');
+                bondsSection.innerHTML = `
+                    <div class="section-header">
+                        <h2 class="section-title">Yield Farming Opportunities</h2>
+                        <button class="header-btn">
+                            <i class="fas fa-seedling"></i> Start Farming
+                        </button>
+                    </div>
+
+                    <div class="farming-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                        <div class="card farming-item">
+                            <div class="card-header">
+                                <div class="card-title">BTC-STRK LP Farming</div>
+                                <i class="fas fa-seedling card-icon"></i>
+                            </div>
+                            <div class="stat">15.2% APY</div>
+                            <div class="progress-container" style="margin: 15px 0;">
+                                <div class="progress-header">
+                                    <div class="progress-label">Pool Utilization</div>
+                                    <div class="progress-value">87%</div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: 87%"></div>
+                                </div>
+                            </div>
+                            <button class="bond-btn" style="width: 100%; margin-top: 15px;">Stake LP Tokens</button>
+                        </div>
+
+                        <div class="card farming-item">
+                            <div class="card-header">
+                                <div class="card-title">Bond Yield Farming</div>
+                                <i class="fas fa-coins card-icon"></i>
+                            </div>
+                            <div class="stat">12.8% APY</div>
+                            <div class="progress-container" style="margin: 15px 0;">
+                                <div class="progress-header">
+                                    <div class="progress-label">Pool Utilization</div>
+                                    <div class="progress-value">64%</div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: 64%"></div>
+                                </div>
+                            </div>
+                            <button class="bond-btn" style="width: 100%; margin-top: 15px;">Farm Yields</button>
+                        </div>
+
+                        <div class="card farming-item">
+                            <div class="card-header">
+                                <div class="card-title">Bridge Fee Farming</div>
+                                <i class="fas fa-bridge card-icon"></i>
+                            </div>
+                            <div class="stat">9.5% APY</div>
+                            <div class="progress-container" style="margin: 15px 0;">
+                                <div class="progress-header">
+                                    <div class="progress-label">Pool Utilization</div>
+                                    <div class="progress-value">42%</div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: 42%"></div>
+                                </div>
+                            </div>
+                            <button class="bond-btn" style="width: 100%; margin-top: 15px;">Earn Bridge Fees</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Show risk management content
+            function showRiskManagementContent() {
+                const bondsSection = document.querySelector('.bonds-section');
+                bondsSection.innerHTML = `
+                    <div class="section-header">
+                        <h2 class="section-title">Risk Management Dashboard</h2>
+                        <button class="header-btn">
+                            <i class="fas fa-shield-alt"></i> Risk Assessment
+                        </button>
+                    </div>
+
+                    <div class="risk-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div class="card risk-item">
+                            <div class="card-header">
+                                <div class="card-title">Portfolio Risk Score</div>
+                                <i class="fas fa-chart-line card-icon"></i>
+                            </div>
+                            <div class="stat">Medium</div>
+                            <div class="progress-container" style="margin: 15px 0;">
+                                <div class="progress-header">
+                                    <div class="progress-label">Risk Level</div>
+                                    <div class="progress-value">45/100</div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: 45%; background: linear-gradient(90deg, var(--success), var(--warning));"></div>
+                                </div>
+                            </div>
+                            <div class="risk-factors" style="margin-top: 15px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <span style="font-size: 14px;">Market Volatility</span>
+                                    <span style="color: var(--warning);">High</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <span style="font-size: 14px;">Liquidity Risk</span>
+                                    <span style="color: var(--success);">Low</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="font-size: 14px;">Default Risk</span>
+                                    <span style="color: var(--success);">Very Low</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card risk-item">
+                            <div class="card-header">
+                                <div class="card-title">Collateral Health</div>
+                                <i class="fas fa-shield-alt card-icon"></i>
+                            </div>
+                            <div class="stat">152%</div>
+                            <div class="progress-container" style="margin: 15px 0;">
+                                <div class="progress-header">
+                                    <div class="progress-label">Health Ratio</div>
+                                    <div class="progress-value">152%</div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: 100%; background: linear-gradient(90deg, var(--success), var(--success));"></div>
+                                </div>
+                            </div>
+                            <div style="text-align: center; color: var(--success); margin-top: 15px;">
+                                <i class="fas fa-check-circle"></i> All positions are healthy
+                            </div>
+                        </div>
+
+                        <div class="card risk-item">
+                            <div class="card-header">
+                                <div class="card-title">Insurance Coverage</div>
+                                <i class="fas fa-umbrella card-icon"></i>
+                            </div>
+                            <div class="stat">$2.4M</div>
+                            <div class="progress-container" style="margin: 15px 0;">
+                                <div class="progress-header">
+                                    <div class="progress-label">Coverage Ratio</div>
+                                    <div class="progress-value">89%</div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: 89%; background: linear-gradient(90deg, var(--success), var(--warning));"></div>
+                                </div>
+                            </div>
+                            <button class="bond-btn" style="width: 100%; margin-top: 15px;">Increase Coverage</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Show analytics content
+            function showAnalyticsContent() {
+                const bondsSection = document.querySelector('.bonds-section');
+                bondsSection.innerHTML = `
+                    <div class="section-header">
+                        <h2 class="section-title">Bond Analytics & Insights</h2>
+                        <button class="header-btn">
+                            <i class="fas fa-download"></i> Export Report
+                        </button>
+                    </div>
+
+                    <div class="analytics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div class="card analytics-item">
+                            <div class="card-header">
+                                <div class="card-title">Yield Performance</div>
+                                <i class="fas fa-chart-bar card-icon"></i>
+                            </div>
+                            <div class="yield-grid" style="margin-top: 20px;">
+                                <div class="yield-item">
+                                    <div class="yield-icon">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </div>
+                                    <div class="yield-value">+8.4%</div>
+                                    <div class="yield-label">30-Day Return</div>
+                                </div>
+                                <div class="yield-item">
+                                    <div class="yield-icon">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                    <div class="yield-value">+24.7%</div>
+                                    <div class="yield-label">90-Day Return</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card analytics-item">
+                            <div class="card-header">
+                                <div class="card-title">Risk Metrics</div>
+                                <i class="fas fa-exclamation-triangle card-icon"></i>
+                            </div>
+                            <div class="yield-grid" style="margin-top: 20px;">
+                                <div class="yield-item">
+                                    <div class="yield-icon">
+                                        <i class="fas fa-shield-alt"></i>
+                                    </div>
+                                    <div class="yield-value">0.12%</div>
+                                    <div class="yield-label">Default Rate</div>
+                                </div>
+                                <div class="yield-item">
+                                    <div class="yield-icon">
+                                        <i class="fas fa-wave-square"></i>
+                                    </div>
+                                    <div class="yield-value">2.3%</div>
+                                    <div class="yield-label">Volatility</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card analytics-item">
+                            <div class="card-header">
+                                <div class="card-title">Market Insights</div>
+                                <i class="fas fa-lightbulb card-icon"></i>
+                            </div>
+                            <div style="margin-top: 20px;">
+                                <div class="alert alert-info" style="margin-bottom: 15px;">
+                                    <div class="alert-icon">
+                                        <i class="fas fa-info-circle"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        <div class="alert-title">Market Opportunity</div>
+                                        <div class="alert-description">BTC bonds showing 15% higher yields than traditional bonds</div>
+                                    </div>
+                                </div>
+                                <div class="alert alert-warning">
+                                    <div class="alert-icon">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        <div class="alert-title">Rate Alert</div>
+                                        <div class="alert-description">STRK bond rates expected to increase by 2-3% next week</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Enhanced form validation and submission
+            function setupFormValidation() {
+                const bondBtn = document.querySelector('.bond-btn');
+                const valueInput = document.querySelector('.form-input[placeholder="Enter bond value"]');
+                const typeSelect = document.querySelector('.form-input[type="select"]');
+
+                // Real-time validation
+                valueInput.addEventListener('input', function() {
+                    const value = parseFloat(this.value);
+                    if (isNaN(value) || value < 10000) {
+                        this.style.borderColor = 'var(--warning)';
+                    } else {
+                        this.style.borderColor = 'var(--success)';
+                    }
+                });
+
+                bondBtn.addEventListener('click', function() {
+                    const value = parseFloat(valueInput.value);
+                    const type = typeSelect.value;
+
+                    if (isNaN(value) || value < 10000) {
+                        valueInput.style.borderColor = 'var(--warning)';
+                        valueInput.style.animation = 'shake 0.5s ease';
+                        setTimeout(() => valueInput.style.animation = '', 500);
+                        return;
+                    }
+
+                    // Disable button and show loading
+                    this.disabled = true;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+                    // Simulate processing
                     setTimeout(() => {
-                        newBond.style.transition = 'all 0.5s ease';
-                        newBond.style.opacity = '1';
-                        newBond.style.transform = 'translateY(0)';
-                    }, 100);
-                }, 2000);
-            }, 1500);
+                        this.innerHTML = '<i class="fas fa-check-circle"></i> Bond Issued!';
+                        this.style.background = 'linear-gradient(90deg, var(--success), var(--success))';
+
+                        // Create new bond
+                        const newBond = {
+                            id: generateBondId(type),
+                            title: `${type} - ${(7 + Math.random() * 5).toFixed(1)}% APY`,
+                            type: type,
+                            value: value,
+                            purchasePrice: value * 0.98,
+                            yieldRate: 7 + Math.random() * 5,
+                            issued: 'just now',
+                            maturity: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+                            collateral: `${(value / 50000).toFixed(1)} BTC`,
+                            status: 'active',
+                            daysToMaturity: 90,
+                            totalDays: 90,
+                            icon: 'fas fa-clock'
+                        };
+
+                        bondsData.unshift(newBond);
+                        updateDashboardStats();
+                        renderBondsList();
+
+                        // Animate new bond
+                        const newBondElement = document.querySelector('.bond-item');
+                        newBondElement.style.opacity = '0';
+                        newBondElement.style.transform = 'translateY(-20px)';
+
+                        setTimeout(() => {
+                            newBondElement.style.transition = 'all 0.5s ease';
+                            newBondElement.style.opacity = '1';
+                            newBondElement.style.transform = 'translateY(0)';
+                        }, 100);
+
+                        // Reset form
+                        setTimeout(() => {
+                            this.innerHTML = '<i class="fas fa-handshake"></i> Issue Bond';
+                            this.style.background = 'linear-gradient(90deg, var(--bond-primary), var(--bond-secondary))';
+                            this.disabled = false;
+                            valueInput.value = '';
+                            valueInput.style.borderColor = 'var(--border)';
+                        }, 2000);
+                    }, 1500);
+                });
+            }
+
+            // Export functionality
+            function setupExport() {
+                const exportBtn = document.querySelector('.header-actions .header-btn:nth-child(2)');
+                exportBtn.addEventListener('click', function() {
+                    const csvData = [
+                        ['Bond ID', 'Type', 'Value', 'Yield Rate', 'Status', 'Maturity', 'Collateral']
+                    ];
+
+                    bondsData.forEach(bond => {
+                        csvData.push([
+                            bond.id,
+                            bond.type,
+                            bond.value,
+                            bond.yieldRate + '%',
+                            bond.status,
+                            bond.maturity,
+                            bond.collateral
+                        ]);
+                    });
+
+                    const csvContent = csvData.map(row => row.join(',')).join('\n');
+                    const blob = new Blob([csvContent], { type: 'text/csv' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'bonds-data.csv';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
+            }
+
+            // Search functionality
+            function setupSearch() {
+                const searchInput = document.createElement('input');
+                searchInput.type = 'text';
+                searchInput.placeholder = 'Search bonds...';
+                searchInput.className = 'form-input';
+                searchInput.style.width = '250px';
+                searchInput.style.marginLeft = '10px';
+
+                document.querySelector('.section-header').appendChild(searchInput);
+
+                searchInput.addEventListener('input', function() {
+                    searchQuery = this.value;
+                    renderBondsList();
+                });
+            }
+
+            // Real-time updates
+            function startRealTimeUpdates() {
+                setInterval(() => {
+                    // Update bond timers
+                    bondsData.forEach(bond => {
+                        if (bond.daysToMaturity > 0) {
+                            bond.daysToMaturity = Math.max(0, bond.daysToMaturity - 1);
+                        }
+                    });
+
+                    updateDashboardStats();
+                    updateConnectionNodes();
+                    renderBondsList();
+                }, 60000); // Update every minute
+
+                // Random bond updates
+                setInterval(() => {
+                    if (Math.random() < 0.3) { // 30% chance every 30 seconds
+                        const randomBond = bondsData[Math.floor(Math.random() * bondsData.length)];
+                        if (randomBond.status === 'active') {
+                            randomBond.value += Math.random() * 1000 - 500;
+                            randomBond.value = Math.max(10000, randomBond.value);
+                        }
+                        updateDashboardStats();
+                    }
+                }, 30000);
+            }
+
+            // Setup filter controls
+            function setupFilterControls() {
+                const filterSelect = document.querySelector('.filter-select');
+                const sortSelect = document.querySelector('.sort-select');
+                const refreshBtn = document.querySelector('.refresh-btn');
+
+                if (filterSelect) {
+                    filterSelect.addEventListener('change', function() {
+                        filterStatus = this.value;
+                        renderBondsList();
+                    });
+                }
+
+                if (sortSelect) {
+                    sortSelect.addEventListener('change', function() {
+                        sortBy = this.value;
+                        renderBondsList();
+                    });
+                }
+
+                if (refreshBtn) {
+                    refreshBtn.addEventListener('click', function() {
+                        this.querySelector('i').classList.add('fa-spin');
+                        this.disabled = true;
+
+                        // Simulate refresh
+                        setTimeout(() => {
+                            updateDashboardStats();
+                            updateConnectionNodes();
+                            renderBondsList();
+                            this.querySelector('i').classList.remove('fa-spin');
+                            this.disabled = false;
+
+                            // Show success notification
+                            showNotification('Data refreshed successfully!', 'success');
+                        }, 1500);
+                    });
+                }
+            }
+
+            // Show notification
+            function showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `alert alert-${type} notification`;
+                notification.style.cssText = `
+                    position: fixed; top: 20px; right: 20px; z-index: 1000;
+                    max-width: 300px; animation: slideInLeft 0.5s ease;
+                `;
+                notification.innerHTML = `
+                    <div class="alert-icon">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                    </div>
+                    <div class="alert-content">
+                        <div class="alert-description">${message}</div>
+                    </div>
+                `;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.animation = 'fadeOut 0.5s ease';
+                    setTimeout(() => notification.remove(), 500);
+                }, 3000);
+            }
+
+            // Enhanced search functionality
+            function setupSearch() {
+                const searchInput = document.querySelector('.filter-controls input[type="text"]') ||
+                                   document.querySelector('input[placeholder="Search bonds..."]');
+
+                if (searchInput) {
+                    let searchTimeout;
+                    searchInput.addEventListener('input', function() {
+                        clearTimeout(searchTimeout);
+                        searchTimeout = setTimeout(() => {
+                            searchQuery = this.value.toLowerCase();
+                            renderBondsList();
+                        }, 300);
+                    });
+                }
+            }
+
+            // Initialize everything
+            function init() {
+                updateDashboardStats();
+                updateConnectionNodes();
+                renderBondsList();
+                setupFormValidation();
+                setupExport();
+                setupSearch();
+                setupFilterControls();
+                startRealTimeUpdates();
+
+                // Tab switching
+                document.querySelectorAll('.bonds-tab').forEach(tab => {
+                    tab.addEventListener('click', () => switchTab(tab.textContent));
+                });
+
+                // Close button functionality
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('fa-times')) {
+                        e.target.closest('.bond-detail').style.display = 'none';
+                    }
+                });
+
+                // Header button functionality
+                document.querySelectorAll('.header-controls .header-btn').forEach((btn, index) => {
+                    btn.addEventListener('click', function() {
+                        switch (index) {
+                            case 0: // Issue Bond
+                                showNotification('Redirecting to bond issuance form...', 'info');
+                                setTimeout(() => switchTab('Active Bonds'), 1000);
+                                break;
+                            case 1: // My Bonds
+                                showNotification('Loading your bond portfolio...', 'info');
+                                setTimeout(() => switchTab('Bond History'), 1000);
+                                break;
+                        }
+                    });
+                });
+            }
+
+            init();
         });
     </script>
 </body>

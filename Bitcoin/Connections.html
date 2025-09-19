@@ -171,6 +171,7 @@
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
+            
         }
         
         .transaction-header {
@@ -214,10 +215,7 @@
             width: 75%;
         }
         
-        .chart-container {
-            height: 250px;
-            margin-top: 20px;
-        }
+        
         
         .connections-grid {
             display: grid;
@@ -264,6 +262,8 @@
             font-size: 14px;
             border-top: 1px solid #2d3748;
         }
+
+        
         
         @media (max-width: 1024px) {
             .dashboard {
@@ -341,7 +341,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="connections-grid">
             <div class="connection-node">
                 <i class="fas fa-link node-icon"></i>
@@ -438,38 +438,6 @@
         </footer>
     </div>
 
-    <script>
-        // Simulate live data updates
-        function updateData() {
-            // Update connection nodes with random data to simulate live changes
-            document.querySelector('[title="Active Connections"]').innerHTML = Math.floor(Math.random() * 10 + 40);
-            document.querySelector('[title="Current TPS"]').innerHTML = Math.floor(Math.random() * 50 + 100);
-            
-            // Randomly update status indicators
-            if (Math.random() > 0.9) {
-                const indicator = document.querySelector('.status-indicator');
-                indicator.style.backgroundColor = '#e74c3c';
-                indicator.style.boxShadow = '0 0 10px #e74c3c';
-                document.querySelector('.network-status span').textContent = 'Network Issues';
-            }
-        }
-        
-        // Update data every 5 seconds
-        setInterval(updateData, 5000);
-        
-        // Add hover effects to cards
-        const cards = document.querySelectorAll('.card, .connection-node');
-        cards.forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                card.style.transform = 'translateY(-5px)';
-                card.style.boxShadow = '0 15px 30px rgba(0, 0, 0, 0.2)';
-            });
-            
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'translateY(0)';
-                card.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.3)';
-            });
-        });
-    </script>
+    
 </body>
 </html>

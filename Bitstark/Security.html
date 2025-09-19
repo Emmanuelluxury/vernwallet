@@ -6,6 +6,7 @@
     <title>Security Dashboard - Bitcoin-Starknet Bridge</title>
     <link rel="icon" href="../images/image.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #10b981; /* Security green */
@@ -171,6 +172,7 @@
             font-size: 1.8rem;
             font-weight: 700;
             margin-bottom: 5px;
+            transition: all 0.3s ease;
         }
         
         .stat-change {
@@ -197,6 +199,13 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(16, 185, 129, 0.1);
             margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(16, 185, 129, 0.3);
         }
         
         .card-header {
@@ -356,6 +365,7 @@
             height: 100%;
             border-radius: 4px;
             background: var(--primary);
+            transition: width 0.5s ease;
         }
         
         /* Security events */
@@ -365,6 +375,15 @@
             gap: 12px;
             padding: 12px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .security-event:hover {
+            background: rgba(16, 185, 129, 0.05);
+            border-radius: 8px;
+            padding-left: 8px;
+            margin-left: -8px;
+            margin-right: -8px;
         }
         
         .security-event:last-child {
@@ -421,6 +440,18 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            animation: alertSlideIn 0.5s ease-out;
+        }
+
+        @keyframes alertSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
         
         .alert-info {
@@ -533,9 +564,135 @@
             50% { opacity: 1; }
             100% { opacity: 0.6; }
         }
-        
+
         .critical {
             animation: pulse 2s infinite;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: rgba(31, 41, 55, 0.95);
+            backdrop-filter: blur(10px);
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--light);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--light);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .form-error {
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-input.error {
+            border-color: var(--danger);
         }
     </style>
 </head>
@@ -598,11 +755,11 @@
             <div class="header">
                 <h1 class="header-title"><i class="fas fa-shield-alt"></i> Security Dashboard</h1>
                 <div class="header-actions">
-                    <button class="btn btn-secondary">
+                    <button class="btn btn-secondary" aria-label="Refresh security dashboard data">
                         <i class="fas fa-sync-alt"></i>
                         Refresh
                     </button>
-                    <button class="btn">
+                    <button class="btn" aria-label="Toggle security alerts mute">
                         <i class="fas fa-bell"></i>
                         Mute Alerts
                     </button>
@@ -753,6 +910,23 @@
                                     Export
                                 </button>
                             </div>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                            <input type="text" id="eventSearch" class="form-input" placeholder="Search events..." style="flex: 1; padding: 8px;" aria-label="Search security events">
+                            <select id="eventFilter" class="form-select" style="width: 150px; padding: 8px;" aria-label="Filter by severity">
+                                <option value="all">All Severities</option>
+                                <option value="critical">Critical</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                            <select id="statusFilter" class="form-select" style="width: 120px; padding: 8px;" aria-label="Filter by status">
+                                <option value="all">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="resolved">Resolved</option>
+                                <option value="investigating">Investigating</option>
+                            </select>
                         </div>
                         
                         <div class="security-event">
@@ -984,19 +1158,19 @@
                         </div>
                         
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <button class="btn btn-success">
+                            <button class="btn btn-success" aria-label="Run security audit">
                                 <i class="fas fa-shield-alt"></i>
                                 Run Audit
                             </button>
-                            <button class="btn btn-warning">
+                            <button class="btn btn-warning" aria-label="Test alert system">
                                 <i class="fas fa-bell"></i>
                                 Test Alerts
                             </button>
-                            <button class="btn btn-secondary">
+                            <button class="btn btn-secondary" aria-label="Check system logs">
                                 <i class="fas fa-history"></i>
                                 Check Logs
                             </button>
-                            <button class="btn btn-danger">
+                            <button class="btn btn-danger" aria-label="Activate emergency stop">
                                 <i class="fas fa-ban"></i>
                                 Emergency Stop
                             </button>
@@ -1044,27 +1218,894 @@
         </div>
     </div>
 
+    <!-- Modals -->
+    <!-- Security Event Details Modal -->
+    <div id="eventDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Security Event Details</h2>
+                <button class="modal-close" onclick="closeModal('eventDetailsModal')">&times;</button>
+            </div>
+            <form id="eventDetailsForm">
+                <div class="form-group">
+                    <label class="form-label" for="editEventTitle">Event Title</label>
+                    <input type="text" id="editEventTitle" class="form-input" required aria-describedby="editEventTitleError">
+                    <div class="form-error" id="editEventTitleError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editEventDescription">Description</label>
+                    <textarea id="editEventDescription" class="form-input" rows="3" required aria-describedby="editEventDescriptionError"></textarea>
+                    <div class="form-error" id="editEventDescriptionError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editEventSeverity">Severity</label>
+                    <select id="editEventSeverity" class="form-select" required>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editEventStatus">Status</label>
+                    <select id="editEventStatus" class="form-select" required>
+                        <option value="active">Active</option>
+                        <option value="resolved">Resolved</option>
+                        <option value="investigating">Investigating</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('eventDetailsModal')">Cancel</button>
+                    <button type="submit" class="btn">Save Changes</button>
+                    <button type="button" class="btn btn-danger" id="resolveEventBtn">Resolve Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="confirmTitle">Confirm Action</h2>
+                <button class="modal-close" onclick="closeModal('confirmModal')">&times;</button>
+            </div>
+            <p id="confirmMessage">Are you sure you want to perform this action?</p>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('confirmModal')">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Simple interactivity for demonstration
+        // Security Dashboard - Interactive Functionality
+        let securityEvents = [
+            { id: 1, title: 'Slashing Condition Met', description: 'Operator 03 failed to respond to signing request within timeout period.', severity: 'high', status: 'active', timestamp: '10 minutes ago' },
+            { id: 2, title: 'Bond Level Warning', description: 'Operator 07 bond is 1.2 BTC (15% below network average).', severity: 'medium', status: 'active', timestamp: '3 hours ago' },
+            { id: 3, title: 'New Operator Added', description: 'Operator 10 joined the network with 2.1 BTC bond.', severity: 'low', status: 'resolved', timestamp: '12 hours ago' },
+            { id: 4, title: 'Slashing Executed', description: 'Operator 05 slashed for 0.5 BTC due to consensus failure.', severity: 'high', status: 'resolved', timestamp: '2 days ago' }
+        ];
+
+        let currentEvent = null;
+
+        // localStorage functions
+        function saveSecurityData() {
+            localStorage.setItem('securityEvents', JSON.stringify(securityEvents));
+        }
+
+        function loadSecurityData() {
+            const savedEvents = localStorage.getItem('securityEvents');
+            if (savedEvents) {
+                securityEvents = JSON.parse(savedEvents);
+            }
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            // Refresh button animation
-            const refreshBtn = document.querySelector('.header-actions .btn-secondary');
-            refreshBtn.addEventListener('click', function() {
-                this.querySelector('i').classList.add('fa-spin');
-                setTimeout(() => {
-                    this.querySelector('i').classList.remove('fa-spin');
-                }, 1000);
-            });
-            
-            // Simulate live updates for security events
-            setInterval(() => {
-                const securityScore = document.querySelector('.score-value');
-                if (securityScore && parseInt(securityScore.textContent) < 95) {
-                    securityScore.textContent = '93%';
-                    securityScore.style.color = '#10b981';
-                }
-            }, 8000);
+            loadSecurityData(); // Load saved data first
+            // Initialize all interactive elements
+            initializeButtons();
+            initializeLiveUpdates();
+            updateSecurityEvents(); // Initial render
         });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Escape to close modals
+            if (e.key === 'Escape') {
+                const modals = ['eventDetailsModal', 'confirmModal'];
+                modals.forEach(modalId => {
+                    const modal = document.getElementById(modalId);
+                    if (modal && modal.style.display === 'block') {
+                        closeModal(modalId);
+                    }
+                });
+                // Also close dynamically created modals
+                const dynamicModals = document.querySelectorAll('.modal');
+                dynamicModals.forEach(modal => {
+                    if (modal.style.display === 'block' || modal.style.display === '') {
+                        modal.remove();
+                    }
+                });
+            }
+
+            // Ctrl+R to refresh
+            if (e.ctrlKey && e.key === 'r') {
+                e.preventDefault();
+                handleRefresh();
+            }
+
+            // Ctrl+A for security audit
+            if (e.ctrlKey && e.key === 'a') {
+                e.preventDefault();
+                runSecurityAudit();
+            }
+
+            // Ctrl+L for system logs
+            if (e.ctrlKey && e.key === 'l') {
+                e.preventDefault();
+                checkSystemLogs();
+            }
+        });
+
+        // Event details functions
+        function openEventDetails(event) {
+            currentEvent = event;
+            document.getElementById('editEventTitle').value = event.title;
+            document.getElementById('editEventDescription').value = event.description;
+            document.getElementById('editEventSeverity').value = event.severity;
+            document.getElementById('editEventStatus').value = event.status;
+            openModal('eventDetailsModal');
+        }
+
+        function showConfirmation(message, callback) {
+            document.getElementById('confirmMessage').textContent = message;
+            document.getElementById('confirmBtn').onclick = function() {
+                callback();
+                closeModal('confirmModal');
+            };
+            openModal('confirmModal');
+        }
+
+        // Initialize all button event listeners
+        function initializeButtons() {
+            // Header buttons
+            const refreshBtn = document.querySelector('.header-actions .btn-secondary');
+            const muteAlertsBtn = document.querySelector('.header-actions .btn');
+
+            refreshBtn.addEventListener('click', handleRefresh);
+            muteAlertsBtn.addEventListener('click', handleMuteAlerts);
+
+            // Security Health card buttons
+            const viewHistoryBtn = document.querySelector('.card-title + .card-actions .btn-secondary');
+            if (viewHistoryBtn) {
+                viewHistoryBtn.addEventListener('click', showSecurityHistory);
+            }
+
+            // Recent Security Events export button
+            const exportEventsBtn = document.querySelectorAll('.card-actions .btn-secondary')[1];
+            if (exportEventsBtn && exportEventsBtn.textContent.includes('Export')) {
+                exportEventsBtn.addEventListener('click', exportSecurityEvents);
+            }
+
+            // Slashing History report button
+            const reportBtn = document.querySelector('.card-title + .card-actions .btn');
+            if (reportBtn && reportBtn.textContent.includes('Report')) {
+                reportBtn.addEventListener('click', generateSlashingReport);
+            }
+
+            // Operator Bonds buttons
+            const addBondBtn = document.querySelector('.card-actions .btn');
+            if (addBondBtn && addBondBtn.textContent.includes('Add Bond')) {
+                addBondBtn.addEventListener('click', showAddBondModal);
+            }
+
+            // View buttons in operator table
+            const viewButtons = document.querySelectorAll('.btn-secondary');
+            viewButtons.forEach(btn => {
+                if (btn.textContent.includes('View')) {
+                    btn.addEventListener('click', function() {
+                        const operator = this.closest('tr').querySelector('td').textContent;
+                        showOperatorDetails(operator);
+                    });
+                }
+            });
+
+            // Slash button
+            const slashBtn = document.querySelector('.btn-danger');
+            if (slashBtn) {
+                slashBtn.addEventListener('click', function() {
+                    const operator = this.closest('tr').querySelector('td').textContent;
+                    handleSlashing(operator);
+                });
+            }
+
+            // Notify button
+            const notifyBtn = document.querySelector('.btn-warning');
+            if (notifyBtn && notifyBtn.textContent.includes('Notify')) {
+                notifyBtn.addEventListener('click', function() {
+                    const operator = this.closest('tr').querySelector('td').textContent;
+                    sendNotification(operator);
+                });
+            }
+
+            // Security Actions buttons
+            const runAuditBtn = document.querySelector('.btn-success');
+            const testAlertsBtn = document.querySelectorAll('.btn-warning')[1];
+            const checkLogsBtn = document.querySelectorAll('.btn-secondary')[2];
+            const emergencyStopBtn = document.querySelector('.btn-danger');
+
+            if (runAuditBtn) runAuditBtn.addEventListener('click', runSecurityAudit);
+            if (testAlertsBtn) testAlertsBtn.addEventListener('click', testAlertSystem);
+            if (checkLogsBtn) checkLogsBtn.addEventListener('click', checkSystemLogs);
+            if (emergencyStopBtn) emergencyStopBtn.addEventListener('click', emergencyStop);
+
+            // Search and filter
+            document.getElementById('eventSearch').addEventListener('input', updateSecurityEvents);
+            document.getElementById('eventFilter').addEventListener('change', updateSecurityEvents);
+            document.getElementById('statusFilter').addEventListener('change', updateSecurityEvents);
+
+            // Make security events clickable
+            updateSecurityEvents(); // Initial render
+
+            // Event details form
+            document.getElementById('eventDetailsForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (!currentEvent) return;
+                if (!validateEventForm()) return;
+
+                currentEvent.title = document.getElementById('editEventTitle').value;
+                currentEvent.description = document.getElementById('editEventDescription').value;
+                currentEvent.severity = document.getElementById('editEventSeverity').value;
+                currentEvent.status = document.getElementById('editEventStatus').value;
+
+                saveSecurityData();
+                updateSecurityEvents();
+                closeModal('eventDetailsModal');
+                showNotification('Event updated successfully!', 'success');
+            });
+
+            // Resolve event button
+            document.getElementById('resolveEventBtn').addEventListener('click', function() {
+                if (!currentEvent) return;
+                showConfirmation('Resolve this security event?', () => {
+                    currentEvent.status = 'resolved';
+                    saveSecurityData();
+                    updateSecurityEvents();
+                    updateStats();
+                    closeModal('eventDetailsModal');
+                    showNotification('Event resolved!', 'success');
+                });
+            });
+
+            // Real-time validation for event form
+            ['editEventTitle', 'editEventDescription'].forEach(id => {
+                document.getElementById(id).addEventListener('input', validateEventForm);
+            });
+        }
+
+        // Handle refresh button
+        function handleRefresh() {
+            const refreshBtn = document.querySelector('.header-actions .btn-secondary');
+            refreshBtn.querySelector('i').classList.add('fa-spin');
+            refreshBtn.disabled = true;
+
+            // Simulate refresh delay
+            setTimeout(() => {
+                refreshBtn.querySelector('i').classList.remove('fa-spin');
+                refreshBtn.disabled = false;
+
+                // Update some stats randomly
+                updateRandomStats();
+                showNotification('Security dashboard refreshed successfully', 'success');
+            }, 2000);
+        }
+
+        // Handle mute alerts button
+        let alertsMuted = false;
+        function handleMuteAlerts() {
+            const muteBtn = document.querySelector('.header-actions .btn');
+            alertsMuted = !alertsMuted;
+
+            if (alertsMuted) {
+                muteBtn.innerHTML = '<i class="fas fa-bell-slash"></i> Unmute Alerts';
+                muteBtn.classList.remove('btn');
+                muteBtn.classList.add('btn-secondary');
+                showNotification('Security alerts muted', 'info');
+            } else {
+                muteBtn.innerHTML = '<i class="fas fa-bell"></i> Mute Alerts';
+                muteBtn.classList.remove('btn-secondary');
+                muteBtn.classList.add('btn');
+                showNotification('Security alerts unmuted', 'info');
+            }
+        }
+
+        // Show security history modal
+        function showSecurityHistory() {
+            const modal = createModal('Security History', `
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: var(--primary); margin-bottom: 15px;">Last 30 Days</h4>
+                        <canvas id="securityChart" width="400" height="200"></canvas>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 15px;">Historical Events</h4>
+                        <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;">
+                            <div style="margin-bottom: 10px;"><strong>2023-10-15:</strong> Security score peaked at 95%</div>
+                            <div style="margin-bottom: 10px;"><strong>2023-10-10:</strong> New operator joined network</div>
+                            <div style="margin-bottom: 10px;"><strong>2023-10-05:</strong> Slashing event resolved</div>
+                            <div style="margin-bottom: 10px;"><strong>2023-09-28:</strong> Bond requirements updated</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button onclick="refreshSecurityChart()" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Refresh Chart</button>
+                    </div>
+                </div>
+            `);
+            document.body.appendChild(modal);
+
+            // Create chart after modal is added to DOM
+            setTimeout(() => {
+                loadSecurityChart();
+            }, 100);
+        }
+
+        let securityChart;
+
+        function loadSecurityChart() {
+            const ctx = document.getElementById('securityChart');
+            if (!ctx) return;
+
+            const labels = [];
+            const securityData = [];
+            const alertsData = [];
+
+            // Generate last 30 days data
+            for (let i = 29; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                labels.push(date.toLocaleDateString());
+
+                securityData.push(85 + Math.random() * 10);
+                alertsData.push(Math.floor(Math.random() * 5));
+            }
+
+            securityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Security Score %',
+                        data: securityData,
+                        borderColor: 'var(--primary)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    }, {
+                        label: 'Active Alerts',
+                        data: alertsData,
+                        borderColor: 'var(--warning)',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            min: 80,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Security Score %'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            min: 0,
+                            max: 5,
+                            title: {
+                                display: true,
+                                text: 'Active Alerts'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(1);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function refreshSecurityChart() {
+            if (securityChart) {
+                securityChart.data.datasets.forEach(dataset => {
+                    if (dataset.label === 'Security Score %') {
+                        dataset.data = dataset.data.map(() => 85 + Math.random() * 10);
+                    } else {
+                        dataset.data = dataset.data.map(() => Math.floor(Math.random() * 5));
+                    }
+                });
+                securityChart.update();
+                showNotification('Security chart refreshed!', 'info');
+            }
+        }
+
+        // Export security events
+        function exportSecurityEvents() {
+            const events = [
+                { date: '2023-10-15 14:30', type: 'Slashing', severity: 'High', description: 'Operator 03 failed to respond' },
+                { date: '2023-10-15 11:15', type: 'Warning', severity: 'Medium', description: 'Operator 07 bond below average' },
+                { date: '2023-10-15 08:45', type: 'Info', severity: 'Low', description: 'New operator added' },
+                { date: '2023-10-13 16:20', type: 'Slashing', severity: 'High', description: 'Operator 05 consensus failure' }
+            ];
+
+            const csvContent = 'Date,Type,Severity,Description\n' +
+                events.map(event => `${event.date},${event.type},${event.severity},"${event.description}"`).join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'security-events-export.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showNotification('Security events exported successfully', 'success');
+        }
+
+        // Generate slashing report
+        function generateSlashingReport() {
+            const report = {
+                title: 'Slashing Report - October 2023',
+                generated: new Date().toISOString(),
+                summary: {
+                    totalSlashings: 4,
+                    totalAmount: '3.7 BTC',
+                    averageAmount: '0.925 BTC'
+                },
+                incidents: [
+                    { operator: 'Operator 05', amount: '0.5 BTC', reason: 'Consensus failure', date: '2023-10-15' },
+                    { operator: 'Operator 02', amount: '0.3 BTC', reason: 'Late response', date: '2023-09-22' },
+                    { operator: 'Operator 08', amount: '1.2 BTC', reason: 'Double signing attempt', date: '2023-08-05' },
+                    { operator: 'Operator 03', amount: '0.7 BTC', reason: 'Node offline', date: '2023-07-18' }
+                ]
+            };
+
+            const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'slashing-report.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showNotification('Slashing report generated successfully', 'success');
+        }
+
+        // Show add bond modal
+        function showAddBondModal() {
+            const modal = createModal('Add Operator Bond', `
+                <form id="addBondForm">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; color: var(--light);">Operator ID</label>
+                        <input type="text" placeholder="Operator 11" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white;" required>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; color: var(--light);">Bond Amount (BTC)</label>
+                        <input type="number" step="0.1" placeholder="2.0" min="1.5" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white;" required>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 5px; color: var(--light);">Wallet Address</label>
+                        <input type="text" placeholder="0x..." style="width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white;" required>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" style="flex: 1; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer;">Add Bond</button>
+                        <button type="button" onclick="this.closest('.modal').remove()" style="background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer;">Cancel</button>
+                    </div>
+                </form>
+            `);
+            document.body.appendChild(modal);
+
+            // Handle form submission
+            document.getElementById('addBondForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                showNotification('Bond added successfully! Operator will be activated after confirmation.', 'success');
+                modal.remove();
+            });
+        }
+
+        // Show operator details
+        function showOperatorDetails(operator) {
+            const modal = createModal(`${operator} Details`, `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 10px;">Basic Information</h4>
+                        <p><strong>Status:</strong> Active</p>
+                        <p><strong>Location:</strong> Munich, Germany</p>
+                        <p><strong>Uptime:</strong> 99.7%</p>
+                        <p><strong>Joined:</strong> 2023-08-15</p>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 10px;">Performance</h4>
+                        <p><strong>Response Time:</strong> 1.2s avg</p>
+                        <p><strong>Signatures:</strong> 1,247</p>
+                        <p><strong>Success Rate:</strong> 99.8%</p>
+                        <p><strong>Reputation:</strong> Excellent</p>
+                    </div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <h4 style="color: var(--primary); margin-bottom: 10px;">Recent Activity</h4>
+                    <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; font-size: 0.9rem;">
+                        <div>• Signed transaction #12345 (2 hours ago)</div>
+                        <div>• Participated in consensus round #892 (4 hours ago)</div>
+                        <div>• Updated bond amount (1 day ago)</div>
+                    </div>
+                </div>
+            `);
+            document.body.appendChild(modal);
+        }
+
+        // Handle slashing
+        function handleSlashing(operator) {
+            if (confirm(`Are you sure you want to slash ${operator}? This action cannot be undone and will result in bond reduction.`)) {
+                showNotification(`${operator} has been slashed. Bond reduced by 20%.`, 'warning');
+
+                // Update the operator status
+                const operatorRow = event.target.closest('tr');
+                const statusCell = operatorRow.querySelector('.status-badge');
+                statusCell.className = 'status-badge status-critical';
+                statusCell.innerHTML = '<i class="fas fa-ban"></i> Slashed';
+            }
+        }
+
+        // Send notification
+        function sendNotification(operator) {
+            showNotification(`Notification sent to ${operator} regarding bond level.`, 'info');
+        }
+
+        // Security actions
+        function runSecurityAudit() {
+            const btn = document.querySelector('.btn-success');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running Audit...';
+
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-shield-alt"></i> Run Audit';
+                showNotification('Security audit completed successfully. No vulnerabilities found.', 'success');
+            }, 3000);
+        }
+
+        function testAlertSystem() {
+            showNotification('Test alert sent to all operators and administrators.', 'warning');
+        }
+
+        function checkSystemLogs() {
+            const modal = createModal('System Logs', `
+                <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; font-family: monospace; font-size: 0.9rem; max-height: 300px; overflow-y: auto;">
+                    <div style="color: #50fa7b;">[2023-10-15 14:30:22] INFO: Security audit completed successfully</div>
+                    <div style="color: #f1fa8c;">[2023-10-15 14:25:15] WARN: Operator 07 bond below threshold</div>
+                    <div style="color: #ff79c6;">[2023-10-15 14:20:08] INFO: New transaction signed by consensus</div>
+                    <div style="color: #bd93f9;">[2023-10-15 14:15:33] DEBUG: Bond verification completed</div>
+                    <div style="color: #50fa7b;">[2023-10-15 14:10:45] INFO: All operators responding normally</div>
+                    <div style="color: #f1fa8c;">[2023-10-15 14:05:12] WARN: Network latency spike detected</div>
+                </div>
+            `);
+            document.body.appendChild(modal);
+        }
+
+        function emergencyStop() {
+            if (confirm('Are you sure you want to activate emergency stop? This will halt all bridge operations.')) {
+                showNotification('Emergency stop activated. All operations halted.', 'danger');
+
+                // Disable all action buttons temporarily
+                const actionButtons = document.querySelectorAll('.card:last-child button');
+                actionButtons.forEach(btn => {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+                });
+
+                // Re-enable after 30 seconds
+                setTimeout(() => {
+                    actionButtons.forEach(btn => {
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                    });
+                    showNotification('Emergency stop lifted. Operations resumed.', 'success');
+                }, 30000);
+            }
+        }
+
+        // Initialize live updates
+        function initializeLiveUpdates() {
+            setInterval(() => {
+                updateLiveSecurityData();
+            }, 3000);
+        }
+
+        function updateLiveSecurityData() {
+            // Update security score
+            const securityScore = document.querySelector('.score-value');
+            if (securityScore) {
+                const currentScore = parseInt(securityScore.textContent);
+                const newScore = Math.max(85, Math.min(98, currentScore + (Math.random() - 0.5) * 2));
+                securityScore.textContent = Math.round(newScore) + '%';
+
+                // Update color based on score
+                if (newScore >= 95) {
+                    securityScore.style.color = '#10b981';
+                } else if (newScore >= 90) {
+                    securityScore.style.color = '#f59e0b';
+                } else {
+                    securityScore.style.color = '#ef4444';
+                }
+            }
+
+            // Update active alerts count
+            const alertsValue = document.querySelector('.stat-card:nth-child(4) .stat-value');
+            if (alertsValue) {
+                const currentAlerts = parseInt(alertsValue.textContent);
+                const newAlerts = Math.max(0, Math.min(10, currentAlerts + (Math.random() > 0.8 ? 1 : Math.random() > 0.9 ? -1 : 0)));
+                alertsValue.textContent = newAlerts;
+
+                const changeElement = alertsValue.nextElementSibling;
+                if (changeElement) {
+                    if (newAlerts > currentAlerts) {
+                        changeElement.innerHTML = '<i class="fas fa-arrow-up"></i> +' + (newAlerts - currentAlerts) + ' today';
+                        changeElement.className = 'stat-change negative';
+                    } else if (newAlerts < currentAlerts) {
+                        changeElement.innerHTML = '<i class="fas fa-arrow-down"></i> -' + (currentAlerts - newAlerts) + ' resolved';
+                        changeElement.className = 'stat-change positive';
+                    }
+                }
+            }
+
+            // Update slashing events count
+            const slashingValue = document.querySelector('.stat-card:nth-child(3) .stat-value');
+            if (slashingValue && Math.random() < 0.05) { // Occasional updates
+                const currentSlashing = parseInt(slashingValue.textContent);
+                const newSlashing = Math.max(0, currentSlashing + (Math.random() > 0.5 ? 1 : 0));
+                slashingValue.textContent = newSlashing;
+            }
+
+            // Update system resources
+            updateSystemResources();
+
+            // Random new events
+            if (Math.random() < 0.02) { // Rare new events
+                addRandomSecurityEvent();
+            }
+
+            // Auto-resolve some events
+            if (Math.random() < 0.03) {
+                autoResolveEvent();
+            }
+        }
+
+        function updateSystemResources() {
+            const cpuEl = document.querySelector('.progress-value');
+            const memEl = document.querySelectorAll('.progress-value')[1];
+            const netEl = document.querySelectorAll('.progress-value')[2];
+
+            if (cpuEl) {
+                const newCpu = Math.max(20, Math.min(80, parseInt(cpuEl.textContent) + (Math.random() - 0.5) * 10));
+                cpuEl.textContent = Math.round(newCpu) + '%';
+                cpuEl.parentElement.nextElementSibling.querySelector('.progress-fill').style.width = newCpu + '%';
+            }
+
+            if (memEl) {
+                const newMem = Math.max(50, Math.min(90, parseInt(memEl.textContent) + (Math.random() - 0.5) * 5));
+                memEl.textContent = Math.round(newMem) + '%';
+                memEl.parentElement.nextElementSibling.querySelector('.progress-fill').style.width = newMem + '%';
+                memEl.parentElement.nextElementSibling.querySelector('.progress-fill').style.background = newMem > 80 ? 'var(--warning)' : 'var(--primary)';
+            }
+
+            if (netEl) {
+                const newNet = Math.max(60, Math.min(95, parseInt(netEl.textContent) + (Math.random() - 0.5) * 15));
+                netEl.textContent = Math.round(newNet) + '%';
+                netEl.parentElement.nextElementSibling.querySelector('.progress-fill').style.width = newNet + '%';
+            }
+        }
+
+        function addRandomSecurityEvent() {
+            const eventTypes = [
+                { title: 'Suspicious Network Activity', description: 'Unusual traffic pattern detected from unknown IP.', severity: 'medium', status: 'active' },
+                { title: 'Bond Verification Failed', description: 'Operator bond verification encountered an error.', severity: 'high', status: 'investigating' },
+                { title: 'New Operator Registration', description: 'New operator successfully registered with 2.3 BTC bond.', severity: 'low', status: 'resolved' }
+            ];
+            const randomEvent = eventTypes[Math.floor(Math.random() * eventTypes.length)];
+            randomEvent.id = securityEvents.length + 1;
+            randomEvent.timestamp = 'Just now';
+            securityEvents.unshift(randomEvent);
+            saveSecurityData();
+            updateSecurityEvents();
+            showNotification('New security event detected!', 'warning');
+        }
+
+        function autoResolveEvent() {
+            const activeEvents = securityEvents.filter(e => e.status === 'active');
+            if (activeEvents.length > 0) {
+                const eventToResolve = activeEvents[Math.floor(Math.random() * activeEvents.length)];
+                eventToResolve.status = 'resolved';
+                saveSecurityData();
+                updateSecurityEvents();
+                updateStats();
+            }
+        }
+
+        // Load initial security data
+        function loadSecurityData() {
+            // Simulate loading additional data
+            setTimeout(() => {
+                updateRandomStats();
+            }, 1000);
+        }
+
+        // Update security events display
+        function updateSecurityEvents() {
+            const eventsContainer = document.querySelector('.card .card-title + .card-actions + div + div + div');
+            if (!eventsContainer) return;
+
+            const searchTerm = document.getElementById('eventSearch').value.toLowerCase();
+            const severityFilter = document.getElementById('eventFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+
+            const filteredEvents = securityEvents.filter(event => {
+                const matchesSearch = event.title.toLowerCase().includes(searchTerm) ||
+                                    event.description.toLowerCase().includes(searchTerm);
+                const matchesSeverity = severityFilter === 'all' || event.severity === severityFilter;
+                const matchesStatus = statusFilter === 'all' || event.status === statusFilter;
+                return matchesSearch && matchesSeverity && matchesStatus;
+            });
+
+            eventsContainer.innerHTML = filteredEvents.map(event => `
+                <div class="security-event" onclick="openEventDetails(securityEvents[${securityEvents.indexOf(event)}])" style="cursor: pointer;">
+                    <div class="event-icon ${event.severity === 'high' || event.severity === 'critical' ? '' : event.severity === 'medium' ? 'warning' : 'info'}">
+                        <i class="fas fa-${event.severity === 'critical' ? 'radiation' : event.severity === 'high' ? 'exclamation-triangle' : event.severity === 'medium' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                    </div>
+                    <div class="event-details">
+                        <div class="event-title">${event.title}</div>
+                        <div class="event-description">${event.description}</div>
+                        <div class="event-meta">${event.timestamp} • ${event.severity.charAt(0).toUpperCase() + event.severity.slice(1)} Severity</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update random stats for demo
+        function updateRandomStats() {
+            // Update bond amount
+            const bondValue = document.querySelector('.stat-card:nth-child(2) .stat-value');
+            if (bondValue) {
+                const currentBond = parseFloat(bondValue.textContent);
+                const newBond = (currentBond + (Math.random() - 0.5) * 0.5).toFixed(1);
+                bondValue.textContent = newBond + ' BTC';
+            }
+
+            // Update uptime
+            const uptimeValue = document.querySelector('.stat-card:nth-child(4) .stat-value');
+            if (uptimeValue && uptimeValue.textContent.includes('%')) {
+                const currentUptime = parseFloat(uptimeValue.textContent);
+                const newUptime = Math.max(95, Math.min(99.9, currentUptime + (Math.random() - 0.5) * 0.1)).toFixed(1);
+                uptimeValue.textContent = newUptime + '%';
+            }
+        }
+
+        function validateEventForm() {
+            const titleField = document.getElementById('editEventTitle');
+            const descField = document.getElementById('editEventDescription');
+
+            const titleError = document.getElementById('editEventTitleError');
+            const descError = document.getElementById('editEventDescriptionError');
+
+            let isValid = true;
+
+            // Title validation
+            if (!titleField.value.trim()) {
+                titleError.textContent = 'Event title is required';
+                titleError.style.display = 'block';
+                titleField.classList.add('error');
+                isValid = false;
+            } else {
+                titleError.style.display = 'none';
+                titleField.classList.remove('error');
+            }
+
+            // Description validation
+            if (!descField.value.trim()) {
+                descError.textContent = 'Event description is required';
+                descError.style.display = 'block';
+                descField.classList.add('error');
+                isValid = false;
+            } else {
+                descError.style.display = 'none';
+                descField.classList.remove('error');
+            }
+
+            return isValid;
+        }
+
+        // Create modal helper function
+        function createModal(title, content) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.8); display: flex; align-items: center;
+                justify-content: center; z-index: 1000;
+            `;
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">${title}</h2>
+                        <button class="modal-close" onclick="this.closest('.modal').remove()">&times;</button>
+                    </div>
+                    ${content}
+                </div>
+            `;
+            return modal;
+        }
+
+        // Show notification helper
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed; top: 20px; right: 20px; background: ${type === 'success' ? '#10b981' : type === 'warning' ? '#f59e0b' : type === 'danger' ? '#ef4444' : '#3b82f6'};
+                color: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 1001; font-weight: 500; max-width: 300px;
+            `;
+            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : type === 'danger' ? 'times-circle' : 'info-circle'}"></i> ${message}`;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 4000);
+        }
     </script>
 </body>
 </html>

@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn More - Bitcoin-Starknet Bridge</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7c3aed; /* Bridge purple */
+            --primary-dark: #6d28d9;
+            --bitcoin: #f7931a; /* Bitcoin orange */
+            --starknet: #ff6b35; /* Starknet orange-red */
+            --secondary: #1a1f2e; /* Dark blue */
+            --dark: #0d1318;
+            --light: #f5f5f5;
+            --gray: #9ca3af;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #0d1318;
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+        
+        /* Header with navigation */
+        .header {
+            background: rgba(26, 31, 46, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .nav-btnn {
+            text-decoration: none;
+            color: white;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(124, 58, 237, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: var(--primary);
+        }
+        
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .title-main {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary), var(--bitcoin));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+        
+        .title-sub {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* Cards */
+        .card {
+            background: rgba(26, 31, 46, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            margin-bottom: 25px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        .card-title i {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 22px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .info-card {
+            background: rgba(26, 31, 46, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .info-card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: rgba(124, 58, 237, 0.2);
+            color: var(--primary);
+        }
+        
+        .info-card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        /* Step cards */
+        .step-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .step-card {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(26, 31, 46, 0.4);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        /* FAQ */
+        .faq-item {
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 20px;
+        }
+        
+        .faq-question {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .faq-answer {
+            color: var(--gray);
+            line-height: 1.6;
+        }
+        
+        /* Resource links */
+        .resource-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .resource-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--light);
+            transition: all 0.3s;
+        }
+        
+        .resource-link:hover {
+            background: rgba(124, 58, 237, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .resource-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: rgba(124, 58, 237, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        /* Code snippet */
+        .code-snippet {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .code-comment {
+            color: #6b7280;
+        }
+        
+        .code-keyword {
+            color: #f472b6;
+        }
+        
+        .code-function {
+            color: #60a5fa;
+        }
+        
+        .code-string {
+            color: #34d399;
+        }
+        
+        /* Comparison table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .comparison-table th {
+            text-align: left;
+            padding: 15px;
+            background: rgba(124, 58, 237, 0.2);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .comparison-table .feature {
+            font-weight: 600;
+            width: 30%;
+        }
+        
+        /* Footer */
+        .footer {
+            background: rgba(26, 31, 46, 0.8);
+            padding: 30px;
+            text-align: center;
+            margin-top: 50px;
+            border-top: 1px solid rgba(124, 58, 237, 0.2);
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-link {
+            color: var(--gray);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-link:hover {
+            color: var(--primary);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .title-main {
+                font-size: 2rem;
+            }
+            
+            .step-card {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .resource-links {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <!-- Header with navigation -->
+    <div class="header">
+        <a href="#" class="logo">
+            <i class="fas fa-bridge logo-icon"></i>
+            <span>Bitcoin-Starknet Bridge</span>
+        </a>
+        
+        <div class="nav-links">
+            <a href="#" class="nav-btn active">
+                <i class="fas fa-graduation-cap"></i>
+                Learn More
+            </a>
+                <button class="nav-btn">
+                    <a href="Documentation.html" class="nav-btnn">
+                    <i class="fas fa-book"></i>
+                    Documentation
+                    </a>
+                </button>
+                <button class="nav-btn">
+                    <a href="../Security/Privacy-Policy.html" class="nav-btnn">
+                    <i class="fas fa-user-shield"></i>
+                    Privacy Policy
+                    </a>
+                </button>
+                <button class="nav-btn">
+                    <i class="fas fa-video"></i>
+                    Tutorials
+                </button>
+                <button class="nav-btn">
+                    <a href="LandingPage.html" class="nav-btnn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Back to App
+                    </a>
+                </button>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-title">
+            <h1 class="title-main">Learn About Bitcoin-Starknet Bridge</h1>
+            <p class="title-sub">Everything you need to know about bridging Bitcoin to Starknet, how it works, and why it matters for the future of decentralized finance.</p>
+        </div>
+        
+        <!-- Info Grid -->
+        <div class="info-grid">
+            <div class="info-card animate-in">
+                <div class="info-card-header">
+                    <div class="info-card-icon">
+                        <i class="fab fa-bitcoin"></i>
+                    </div>
+                    <h2 class="info-card-title">What is Bitcoin?</h2>
+                </div>
+                <p>Bitcoin is the first decentralized cryptocurrency, launched in 2009. It operates on a peer-to-peer network without central authority, using proof-of-work consensus to secure transactions recorded on its blockchain.</p>
+                <p>Bitcoin provides a store of value and medium of exchange with a fixed supply of 21 million coins, making it resistant to inflation.</p>
+            </div>
+            
+            <div class="info-card animate-in delay-1">
+                <div class="info-card-header">
+                    <div class="info-card-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h2 class="info-card-title">What is Starknet?</h2>
+                </div>
+                <p>Starknet is a decentralized Validity-Rollup (also known as a "ZK-Rollup") that operates as an L2 network over Ethereum. It enables scalable decentralized applications without compromising on security.</p>
+                <p>Using STARK proofs, Starknet batches transactions off-chain and submits cryptographic proofs to Ethereum, dramatically reducing costs while maintaining security.</p>
+            </div>
+            
+            <div class="info-card animate-in delay-2">
+                <div class="info-card-header">
+                    <div class="info-card-icon">
+                        <i class="fas fa-link"></i>
+                    </div>
+                    <h2 class="info-card-title">Why Bridge Bitcoin to Starknet?</h2>
+                </div>
+                <p>Bridging Bitcoin to Starknet unlocks Bitcoin's liquidity for DeFi applications while maintaining Bitcoin's security. This allows Bitcoin holders to:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Participate in DeFi protocols</li>
+                    <li>Trade with low fees and fast transactions</li>
+                    <li>Access innovative financial products</li>
+                    <li>Maintain exposure to Bitcoin's value</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- How It Works -->
+        <div class="card animate-in delay-3">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-cogs"></i> How the Bridge Works</h2>
+            </div>
+            
+            <div class="step-cards">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Lock Bitcoin</h3>
+                        <p>Users send Bitcoin to a secure multisignature address on the Bitcoin blockchain, which locks the Bitcoin.</p>
+                    </div>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Generate Proof</h3>
+                        <p>The bridge generates a cryptographic proof verifying the Bitcoin transaction and the amount locked.</p>
+                    </div>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Mint wrapped BTC</h3>
+                        <p>Based on the proof, an equivalent amount of wrapped Bitcoin (wBTC) is minted on Starknet.</p>
+                    </div>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Use on Starknet</h3>
+                        <p>Users can now use their wBTC in Starknet's DeFi ecosystem with low fees and fast transactions.</p>
+                    </div>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Reverse Process</h3>
+                        <p>To redeem Bitcoin, users burn wBTC on Starknet and provide proof to unlock the original Bitcoin.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Technical Details -->
+        <div class="card animate-in delay-4">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-microchip"></i> Technical Architecture</h2>
+            </div>
+            
+            <p>The Bitcoin-Starknet bridge uses a sophisticated architecture to ensure security and efficiency:</p>
+            
+            <table class="comparison-table">
+                <tr>
+                    <th class="feature">Component</th>
+                    <th>Description</th>
+                    <th>Technology</th>
+                </tr>
+                <tr>
+                    <td class="feature">Bitcoin Locking Mechanism</td>
+                    <td>Multisig addresses with threshold signatures</td>
+                    <td>3-of-5 multisig, Taproot</td>
+                </tr>
+                <tr>
+                    <td class="feature">Proof Generation</td>
+                    <td>Zero-knowledge proofs of Bitcoin transactions</td>
+                    <td>STARK proofs, Merkle proofs</td>
+                </tr>
+                <tr>
+                    <td class="feature">Starknet Contracts</td>
+                    <td>Smart contracts for minting/burning wBTC</td>
+                    <td>Cairo, Starknet OS</td>
+                </tr>
+                <tr>
+                    <td class="feature">Relayer Network</td>
+                    <td>Decentralized nodes monitoring both chains</td>
+                    <td>Python, Rust</td>
+                </tr>
+                <tr>
+                    <td class="feature">Security Model</td>
+                    <td>Economic incentives and cryptographic guarantees</td>
+                    <td>Bonding, slashing, fraud proofs</td>
+                </tr>
+            </table>
+            
+            <div class="code-snippet">
+                <span class="code-comment"># Example of wBTC contract interaction</span><br>
+                <span class="code-keyword">from</span> starknet<span class="code-keyword">.</span>contract <span class="code-keyword">import</span> Contract<br>
+                <br>
+                <span class="code-comment"># Initialize wBTC contract</span><br>
+                wbtc_contract <span class="code-keyword">=</span> Contract(<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;address<span class="code-keyword">=</span><span class="code-string">"0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7"</span>,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;abi<span class="code-keyword">=</span>wbtc_abi<br>
+                )<br>
+                <br>
+                <span class="code-comment"># Transfer wBTC</span><br>
+                <span class="code-keyword">await</span> wbtc_contract<span class="code-keyword">.</span>transfer(<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;recipient<span class="code-keyword">=</span><span class="code-string">"0x072d30f..."</span>,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;amount<span class="code-keyword">=</span>100000000 <span class="code-comment"># 1 wBTC</span><br>
+                )<span class="code-keyword">.</span>invoke()
+            </div>
+        </div>
+        
+        <!-- Benefits & Use Cases -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-rocket"></i> Benefits & Use Cases</h2>
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <h2 class="info-card-title">DeFi Participation</h2>
+                    </div>
+                    <p>Use your Bitcoin in Starknet's decentralized finance ecosystem - lending, borrowing, yield farming, and trading with minimal fees.</p>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h2 class="info-card-title">Fast & Cheap Transactions</h2>
+                    </div>
+                    <p>Starknet's rollup technology enables transactions that are 100x cheaper and faster than Ethereum mainnet, making micro-transactions feasible.</p>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h2 class="info-card-title">Enhanced Security</h2>
+                    </div>
+                    <p>Starknet's validity proofs ensure mathematical certainty of transaction correctness, inheriting Ethereum's security while scaling beyond its limitations.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FAQ Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-question-circle"></i> Frequently Asked Questions</h2>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    Is the bridge trustless?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    The bridge uses a combination of cryptographic proofs and economic incentives to minimize trust requirements. While not fully trustless, it significantly reduces trust assumptions compared to traditional bridges.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    What are the fees for using the bridge?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Bridge fees consist of: Bitcoin network fees for the lock/unlock transactions, a small bridge service fee (0.1-0.2%), and Starknet gas fees for minting/burning wBTC. Total fees typically range from 0.3% to 0.5% of the transferred amount.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    How long does a transfer take?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Bitcoin to Starknet transfers typically take 30-60 minutes (1 Bitcoin confirmation + proof generation time). Starknet to Bitcoin transfers take 2-4 hours due to additional security waiting periods.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    Is there a minimum transfer amount?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Yes, the minimum transfer amount is 0.001 BTC to ensure economic viability given network fees. There's no maximum limit, but large transfers may require additional security checks.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    What are the risks?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Potential risks include: smart contract vulnerabilities, bridge operator malfeasance, Bitcoin network reorganization, and Starknet protocol risks. The bridge implements multiple security measures to mitigate these risks.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Resources -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-book-open"></i> Learning Resources</h2>
+            </div>
+            
+            <div class="resource-links">
+                <a href="#" class="resource-link">
+                    <div class="resource-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div>
+                        <div>Technical Documentation</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Complete bridge technical specification</div>
+                    </div>
+                </a>
+                
+                <a href="#" class="resource-link">
+                    <div class="resource-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div>
+                        <div>User Guide</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Step-by-step bridge usage instructions</div>
+                    </div>
+                </a>
+                
+                <a href="#" class="resource-link">
+                    <div class="resource-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <div>
+                        <div>Video Tutorials</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Visual guides for using the bridge</div>
+                    </div>
+                </a>
+                
+                <a href="#" class="resource-link">
+                    <div class="resource-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div>
+                        <div>API Reference</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Developer documentation for integration</div>
+                    </div>
+                </a>
+                
+                <a href="#" class="resource-link">
+                    <div class="resource-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <div>Community Forum</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Discuss with other users and developers</div>
+                    </div>
+                </a>
+                
+                <a href="#" class="resource-link">
+                    <div class="resource-icon">
+                        <i class="fab fa-github"></i>
+                    </div>
+                    <div>
+                        <div>GitHub Repository</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Open-source code and contributions</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-links">
+            <a href="../Bitstark/LandingPage.html" class="footer-link">Home</a>
+            <a href="Documentation.html" class="footer-link">Documentation</a>
+            <a href="../Security/Privacy-Policy.html" class="footer-link">Privacy Policy</a>
+            <a href="../Security/Terms-of-Service.html" class="footer-link">Terms of Service</a>
+            <a href="../Security/Contact.html" class="footer-link">Contact</a>
+        </div>
+        <p>© 2025 Bitcoin-Starknet Bridge. All rights reserved.</p>
+    </div>
+
+    <script>
+        // Learn More Page - Interactive Elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // FAQ toggle functionality
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', () => {
+                    const answer = question.nextElementSibling;
+                    const icon = question.querySelector('i');
+                    
+                    if (answer.style.display === 'block') {
+                        answer.style.display = 'none';
+                        icon.classList.remove('fa-chevron-up');
+                        icon.classList.add('fa-chevron-down');
+                    } else {
+                        answer.style.display = 'block';
+                        icon.classList.remove('fa-chevron-down');
+                        icon.classList.add('fa-chevron-up');
+                    }
+                });
+            });
+            
+            // Initially hide all FAQ answers
+            document.querySelectorAll('.faq-answer').forEach(answer => {
+                answer.style.display = 'none';
+            });
+            
+            // Resource links
+            document.querySelectorAll('.resource-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // In a real implementation, this would navigate to the resource
+                    alert(`Navigating to ${this.querySelector('div > div').textContent}\n(This is a simulation - in a real application, this would open the resource)`);
+                });
+            });
+            
+            // Animation on scroll
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all cards for animation
+            document.querySelectorAll('.card, .info-card').forEach(card => {
+                card.style.opacity = 0;
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>

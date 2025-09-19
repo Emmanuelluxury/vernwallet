@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Bitcoin-Starknet Bridge</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --primary-light: #a78bfa;
+            --bitcoin: #f7931a;
+            --starknet: #ff6b35;
+            --dark: #0f172a;
+            --darker: #0d1318;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --gray-dark: #475569;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--darker);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header with navigation */
+        .header {
+            background: rgba(26, 31, 46, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: white;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 5px;
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .nav-btn:hover {
+            background: rgba(124, 58, 237, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title-main {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary), var(--info));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .title-sub {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Contact Sections */
+        .contact-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        .section-title i {
+            font-size: 1.2rem;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(26, 31, 46, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: rgba(124, 58, 237, 0.2);
+            color: var(--primary);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .card-content {
+            color: var(--gray);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .card-footer {
+            margin-top: auto;
+        }
+
+        .card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            width: 100%;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .card-link:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .card-link.secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .card-link.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Support Resources */
+        .support-resources {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .support-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--light);
+            transition: all 0.3s;
+        }
+
+        .support-item:hover {
+            background: rgba(124, 58, 237, 0.2);
+            transform: translateX(5px);
+        }
+
+        .support-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: rgba(124, 58, 237, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        /* Contact Form */
+        .contact-form {
+            background: rgba(26, 31, 46, 0.6);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 20px;
+            border: 1px solid rgba(124, 58, 237, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--light);
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-submit {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .form-submit:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Status Section */
+        .status-section {
+            background: rgba(26, 31, 46, 0.6);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 40px;
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .status-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            flex-shrink: 0;
+        }
+
+        .status-content {
+            flex-grow: 1;
+        }
+
+        .status-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .status-description {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(26, 31, 46, 0.8);
+            padding: 30px;
+            text-align: center;
+            margin-top: 50px;
+            border-top: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .footer-link {
+            color: var(--gray);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-link:hover {
+            color: var(--primary);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .title-main {
+                font-size: 2rem;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .support-resources {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <!-- Header with navigation -->
+    <div class="header">
+        <a href="#" class="logo">
+            <i class="fas fa-bridge logo-icon"></i>
+            <span>Bitcoin-Starknet Bridge</span>
+        </a>
+        
+        <div class="nav-links">
+            <a href="../Bitstark/LearnMore.html" class="nav-btn">
+                <i class="fas fa-graduation-cap"></i>
+                Learn More
+            </a>
+            <a href="../Bitstark/Documentation.html" class="nav-btn">
+                <i class="fas fa-book"></i>
+                Documentation
+            </a>
+            <a href="../Security/Privacy-Policy.html" class="nav-btn">
+                <i class="fas fa-user-shield"></i>
+                Privacy Policy
+            </a>
+            <a href="#" class="nav-btn active">
+                <i class="fas fa-envelope"></i>
+                Contact
+            </a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-title">
+            <h1 class="title-main">Contact Us</h1>
+            <p class="title-sub">Get in touch with our team for support, partnerships, or general inquiries</p>
+        </div>
+        
+        <!-- Support Status -->
+        <div class="status-section animate-in">
+            <div class="status-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="status-content">
+                <div class="status-title">All Systems Operational</div>
+                <div class="status-description">Our support team is available to help you with any issues</div>
+            </div>
+            <a href="#" class="card-link secondary">
+                <i class="fas fa-heart"></i> Support Status
+            </a>
+        </div>
+        
+        <!-- Contact Methods -->
+        <div class="contact-section">
+            <h2 class="section-title"><i class="fas fa-headset"></i> Get Support</h2>
+            
+            <div class="card-grid">
+                <div class="card animate-in">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3 class="card-title">Community Support</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Join our active community on Discord where developers and users help each other with technical questions and bridge operations.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="card-link">
+                            <i class="fab fa-discord"></i> Join Discord
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card animate-in delay-1">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h3 class="card-title">Email Support</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Contact our support team directly for assistance with technical issues, account problems, or general inquiries about the bridge.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="mailto:support@starknet-bridge.com" class="card-link">
+                            <i class="fas fa-paper-plane"></i> Send Email
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card animate-in delay-2">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-bug"></i>
+                        </div>
+                        <h3 class="card-title">Report a Bug</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Found an issue with our bridge? Report bugs and technical problems through our GitHub issues page for our development team to review.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="card-link">
+                            <i class="fab fa-github"></i> GitHub Issues
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Additional Resources -->
+        <div class="contact-section">
+            <h2 class="section-title"><i class="fas fa-life-ring"></i> Support Resources</h2>
+            
+            <div class="support-resources">
+                <a href="#" class="support-item">
+                    <div class="support-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div>
+                        <div>Documentation</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Technical guides and API references</div>
+                    </div>
+                </a>
+                
+                <a href="#" class="support-item">
+                    <div class="support-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <div>Tutorials</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Step-by-step guides</div>
+                    </div>
+                </a>
+                
+                <a href="#" class="support-item">
+                    <div class="support-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <div>
+                        <div>FAQ</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Frequently asked questions</div>
+                    </div>
+                </a>
+                
+                <a href="#" class="support-item">
+                    <div class="support-icon">
+                        <i class="fas fa-blog"></i>
+                    </div>
+                    <div>
+                        <div>Blog</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Updates and announcements</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Contact Form -->
+        <div class="contact-section">
+            <h2 class="section-title"><i class="fas fa-paper-plane"></i> Send us a Message</h2>
+            
+            <div class="contact-form">
+                <div class="form-group">
+                    <label class="form-label">Your Name</label>
+                    <input type="text" class="form-input" placeholder="Enter your name">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-input" placeholder="Enter your email">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Inquiry Type</label>
+                    <select class="form-select">
+                        <option value="">Select inquiry type</option>
+                        <option value="technical">Technical Support</option>
+                        <option value="partnership">Partnership</option>
+                        <option value="general">General Question</option>
+                        <option value="bug">Bug Report</option>
+                        <option value="suggestion">Feature Suggestion</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Message</label>
+                    <textarea class="form-textarea" placeholder="How can we help you?"></textarea>
+                </div>
+                
+                <button type="submit" class="form-submit">
+                    <i class="fas fa-paper-plane"></i> Send Message
+                </button>
+            </div>
+        </div>
+        
+        <!-- Partnerships -->
+        <div class="contact-section">
+            <h2 class="section-title"><i class="fas fa-handshake"></i> Partnerships & Integration</h2>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-plug"></i>
+                        </div>
+                        <h3 class="card-title">API Integration</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Integrate our bridge into your application or service. Access our comprehensive API documentation and developer resources.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="card-link secondary">
+                            <i class="fas fa-code"></i> API Documentation
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <h3 class="card-title">Business Inquiries</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Interested in partnership opportunities, collaborations, or enterprise solutions? Contact our business development team.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="mailto:partnerships@starknet-bridge.com" class="card-link secondary">
+                            <i class="fas fa-envelope"></i> Contact Business Team
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Social Media -->
+        <div class="contact-section">
+            <h2 class="section-title"><i class="fas fa-hashtag"></i> Stay Connected</h2>
+            
+            <div class="support-resources">
+                <a href="#" class="support-item">
+                    <div class="support-icon">
+                        <i class="fab fa-twitter"></i>
+                    </div>
+                    <div>
+                        <div>Twitter</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Follow us for updates</div>
+                    </div>
+                </a>
+                
+                <a href="#" class="support-item">
+                    <div class="support-icon">
+                        <i class="fab fa-github"></i>
+                    </div>
+                    <div>
+                        <div>GitHub</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Open-source code</div>
+                    </div>
+                </a>
+                
+                <a href="#" class="support-item">
+                    <div class="support-icon">
+                        <i class="fab fa-medium"></i>
+                    </div>
+                    <div>
+                        <div>Medium</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Technical articles</div>
+                    </div>
+                </a>
+                
+                <a href="#" class="support-item">
+                    <div class="support-icon">
+                        <i class="fab fa-telegram"></i>
+                    </div>
+                    <div>
+                        <div>Telegram</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Community announcements</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-links">
+            <a href="../Bitstark/LandingPage.html" class="footer-link">Home</a>
+            <a href="../Bitstark/Documentation.html" class="footer-link">Documentation</a>
+            <a href="../Security/Privacy-Policy.html" class="footer-link">Privacy Policy</a>
+            <a href="../Security/Terms-of-Service.html" class="footer-link">Terms of Service</a>
+            <a href="#" class="footer-link">Contact</a>
+        </div>
+        <p>© 2025 Bitcoin-Starknet Bridge. All rights reserved.</p>
+    </div>
+
+    <script>
+        // Contact Page - Interactive Elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form submission
+            const contactForm = document.querySelector('.contact-form');
+            const submitButton = contactForm.querySelector('.form-submit');
+            
+            submitButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Simple validation
+                const inputs = contactForm.querySelectorAll('.form-input, .form-textarea, .form-select');
+                let isValid = true;
+                
+                inputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        input.style.borderColor = 'var(--danger)';
+                        isValid = false;
+                    } else {
+                        input.style.borderColor = '';
+                    }
+                });
+                
+                if (isValid) {
+                    // Show success message
+                    this.innerHTML = '<i class="fas fa-check"></i> Message Sent';
+                    this.style.background = 'var(--success)';
+                    this.disabled = true;
+                    
+                    // Create confirmation message
+                    const confirmation = document.createElement('div');
+                    confirmation.style.marginTop = '15px';
+                    confirmation.style.color = 'var(--success)';
+                    confirmation.innerHTML = '<i class="fas fa-check-circle"></i> Thank you for your message. We will respond within 24 hours.';
+                    
+                    contactForm.appendChild(confirmation);
+                    
+                    // Reset form after delay
+                    setTimeout(() => {
+                        inputs.forEach(input => {
+                            input.value = '';
+                        });
+                    }, 2000);
+                }
+            });
+            
+            // Animation on scroll
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all cards and sections for animation
+            document.querySelectorAll('.card, .status-section').forEach(item => {
+                item.style.opacity = 0;
+                item.style.transform = 'translateY(20px)';
+                item.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                observer.observe(item);
+            });
+        });
+    </script>
+</body>
+</html>

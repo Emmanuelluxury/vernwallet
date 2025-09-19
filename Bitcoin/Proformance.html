@@ -421,14 +421,258 @@
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .metrics-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .resource-usage {
                 grid-template-columns: 1fr;
             }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            margin: 5% auto;
+            padding: 0;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: white;
+            font-size: 1.4rem;
+        }
+
+        .modal-header h2 i {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+        }
+
+        .form-group input::placeholder {
+            color: var(--gray);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #optimizationForm,
+        #benchmarkForm {
+            padding: 20px;
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            background: rgba(139, 92, 246, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 15px 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+
+        .notification-content i {
+            font-size: 1.2rem;
+        }
+
+        .notification.error {
+            background: rgba(239, 68, 68, 0.9);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .notification.warning {
+            background: rgba(245, 158, 11, 0.9);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        /* Tooltips */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: rgba(31, 41, 55, 0.9);
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .tooltip .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: rgba(31, 41, 55, 0.9) transparent transparent transparent;
+        }
+
+        /* Enhanced hover effects */
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        /* Benchmark progress */
+        .benchmark-progress {
+            margin-top: 15px;
+        }
+
+        .benchmark-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .benchmark-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* Alert management */
+        .alert-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .alert-item:last-child {
+            border-bottom: none;
+        }
+
+        .alert-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .alert-actions button {
+            padding: 5px 10px;
+            font-size: 0.8rem;
         }
     </style>
 </head>
@@ -486,13 +730,15 @@
             <div class="header">
                 <h1 class="header-title"><i class="fas fa-tachometer-alt"></i> Performance Dashboard</h1>
                 <div class="header-actions">
-                    <button class="btn btn-secondary">
+                    <button class="btn btn-secondary tooltip" title="Refresh all performance metrics">
                         <i class="fas fa-sync-alt"></i>
                         Refresh
+                        <span class="tooltip-text">Update all performance data and charts</span>
                     </button>
-                    <button class="btn">
+                    <button class="btn tooltip" title="Export performance report">
                         <i class="fas fa-download"></i>
                         Export Report
+                        <span class="tooltip-text">Download detailed performance report as PDF</span>
                     </button>
                 </div>
             </div>
@@ -586,13 +832,25 @@
                         <div class="card-header">
                             <h2 class="card-title"><i class="fas fa-exchange-alt"></i> Transaction Throughput</h2>
                             <div class="card-actions">
-                                <button class="btn btn-sm btn-secondary">
+                                <select id="timeRangeSelect" class="btn btn-sm btn-secondary" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.1); color: white;">
+                                    <option value="1h">1 Hour</option>
+                                    <option value="6h">6 Hours</option>
+                                    <option value="24h" selected>24 Hours</option>
+                                    <option value="7d">7 Days</option>
+                                </select>
+                                <select id="chartTypeSelect" class="btn btn-sm btn-secondary" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.1); color: white;">
+                                    <option value="line">Line Chart</option>
+                                    <option value="bar">Bar Chart</option>
+                                    <option value="area">Area Chart</option>
+                                </select>
+                                <button class="btn btn-sm btn-secondary tooltip" title="View detailed performance history">
                                     <i class="fas fa-history"></i>
                                     View History
+                                    <span class="tooltip-text">Access detailed performance history and trends</span>
                                 </button>
                             </div>
                         </div>
-                        
+
                         <div class="chart-container">
                             <canvas id="throughputChart"></canvas>
                         </div>
@@ -771,21 +1029,25 @@
                         </div>
                         
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <button class="btn btn-secondary">
+                            <button class="btn btn-secondary tooltip" title="Run performance optimization">
                                 <i class="fas fa-bolt"></i>
                                 Optimize Now
+                                <span class="tooltip-text">Automatically optimize system performance</span>
                             </button>
-                            <button class="btn btn-secondary">
+                            <button class="btn btn-secondary tooltip" title="Scale system resources">
                                 <i class="fas fa-server"></i>
                                 Scale Resources
+                                <span class="tooltip-text">Increase or decrease system resources</span>
                             </button>
-                            <button class="btn">
+                            <button class="btn tooltip" title="Run performance benchmark">
                                 <i class="fas fa-chart-line"></i>
                                 Run Benchmark
+                                <span class="tooltip-text">Execute comprehensive performance testing</span>
                             </button>
-                            <button class="btn btn-secondary">
+                            <button class="btn btn-secondary tooltip" title="Adjust performance settings">
                                 <i class="fas fa-sliders-h"></i>
                                 Adjust Settings
+                                <span class="tooltip-text">Fine-tune performance parameters</span>
                             </button>
                         </div>
                     </div>
@@ -794,12 +1056,276 @@
         </div>
     </div>
 
+    <!-- Performance Optimization Modal -->
+    <div id="optimizationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-bolt"></i> Performance Optimization</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="optimizationForm">
+                <div class="form-group">
+                    <label for="optimizationType">Optimization Type</label>
+                    <select id="optimizationType" required>
+                        <option value="">Select Type</option>
+                        <option value="cpu">CPU Optimization</option>
+                        <option value="memory">Memory Optimization</option>
+                        <option value="network">Network Optimization</option>
+                        <option value="database">Database Optimization</option>
+                        <option value="full">Full System Optimization</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="optimizationLevel">Optimization Level</label>
+                    <select id="optimizationLevel" required>
+                        <option value="conservative">Conservative</option>
+                        <option value="balanced" selected>Balanced</option>
+                        <option value="aggressive">Aggressive</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="autoOptimize">Enable Auto-Optimization</label>
+                    <input type="checkbox" id="autoOptimize" checked>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeOptimizationModal()">Cancel</button>
+                    <button type="submit" class="btn">Start Optimization</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Benchmark Testing Modal -->
+    <div id="benchmarkModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-chart-line"></i> Benchmark Testing</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="benchmarkForm">
+                <div class="form-group">
+                    <label for="benchmarkType">Benchmark Type</label>
+                    <select id="benchmarkType" required>
+                        <option value="">Select Type</option>
+                        <option value="throughput">Throughput Test</option>
+                        <option value="latency">Latency Test</option>
+                        <option value="load">Load Test</option>
+                        <option value="stress">Stress Test</option>
+                        <option value="comprehensive">Comprehensive Test</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="testDuration">Test Duration (minutes)</label>
+                    <input type="number" id="testDuration" min="1" max="60" value="5" required>
+                </div>
+                <div class="form-group">
+                    <label for="concurrencyLevel">Concurrency Level</label>
+                    <input type="number" id="concurrencyLevel" min="1" max="1000" value="100" required>
+                </div>
+                <div class="benchmark-progress" id="benchmarkProgress" style="display: none;">
+                    <div class="benchmark-bar">
+                        <div class="benchmark-fill" id="benchmarkFill" style="width: 0%;"></div>
+                    </div>
+                    <div style="text-align: center; color: var(--gray); font-size: 0.9rem;" id="benchmarkStatus">Initializing benchmark...</div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeBenchmarkModal()">Cancel</button>
+                    <button type="submit" class="btn">Start Benchmark</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alert Management Modal -->
+    <div id="alertModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-bell"></i> Alert Management</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div style="padding: 20px;">
+                <div class="alert-item">
+                    <div>
+                        <div style="font-weight: 600; margin-bottom: 3px;">High CPU Usage</div>
+                        <div style="color: var(--gray); font-size: 0.9rem;">CPU usage above 85% for 5 minutes</div>
+                    </div>
+                    <div class="alert-actions">
+                        <button class="btn btn-sm btn-secondary">Acknowledge</button>
+                        <button class="btn btn-sm" style="background: var(--danger);">Dismiss</button>
+                    </div>
+                </div>
+                <div class="alert-item">
+                    <div>
+                        <div style="font-weight: 600; margin-bottom: 3px;">Memory Warning</div>
+                        <div style="color: var(--gray); font-size: 0.9rem;">Memory usage above 80%</div>
+                    </div>
+                    <div class="alert-actions">
+                        <button class="btn btn-sm btn-secondary">Acknowledge</button>
+                        <button class="btn btn-sm" style="background: var(--danger);">Dismiss</button>
+                    </div>
+                </div>
+                <div class="alert-item">
+                    <div>
+                        <div style="font-weight: 600; margin-bottom: 3px;">Network Latency</div>
+                        <div style="color: var(--gray); font-size: 0.9rem;">Average latency above 200ms</div>
+                    </div>
+                    <div class="alert-actions">
+                        <button class="btn btn-sm btn-secondary">Acknowledge</button>
+                        <button class="btn btn-sm" style="background: var(--danger);">Dismiss</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <div class="notification-content">
+            <i class="fas fa-check-circle"></i>
+            <span id="notificationText"></span>
+        </div>
+    </div>
+
     <script>
-        // Initialize charts
+        // Global variables
+        let throughputChart, responseTimeChart;
+        let currentTimeRange = '24h';
+        let currentChartType = 'line';
+
+        // Modal functions
+        function openOptimizationModal() {
+            document.getElementById('optimizationModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeOptimizationModal() {
+            document.getElementById('optimizationModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            document.getElementById('optimizationForm').reset();
+        }
+
+        function openBenchmarkModal() {
+            document.getElementById('benchmarkModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeBenchmarkModal() {
+            document.getElementById('benchmarkModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            document.getElementById('benchmarkForm').reset();
+            document.getElementById('benchmarkProgress').style.display = 'none';
+        }
+
+        function openAlertModal() {
+            document.getElementById('alertModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAlertModal() {
+            document.getElementById('alertModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Notification function
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            const icon = notification.querySelector('i');
+
+            notificationText.textContent = message;
+
+            if (type === 'error') {
+                notification.classList.add('error');
+                icon.className = 'fas fa-exclamation-circle';
+            } else if (type === 'warning') {
+                notification.classList.add('warning');
+                notification.classList.remove('error');
+                icon.className = 'fas fa-exclamation-triangle';
+            } else {
+                notification.classList.remove('error', 'warning');
+                icon.className = 'fas fa-check-circle';
+            }
+
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Chart update functions
+        function updateChartData(timeRange) {
+            currentTimeRange = timeRange;
+            const labels = [];
+            const data = [];
+
+            switch(timeRange) {
+                case '1h':
+                    for (let i = 0; i < 12; i++) {
+                        labels.push(`${i * 5}m ago`);
+                        data.push(Math.floor(Math.random() * 40) + 100);
+                    }
+                    break;
+                case '6h':
+                    for (let i = 0; i < 12; i++) {
+                        labels.push(`${i * 30}m ago`);
+                        data.push(Math.floor(Math.random() * 40) + 100);
+                    }
+                    break;
+                case '24h':
+                    for (let i = 0; i < 12; i++) {
+                        labels.push(`${i * 2}h ago`);
+                        data.push(Math.floor(Math.random() * 40) + 100);
+                    }
+                    break;
+                case '7d':
+                    for (let i = 0; i < 7; i++) {
+                        labels.push(`Day ${i + 1}`);
+                        data.push(Math.floor(Math.random() * 40) + 100);
+                    }
+                    break;
+            }
+
+            throughputChart.data.labels = labels;
+            throughputChart.data.datasets[0].data = data;
+            throughputChart.update();
+        }
+
+        function updateChartType(chartType) {
+            currentChartType = chartType;
+            throughputChart.config.type = chartType;
+
+            if (chartType === 'area') {
+                throughputChart.config.type = 'line';
+                throughputChart.data.datasets[0].fill = true;
+            } else {
+                throughputChart.data.datasets[0].fill = false;
+            }
+
+            throughputChart.update();
+        }
+
+        // Main initialization
         document.addEventListener('DOMContentLoaded', function() {
-            // Throughput Chart
+            // Modal event listeners
+            document.querySelector('#optimizationModal .modal-close').addEventListener('click', closeOptimizationModal);
+            document.querySelector('#benchmarkModal .modal-close').addEventListener('click', closeBenchmarkModal);
+            document.querySelector('#alertModal .modal-close').addEventListener('click', closeAlertModal);
+
+            // Close modals when clicking outside
+            window.onclick = function(event) {
+                const optModal = document.getElementById('optimizationModal');
+                const benchModal = document.getElementById('benchmarkModal');
+                const alertModal = document.getElementById('alertModal');
+
+                if (event.target == optModal) closeOptimizationModal();
+                if (event.target == benchModal) closeBenchmarkModal();
+                if (event.target == alertModal) closeAlertModal();
+            }
+
+            // Initialize charts
             const throughputCtx = document.getElementById('throughputChart').getContext('2d');
-            const throughputChart = new Chart(throughputCtx, {
+            throughputChart = new Chart(throughputCtx, {
                 type: 'line',
                 data: {
                     labels: ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'],
@@ -841,10 +1367,9 @@
                     }
                 }
             });
-            
-            // Response Time Chart
+
             const responseTimeCtx = document.getElementById('responseTimeChart').getContext('2d');
-            const responseTimeChart = new Chart(responseTimeCtx, {
+            responseTimeChart = new Chart(responseTimeCtx, {
                 type: 'bar',
                 data: {
                     labels: ['Bitcoin', 'Starknet', 'Bridge', 'API', 'Database'],
@@ -889,77 +1414,244 @@
                     }
                 }
             });
-            
-            // Refresh button animation
+
+            // Chart controls
+            document.getElementById('timeRangeSelect').addEventListener('change', function() {
+                updateChartData(this.value);
+                showNotification(`Chart updated to ${this.value} view`, 'success');
+            });
+
+            document.getElementById('chartTypeSelect').addEventListener('change', function() {
+                updateChartType(this.value);
+                showNotification(`Chart type changed to ${this.value}`, 'success');
+            });
+
+            // Form submissions
+            document.getElementById('optimizationForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const optimizationType = document.getElementById('optimizationType').value;
+                const optimizationLevel = document.getElementById('optimizationLevel').value;
+
+                showNotification(`Starting ${optimizationLevel} ${optimizationType} optimization...`, 'success');
+
+                // Simulate optimization process
+                setTimeout(() => {
+                    showNotification(`${optimizationType} optimization completed! Performance improved by 15%`, 'success');
+                    closeOptimizationModal();
+                }, 3000);
+            });
+
+            document.getElementById('benchmarkForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const benchmarkType = document.getElementById('benchmarkType').value;
+                const testDuration = document.getElementById('testDuration').value;
+
+                document.getElementById('benchmarkProgress').style.display = 'block';
+                showNotification(`Starting ${benchmarkType} benchmark test...`, 'success');
+
+                // Simulate benchmark progress
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += Math.random() * 15;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(progressInterval);
+                        document.getElementById('benchmarkStatus').textContent = 'Benchmark completed!';
+                        setTimeout(() => {
+                            showNotification(`${benchmarkType} benchmark completed! Results: 98.5% success rate`, 'success');
+                            closeBenchmarkModal();
+                        }, 1000);
+                    }
+
+                    document.getElementById('benchmarkFill').style.width = progress + '%';
+                    document.getElementById('benchmarkStatus').textContent = `Running benchmark... ${Math.round(progress)}% complete`;
+                }, 500);
+            });
+
+            // Performance actions
+            const actionButtons = document.querySelectorAll('.card button');
+            actionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.textContent.trim();
+
+                    switch(action) {
+                        case 'Optimize Now':
+                            openOptimizationModal();
+                            break;
+                        case 'Scale Resources':
+                            showNotification('Opening resource scaling panel...', 'success');
+                            setTimeout(() => {
+                                alert('Resource Scaling Panel\n\n• CPU Cores: 4 → 8\n• Memory: 16GB → 32GB\n• Storage: 500GB → 1TB\n\nScaling will take approximately 5 minutes.');
+                            }, 500);
+                            break;
+                        case 'Run Benchmark':
+                            openBenchmarkModal();
+                            break;
+                        case 'Adjust Settings':
+                            showNotification('Opening performance settings...', 'success');
+                            setTimeout(() => {
+                                alert('Performance Settings\n\n• Max Connections: 1000\n• Cache Size: 2GB\n• Timeout: 30s\n• Retry Attempts: 3\n\nSettings updated successfully!');
+                            }, 500);
+                            break;
+                        case 'Details':
+                            showNotification('Loading detailed resource information...', 'success');
+                            setTimeout(() => {
+                                alert('Resource Details\n\nCPU Usage Breakdown:\n• User: 45%\n• System: 25%\n• Idle: 30%\n\nMemory Details:\n• Used: 12.8GB\n• Free: 3.2GB\n• Cached: 2.1GB');
+                            }, 1000);
+                            break;
+                        case 'Run Diagnostics':
+                            showNotification('Running system diagnostics...', 'success');
+                            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running...';
+                            setTimeout(() => {
+                                this.innerHTML = '<i class="fas fa-heart"></i> Run Diagnostics';
+                                showNotification('Diagnostics completed! System health: 94%', 'success');
+                            }, 2000);
+                            break;
+                        case 'View History':
+                            showNotification('Loading performance history...', 'success');
+                            setTimeout(() => {
+                                alert('Performance History\n\nLast 7 Days:\n• Peak TPS: 156.8\n• Avg Response Time: 124ms\n• Uptime: 99.8%\n• Total Transactions: 2.4M\n\nDetailed charts available in Analytics section.');
+                            }, 1000);
+                            break;
+                        case 'Adjust':
+                            showNotification('Opening response time settings...', 'success');
+                            setTimeout(() => {
+                                alert('Response Time Settings\n\nCurrent Thresholds:\n• Warning: >150ms\n• Critical: >300ms\n• Timeout: 5000ms\n\nSettings updated successfully!');
+                            }, 500);
+                            break;
+                    }
+                });
+            });
+
+            // Alert management
+            const alertButtons = document.querySelectorAll('.alert-actions button');
+            alertButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.textContent;
+                    const alertItem = this.closest('.alert-item');
+                    const alertTitle = alertItem.querySelector('div:first-child div:first-child').textContent;
+
+                    if (action === 'Acknowledge') {
+                        showNotification(`Alert "${alertTitle}" acknowledged`, 'success');
+                        alertItem.style.opacity = '0.5';
+                    } else if (action === 'Dismiss') {
+                        showNotification(`Alert "${alertTitle}" dismissed`, 'warning');
+                        alertItem.style.display = 'none';
+                    }
+                });
+            });
+
+            // Header actions
             const refreshBtn = document.querySelector('.header-actions .btn-secondary');
             refreshBtn.addEventListener('click', function() {
                 this.querySelector('i').classList.add('fa-spin');
                 setTimeout(() => {
                     this.querySelector('i').classList.remove('fa-spin');
-                    
-                    // Simulate data update
+
+                    // Update stats
                     const tpsValue = document.querySelectorAll('.stat-value')[0];
                     if (tpsValue) {
                         const currentTps = parseFloat(tpsValue.textContent);
                         tpsValue.textContent = (currentTps + (Math.random() * 10 - 5)).toFixed(1);
                     }
-                    
-                    // Update response time
+
                     const responseValue = document.querySelectorAll('.stat-value')[1];
                     if (responseValue) {
                         const currentResponse = parseInt(responseValue.textContent);
                         responseValue.textContent = Math.max(80, Math.min(200, currentResponse + (Math.random() * 20 - 10))) + ' ms';
                     }
-                    
-                    // Update charts with new data
-                    throughputChart.data.datasets[0].data = throughputChart.data.datasets[0].data.map(value => 
+
+                    // Update charts
+                    throughputChart.data.datasets[0].data = throughputChart.data.datasets[0].data.map(value =>
                         Math.max(80, Math.min(160, value + (Math.random() * 20 - 10)))
                     );
                     throughputChart.update();
-                    
-                    responseTimeChart.data.datasets[0].data = responseTimeChart.data.datasets[0].data.map(value => 
+
+                    responseTimeChart.data.datasets[0].data = responseTimeChart.data.datasets[0].data.map(value =>
                         Math.max(60, Math.min(180, value + (Math.random() * 30 - 15)))
                     );
                     responseTimeChart.update();
+
+                    showNotification('All metrics refreshed successfully!', 'success');
                 }, 1000);
             });
-            
-            // Simulate real-time updates
+
+            const exportBtn = document.querySelector('.header-actions .btn');
+            exportBtn.addEventListener('click', function() {
+                showNotification('Generating performance report...', 'success');
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-download"></i> Export Report';
+                    showNotification('Performance report downloaded successfully!', 'success');
+                }, 2000);
+            });
+
+            // Real-time updates
             setInterval(() => {
-                // Randomly update some metrics
-                const cpuValue = document.querySelector('.resource-value');
-                if (cpuValue) {
-                    const currentCpu = parseInt(cpuValue.textContent);
-                    cpuValue.textContent = Math.max(60, Math.min(90, currentCpu + (Math.random() * 10 - 5))) + '%';
-                    
-                    // Update progress bar
-                    const cpuFill = document.querySelector('.progress-fill');
-                    if (cpuFill) {
-                        const newValue = parseInt(cpuValue.textContent);
-                        cpuFill.style.width = newValue + '%';
-                        
-                        // Change color based on value
-                        if (newValue > 85) {
-                            cpuFill.style.background = 'var(--danger)';
-                        } else if (newValue > 75) {
-                            cpuFill.style.background = 'var(--warning)';
-                        } else {
-                            cpuFill.style.background = 'var(--success)';
+                // Update resource usage
+                const resourceValues = document.querySelectorAll('.resource-value');
+                resourceValues.forEach((value, index) => {
+                    if (value) {
+                        const currentValue = parseInt(value.textContent);
+                        let newValue;
+
+                        switch(index) {
+                            case 0: // CPU
+                                newValue = Math.max(60, Math.min(95, currentValue + (Math.random() * 8 - 4)));
+                                break;
+                            case 1: // Memory
+                                newValue = Math.max(50, Math.min(85, currentValue + (Math.random() * 6 - 3)));
+                                break;
+                            case 2: // Disk I/O
+                                newValue = Math.max(20, Math.min(70, currentValue + (Math.random() * 10 - 5)));
+                                break;
+                            case 3: // Network I/O
+                                newValue = Math.max(30, Math.min(80, currentValue + (Math.random() * 12 - 6)));
+                                break;
+                        }
+
+                        value.textContent = Math.round(newValue) + '%';
+
+                        // Update progress bar
+                        const progressFill = value.closest('.resource-card').querySelector('.progress-fill');
+                        if (progressFill) {
+                            progressFill.style.width = newValue + '%';
+
+                            // Color coding
+                            if (newValue > 85) {
+                                progressFill.style.background = 'var(--danger)';
+                            } else if (newValue > 75) {
+                                progressFill.style.background = 'var(--warning)';
+                            } else {
+                                progressFill.style.background = 'var(--success)';
+                            }
                         }
                     }
-                }
-                
-                // Update health score slightly
-                const healthValue = document.querySelectorAll('.progress-value')[0];
-                if (healthValue) {
-                    const currentHealth = parseInt(healthValue.textContent);
-                    healthValue.textContent = Math.max(85, Math.min(99, currentHealth + (Math.random() * 4 - 2))) + '%';
-                    
-                    // Update progress bar
-                    const healthFill = document.querySelectorAll('.progress-fill')[0];
-                    if (healthFill) {
-                        healthFill.style.width = healthValue.textContent;
+                });
+
+                // Update health scores
+                const healthValues = document.querySelectorAll('.progress-value');
+                healthValues.forEach((value, index) => {
+                    if (value && value.textContent.includes('%')) {
+                        const currentValue = parseInt(value.textContent);
+                        const newValue = Math.max(85, Math.min(99, currentValue + (Math.random() * 2 - 1)));
+                        value.textContent = Math.round(newValue) + '%';
+
+                        // Update progress bar
+                        const healthFill = document.querySelectorAll('.progress-fill')[index];
+                        if (healthFill) {
+                            healthFill.style.width = newValue + '%';
+                        }
                     }
+                });
+
+                // Random alerts
+                if (Math.random() < 0.02) { // 2% chance every 5 seconds
+                    const alerts = ['High CPU Usage', 'Memory Warning', 'Network Latency', 'Disk I/O Spike'];
+                    const randomAlert = alerts[Math.floor(Math.random() * alerts.length)];
+                    showNotification(`Alert: ${randomAlert} detected!`, 'warning');
                 }
             }, 5000);
         });

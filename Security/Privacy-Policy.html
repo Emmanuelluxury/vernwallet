@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Bitcoin-Starknet Bridge</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --primary-light: #a78bfa;
+            --bitcoin: #f7931a;
+            --starknet: #ff6b35;
+            --dark: #0f172a;
+            --darker: #0d1318;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --gray-dark: #475569;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--darker);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header with navigation */
+        .header {
+            background: rgba(26, 31, 46, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: white;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 5px;
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .nav-btn:hover {
+            background: rgba(124, 58, 237, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title-main {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary), var(--info));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .title-sub {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Last Updated */
+        .last-updated {
+            text-align: center;
+            color: var(--gray);
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        /* Policy Sections */
+        .policy-section {
+            margin-bottom: 40px;
+            background: rgba(26, 31, 46, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        .section-title i {
+            font-size: 1.2rem;
+        }
+
+        /* Policy Content */
+        .policy-content {
+            color: var(--gray);
+            line-height: 1.8;
+        }
+
+        .policy-content p {
+            margin-bottom: 15px;
+        }
+
+        .policy-content ul, .policy-content ol {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .policy-content li {
+            margin-bottom: 10px;
+        }
+
+        .highlight {
+            background: rgba(124, 58, 237, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        /* Policy Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .card {
+            background: rgba(26, 31, 46, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            background: rgba(124, 58, 237, 0.2);
+            color: var(--primary);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .card-content {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(26, 31, 46, 0.8);
+            padding: 30px;
+            text-align: center;
+            margin-top: 50px;
+            border-top: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .footer-link {
+            color: var(--gray);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-link:hover {
+            color: var(--primary);
+        }
+
+        /* Contact Section */
+        .contact-section {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px;
+            background: rgba(26, 31, 46, 0.6);
+            border-radius: 12px;
+            border: 1px solid rgba(124, 58, 237, 0.1);
+        }
+
+        .contact-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            margin-top: 15px;
+        }
+
+        .contact-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .title-main {
+                font-size: 2rem;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .policy-section {
+                padding: 20px;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <!-- Header with navigation -->
+    <div class="header">
+        <a href="#" class="logo">
+            <i class="fas fa-shield-alt logo-icon"></i>
+            <span>Bitcoin-Starknet Bridge</span>
+        </a>
+        
+        <div class="nav-links">
+            <a href="../Bitstark/LandingPage.html" class="nav-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                Back to App
+            </a>
+            <a href="../Bitstark/LearnMore.html" class="nav-btn">
+                <i class="fas fa-graduation-cap"></i>
+                Learn More
+            </a>
+            <a href="../Bitstark/Documentation.html" class="nav-btn">
+                <i class="fas fa-book"></i>
+                Documentation
+            </a>
+            <a href="#" class="nav-btn active">
+                <i class="fas fa-user-shield"></i>
+                Privacy Policy
+            </a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-title">
+            <h1 class="title-main">Privacy Policy</h1>
+            <p class="title-sub">How we protect and handle your data on the Bitcoin-Starknet Bridge</p>
+        </div>
+
+        <div class="last-updated">
+            <i class="fas fa-history"></i> Last Updated: September 10, 2025
+        </div>
+        
+        <!-- Introduction -->
+        <div class="policy-section animate-in">
+            <h2 class="section-title"><i class="fas fa-info-circle"></i> Introduction</h2>
+            <div class="policy-content">
+                <p>At Bitcoin-Starknet Bridge, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our bridge service to transfer assets between Bitcoin and Starknet networks.</p>
+                
+                <p>Please read this privacy policy carefully. By using our service, you consent to the practices described in this policy. If you do not agree with the practices described, you should not use our services.</p>
+                
+                <div class="highlight">
+                    <p><strong>Note:</strong> As a decentralized bridge protocol, we are designed to minimize data collection while maintaining security and compliance with applicable regulations.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Information We Collect -->
+        <div class="policy-section animate-in delay-1">
+            <h2 class="section-title"><i class="fas fa-database"></i> Information We Collect</h2>
+            <div class="policy-content">
+                <p>Our bridge is designed with privacy in mind. We collect minimal information necessary to provide and improve our services:</p>
+                
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <h3 class="card-title">Wallet Addresses</h3>
+                        </div>
+                        <div class="card-content">
+                            <p>We collect and store public wallet addresses involved in transactions for operational purposes and compliance.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <h3 class="card-title">Transaction Data</h3>
+                        </div>
+                        <div class="card-content">
+                            <p>Transaction amounts, timestamps, and status are recorded on the blockchain and in our systems for auditing and support purposes.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                            <h3 class="card-title">Network Information</h3>
+                        </div>
+                        <div class="card-content">
+                            <p>We collect IP addresses and browser information for security monitoring and to prevent fraudulent activities.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="highlight">
+                    <p><strong>We do not collect:</strong> Personal identification information, private keys, or any sensitive data beyond what is necessary for the operation of the bridge.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- How We Use Your Information -->
+        <div class="policy-section animate-in delay-2">
+            <h2 class="section-title"><i class="fas fa-cogs"></i> How We Use Your Information</h2>
+            <div class="policy-content">
+                <p>The limited information we collect is used for the following purposes:</p>
+                
+                <ul>
+                    <li><strong>Service Operation:</strong> To process your bridge transactions between Bitcoin and Starknet networks</li>
+                    <li><strong>Security:</strong> To detect and prevent fraudulent transactions, abuse, and security incidents</li>
+                    <li><strong>Compliance:</strong> To meet regulatory requirements and prevent illegal activities</li>
+                    <li><strong>Improvements:</strong> To analyze usage patterns and improve our service (using aggregated, anonymized data)</li>
+                    <li><strong>Support:</strong> To provide customer support and troubleshoot issues</li>
+                </ul>
+                
+                <p>We do not sell, trade, or rent your personal information to third parties. We may share anonymized, aggregated data with partners for research or analytical purposes.</p>
+            </div>
+        </div>
+        
+        <!-- Data Storage and Security -->
+        <div class="policy-section animate-in delay-3">
+            <h2 class="section-title"><i class="fas fa-lock"></i> Data Storage and Security</h2>
+            <div class="policy-content">
+                <p>We implement industry-standard security measures to protect your information:</p>
+                
+                <ul>
+                    <li>All sensitive data is encrypted at rest and in transit</li>
+                    <li>Access to user data is strictly limited to authorized personnel</li>
+                    <li>We employ blockchain-native security practices to protect transactions</li>
+                    <li>Regular security audits and penetration testing are conducted</li>
+                </ul>
+                
+                <p>While we implement robust security measures, no method of transmission over the Internet or electronic storage is 100% secure. We cannot guarantee absolute security but commit to following best practices in the industry.</p>
+                
+                <div class="highlight">
+                    <p><strong>Important:</strong> As a user of blockchain technology, you are responsible for securing your own private keys and wallet information. We never have access to your private keys.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Third-Party Services -->
+        <div class="policy-section">
+            <h2 class="section-title"><i class="fas fa-external-link-alt"></i> Third-Party Services</h2>
+            <div class="policy-content">
+                <p>We may use third-party services to operate our bridge:</p>
+                
+                <ul>
+                    <li><strong>Node Providers:</strong> We use infrastructure providers for Bitcoin and Starknet node operations</li>
+                    <li><strong>Analytics:</strong> We use privacy-focused analytics to understand usage patterns</li>
+                    <li><strong>Support:</strong> We may use customer support platforms to assist users</li>
+                </ul>
+                
+                <p>All third-party services are vetted for privacy and security compliance. We only share the minimum information necessary for these services to function.</p>
+            </div>
+        </div>
+        
+        <!-- Your Rights -->
+        <div class="policy-section">
+            <h2 class="section-title"><i class="fas fa-user-check"></i> Your Rights</h2>
+            <div class="policy-content">
+                <p>Depending on your jurisdiction, you may have the following rights regarding your data:</p>
+                
+                <ul>
+                    <li><strong>Access:</strong> You can request information about what data we have about you</li>
+                    <li><strong>Correction:</strong> You can request correction of inaccurate data</li>
+                    <li><strong>Deletion:</strong> You can request deletion of your data, subject to legal obligations</li>
+                    <li><strong>Portability:</strong> You can request a copy of your data in a machine-readable format</li>
+                    <li><strong>Objection:</strong> You can object to certain processing activities</li>
+                </ul>
+                
+                <p>To exercise any of these rights, please contact us using the information provided below.</p>
+            </div>
+        </div>
+        
+        <!-- Changes to This Policy -->
+        <div class="policy-section">
+            <h2 class="section-title"><i class="fas fa-code-branch"></i> Changes to This Policy</h2>
+            <div class="policy-content">
+                <p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date.</p>
+                
+                <p>You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.</p>
+                
+                <div class="highlight">
+                    <p><strong>Continued use</strong> of our services after any modifications to this Privacy Policy will constitute your acknowledgment of the modifications and your consent to abide and be bound by the modified Privacy Policy.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contact Section -->
+        <div class="contact-section">
+            <h2 class="section-title"><i class="fas fa-envelope"></i> Contact Us</h2>
+            <div class="policy-content">
+                <p>If you have any questions about this Privacy Policy, please contact us:</p>
+                
+                <p>Email: <strong>privacy@starknet-bridge.com</strong></p>
+                <p>Discord: <strong>https://discord.gg/starknet-bridge</strong></p>
+                
+                <a href="mailto:privacy@starknet-bridge.com" class="contact-button">
+                    <i class="fas fa-envelope"></i> Contact Our Privacy Team
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-links">
+            <a href="../Bitstark/LandingPage.html" class="footer-link">Home</a>
+            <a href="../Bitstark/Documentation.html" class="footer-link">Documentation</a>
+            <a href="#" class="footer-link">Privacy Policy</a>
+            <a href="../Security/Terms-of-Service.html" class="footer-link">Terms of Service</a>
+            <a href="../Security/Contact.html" class="footer-link">Contact</a>
+        </div>
+        <p>© 2025 Bitcoin-Starknet Bridge. All rights reserved.</p>
+    </div>
+
+    <script>
+        // Privacy Policy Page - Interactive Elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animation on scroll
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all sections for animation
+            document.querySelectorAll('.policy-section').forEach(section => {
+                section.style.opacity = 0;
+                section.style.transform = 'translateY(20px)';
+                section.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>

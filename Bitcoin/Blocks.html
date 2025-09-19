@@ -519,32 +519,120 @@
             width: 200px;
         }
         
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Loading states */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.2), transparent);
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Hover effects */
+        .table tr:hover {
+            background: rgba(245, 158, 11, 0.05);
+            transition: background 0.3s ease;
+        }
+
+        .table tr.selected {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 3px solid var(--primary);
+        }
+
+        .block:hover {
+            transform: translateY(-2px);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        /* Button states */
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 1024px) {
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .sidebar {
                 width: 80px;
             }
-            
+
             .nav-item span {
                 display: none;
             }
         }
-        
+
         @media (max-width: 768px) {
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .block-visualization {
                 flex-wrap: wrap;
                 justify-content: center;
                 gap: 20px;
             }
-            
+
             .block-connector {
                 display: none;
             }
@@ -700,7 +788,7 @@
                         <div class="card-header">
                             <h2 class="card-title"><i class="fas fa-cubes"></i> Recent Blocks</h2>
                             <div class="card-actions">
-                                <button class="btn btn-sm btn-secondary">
+                                <button class="btn btn-sm btn-secondary export-table-btn">
                                     <i class="fas fa-download"></i>
                                     Export
                                 </button>
@@ -1002,60 +1090,316 @@
     </div>
 
     <script>
-        // Simple interactivity for demonstration
+        // Enhanced interactivity for Blocks Dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            // Refresh button animation
+            // Mock data for blocks
+            let mockBlocks = [
+                { chain: 'Bitcoin', height: 788543, txs: 2458, size: '1.32 MB', time: '2 min ago', hash: '0000000000000000000a7b1385b7e56c2e7f3e6d7f6b5a4c3b2a1f0e9d8c7b6a' },
+                { chain: 'Bitcoin', height: 788542, txs: 1987, size: '1.18 MB', time: '11 min ago', hash: '0000000000000000000c4a2e5b6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d' },
+                { chain: 'Starknet', height: 1245872, txs: 317, size: '0.42 MB', time: '15 min ago', hash: '0x123456789abcdef' },
+                { chain: 'Bitcoin', height: 788541, txs: 2156, size: '1.27 MB', time: '20 min ago', hash: '0000000000000000000d5b3f6c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' },
+                { chain: 'Starknet', height: 1245871, txs: 284, size: '0.38 MB', time: '25 min ago', hash: '0xabcdef123456789' }
+            ];
+
+            let currentBitcoinHeight = 788543;
+            let currentStarknetHeight = 1245872;
+            let filterChain = 'All Chains';
+            let filterTime = 'Last 24 Hours';
+            let searchQuery = '';
+
+            // Generate random hash
+            function generateHash() {
+                return '0000000000000000000' + Math.random().toString(16).substr(2, 16);
+            }
+
+            // Update stats
+            function updateStats() {
+                document.querySelectorAll('.stat-value')[0].textContent = currentBitcoinHeight.toLocaleString();
+                document.querySelectorAll('.stat-value')[1].textContent = currentStarknetHeight.toLocaleString();
+                document.querySelectorAll('.stat-value')[2].textContent = (9.8 + Math.random() * 0.4 - 0.2).toFixed(1) + 'm';
+                document.querySelectorAll('.stat-value')[3].textContent = (2458 + Math.floor(Math.random() * 200 - 100)).toString();
+            }
+
+            // Add new block to table
+            function addNewBlock(chain, height, txs, size, time, hash) {
+                const tbody = document.querySelector('.table tbody');
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fab fa-${chain.toLowerCase()}" style="color: var(--${chain.toLowerCase()});"></i>
+                            ${chain}
+                        </div>
+                    </td>
+                    <td>${height.toLocaleString()}</td>
+                    <td>${txs}</td>
+                    <td>${size}</td>
+                    <td>${time}</td>
+                `;
+
+                // Add animation
+                row.style.animation = 'fadeIn 0.5s ease-in';
+                tbody.insertBefore(row, tbody.firstChild);
+
+                // Remove old rows if too many
+                if (tbody.children.length > 10) {
+                    tbody.removeChild(tbody.lastChild);
+                }
+
+                // Update mock data
+                mockBlocks.unshift({ chain, height, txs, size, time, hash });
+                if (mockBlocks.length > 10) mockBlocks.pop();
+            }
+
+            // Filter blocks
+            function filterBlocks() {
+                const tbody = document.querySelector('.table tbody');
+                tbody.innerHTML = '';
+
+                mockBlocks.forEach(block => {
+                    if ((filterChain === 'All Chains' || block.chain === filterChain) &&
+                        (searchQuery === '' || block.height.toString().includes(searchQuery) || block.hash.includes(searchQuery))) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <i class="fab fa-${block.chain.toLowerCase()}" style="color: var(--${block.chain.toLowerCase()});"></i>
+                                    ${block.chain}
+                                </div>
+                            </td>
+                            <td>${block.height.toLocaleString()}</td>
+                            <td>${block.txs}</td>
+                            <td>${block.size}</td>
+                            <td>${block.time}</td>
+                        `;
+                        tbody.appendChild(row);
+                    }
+                });
+
+                addTableRowClickHandlers();
+            }
+
+            // Refresh button
             const refreshBtn = document.querySelector('.header-actions .btn-secondary');
             refreshBtn.addEventListener('click', function() {
                 this.querySelector('i').classList.add('fa-spin');
+                this.disabled = true;
+
                 setTimeout(() => {
                     this.querySelector('i').classList.remove('fa-spin');
-                    
+                    this.disabled = false;
+
                     // Simulate new block
-                    const bitcoinHeight = document.querySelectorAll('.stat-value')[0];
-                    if (bitcoinHeight) {
-                        const currentHeight = parseInt(bitcoinHeight.textContent.replace(/,/g, ''));
-                        bitcoinHeight.textContent = (currentHeight + 1).toLocaleString();
+                    const isBitcoin = Math.random() > 0.5;
+                    if (isBitcoin) {
+                        currentBitcoinHeight++;
+                        addNewBlock('Bitcoin', currentBitcoinHeight, 2000 + Math.floor(Math.random() * 1000), (1 + Math.random()).toFixed(2) + ' MB', 'just now', generateHash());
+                    } else {
+                        currentStarknetHeight++;
+                        addNewBlock('Starknet', currentStarknetHeight, 200 + Math.floor(Math.random() * 200), (0.3 + Math.random() * 0.3).toFixed(2) + ' MB', 'just now', '0x' + Math.random().toString(16).substr(2, 16));
                     }
-                    
-                    // Update block visualization
-                    const pendingBlock = document.querySelector('.block:last-child .block-height');
-                    if (pendingBlock && pendingBlock.textContent === '788,544') {
-                        pendingBlock.textContent = '788,545';
-                        
-                        // Move the current block to previous
-                        const currentBlock = document.querySelector('.block:nth-child(2)');
-                        const newBlock = currentBlock.cloneNode(true);
-                        newBlock.querySelector('.block-height').textContent = '788,544';
-                        newBlock.querySelector('.block-hash').textContent = '0000000000...newhash';
-                        
-                        currentBlock.parentNode.appendChild(newBlock);
-                    }
+
+                    updateStats();
+                    updateBlockVisualization();
                 }, 1000);
             });
-            
+
             // Copy hash functionality
             const copyBtn = document.querySelector('.btn-sm');
             copyBtn.addEventListener('click', function() {
-                const originalHtml = this.innerHTML;
-                this.innerHTML = '<i class="fas fa-check"></i> Copied';
-                
-                setTimeout(() => {
-                    this.innerHTML = originalHtml;
-                }, 2000);
+                const hash = document.querySelector('.detail-value').textContent;
+                navigator.clipboard.writeText(hash).then(() => {
+                    const originalHtml = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check"></i> Copied';
+                    setTimeout(() => {
+                        this.innerHTML = originalHtml;
+                    }, 2000);
+                });
             });
-            
-            // Simulate real-time block updates
+
+            // Filter event listeners
+            document.querySelectorAll('.filter-select')[0].addEventListener('change', function() {
+                filterChain = this.value;
+                filterBlocks();
+            });
+
+            document.querySelectorAll('.filter-select')[1].addEventListener('change', function() {
+                filterTime = this.value;
+                // In a real app, this would filter by time
+                filterBlocks();
+            });
+
+            document.querySelector('.filter-input').addEventListener('input', function() {
+                searchQuery = this.value.toLowerCase();
+                filterBlocks();
+            });
+
+            // Export functionality
+            document.querySelector('.header-actions .btn').addEventListener('click', function() {
+                const data = mockBlocks.map(block => ({
+                    chain: block.chain,
+                    height: block.height,
+                    transactions: block.txs,
+                    size: block.size,
+                    time: block.time,
+                    hash: block.hash
+                }));
+
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'blocks-data.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+
+            // Table export functionality
+            document.querySelector('.export-table-btn').addEventListener('click', function() {
+                const rows = document.querySelectorAll('.table tbody tr');
+                const csvData = [['Chain', 'Height', 'Transactions', 'Size', 'Time']];
+
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    const rowData = [];
+                    cells.forEach(cell => {
+                        // Extract text content, removing icons
+                        const text = cell.textContent.trim();
+                        const iconIndex = text.indexOf(' ');
+                        rowData.push(iconIndex > 0 ? text.substring(iconIndex + 1) : text);
+                    });
+                    csvData.push(rowData);
+                });
+
+                const csvContent = csvData.map(row => row.join(',')).join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'recent-blocks.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+
+            // Block actions
+            const blockActionButtons = document.querySelectorAll('.card:last-child .btn');
+            blockActionButtons[0].addEventListener('click', function() {
+                const blockHeight = document.querySelector('.detail-value').textContent;
+                window.open(`https://blockchain.com/btc/block/${blockHeight}`, '_blank');
+            });
+
+            blockActionButtons[1].addEventListener('click', function() {
+                const blockData = mockBlocks[0];
+                const rawData = JSON.stringify(blockData, null, 2);
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                    background: rgba(0,0,0,0.8); z-index: 1000; display: flex;
+                    align-items: center; justify-content: center;
+                `;
+                modal.innerHTML = `
+                    <div style="background: var(--dark); padding: 20px; border-radius: 16px; max-width: 600px; max-height: 80vh; overflow-y: auto;">
+                        <h3 style="margin-bottom: 15px; color: var(--primary);">Raw Block Data</h3>
+                        <pre style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-size: 0.9rem; overflow-x: auto;">${rawData}</pre>
+                        <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 15px; background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer;">Close</button>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            });
+
+            blockActionButtons[2].addEventListener('click', function() {
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resyncing...';
+                this.disabled = true;
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-sync-alt"></i> Resync Chain';
+                    this.disabled = false;
+                    alert('Chain resynced successfully!');
+                }, 3000);
+            });
+
+            blockActionButtons[3].addEventListener('click', function() {
+                const blockData = mockBlocks[0];
+                const analysis = `
+Block Analysis for ${blockData.chain} Block ${blockData.height}:
+- Transactions: ${blockData.txs}
+- Size: ${blockData.size}
+- Hash: ${blockData.hash.substring(0, 20)}...
+- Status: Confirmed
+- Fee Rate: ${(Math.random() * 50 + 10).toFixed(2)} sat/vB
+- Confirmations: ${Math.floor(Math.random() * 100 + 50)}
+                `;
+                alert(analysis);
+            });
+
+            // Update block visualization
+            function updateBlockVisualization() {
+                const blocks = document.querySelectorAll('.block');
+                if (blocks.length >= 3) {
+                    blocks[0].querySelector('.block-height').textContent = (currentBitcoinHeight - 1).toLocaleString();
+                    blocks[1].querySelector('.block-height').textContent = currentBitcoinHeight.toLocaleString();
+                    blocks[2].querySelector('.block-height').textContent = (currentBitcoinHeight + 1).toLocaleString();
+                }
+            }
+
+            // Real-time simulation
             setInterval(() => {
+                // Random chance to add new block
+                if (Math.random() < 0.3) {
+                    const isBitcoin = Math.random() > 0.5;
+                    if (isBitcoin) {
+                        currentBitcoinHeight++;
+                        addNewBlock('Bitcoin', currentBitcoinHeight, 2000 + Math.floor(Math.random() * 1000), (1 + Math.random()).toFixed(2) + ' MB', 'just now', generateHash());
+                    } else {
+                        currentStarknetHeight++;
+                        addNewBlock('Starknet', currentStarknetHeight, 200 + Math.floor(Math.random() * 200), (0.3 + Math.random() * 0.3).toFixed(2) + ' MB', 'just now', '0x' + Math.random().toString(16).substr(2, 16));
+                    }
+                    updateStats();
+                    updateBlockVisualization();
+                }
+
+                // Pulse animation for pending block
                 const pendingBlock = document.querySelector('.block:last-child .block-icon');
                 if (pendingBlock) {
                     pendingBlock.style.animation = 'pulse 2s infinite';
-                    
                     setTimeout(() => {
                         pendingBlock.style.animation = '';
                     }, 2000);
                 }
-            }, 10000);
+            }, 15000);
+
+            // Table row click handlers
+            function addTableRowClickHandlers() {
+                document.querySelectorAll('.table tbody tr').forEach((row, index) => {
+                    row.addEventListener('click', function() {
+                        const blockData = mockBlocks[index];
+                        if (blockData) {
+                            // Update block details section
+                            const details = document.querySelector('.block-details');
+                            const detailRows = details.querySelectorAll('.detail-row');
+
+                            detailRows[0].querySelector('.detail-value').textContent = blockData.height.toLocaleString();
+                            detailRows[1].querySelector('.detail-value').textContent = blockData.hash;
+                            detailRows[2].querySelector('.detail-value').textContent = mockBlocks[index + 1] ? mockBlocks[index + 1].hash : 'Genesis Block';
+                            detailRows[3].querySelector('.detail-value').textContent = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+                            detailRows[4].querySelector('.detail-value').textContent = blockData.txs;
+                            detailRows[5].querySelector('.detail-value').textContent = blockData.size;
+                            detailRows[6].querySelector('.detail-value').textContent = (Math.random() * 100000000000 + 40000000000).toLocaleString();
+                            detailRows[7].querySelector('.detail-value').textContent = ['Foundry USA', 'AntPool', 'F2Pool', 'Binance Pool'][Math.floor(Math.random() * 4)];
+                            detailRows[8].querySelector('.detail-value').textContent = '0x' + Math.floor(Math.random() * 0xFFFFFFFF).toString(16).toUpperCase();
+
+                            // Highlight selected row
+                            document.querySelectorAll('.table tbody tr').forEach(r => r.classList.remove('selected'));
+                            this.classList.add('selected');
+                        }
+                    });
+                });
+            }
+
+            // Initial setup
+            updateStats();
+            filterBlocks();
+            addTableRowClickHandlers();
         });
     </script>
 </body>

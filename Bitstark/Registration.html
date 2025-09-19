@@ -7,6 +7,7 @@
     <link rel="icon" href="../images/image.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         :root {
             --primary: #7c3aed;
@@ -281,6 +282,21 @@
             background: rgba(124, 58, 237, 0.1);
             border-color: var(--primary);
         }
+
+        .google-btn {
+            background: #4285f4;
+            border-color: #4285f4;
+            color: white;
+        }
+
+        .google-btn:hover {
+            background: #3367d6;
+            border-color: #3367d6;
+        }
+
+        .google-btn .wallet-icon {
+            color: white;
+        }
         
         .wallet-icon {
             font-size: 1.5rem;
@@ -528,6 +544,71 @@
             color: var(--gray);
             margin-bottom: 30px;
         }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--light);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .email-radio {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--gray);
+            border-radius: 50%;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .email-radio.selected::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        .different-email {
+            border: 2px dashed rgba(124, 58, 237, 0.3);
+            background: rgba(124, 58, 237, 0.05);
+        }
+
+        .different-email:hover {
+            border-color: var(--primary);
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .different-email .email-avatar {
+            background: transparent;
+            color: var(--primary);
+        }
+
         
         /* Password strength indicator */
         .password-strength {
@@ -655,17 +736,11 @@
                         </div>
                         
                         <div class="wallet-options">
-                            <button type="button" class="wallet-btn" id="metamaskBtn">
-                                <i class="fab fa-ethereum wallet-icon"></i>
-                                <span>MetaMask</span>
+                            <button type="button" class="wallet-btn google-btn" id="googleBtn">
+                                <i class="fab fa-google wallet-icon"></i>
+                                <span>Sign in with Google</span>
                             </button>
-                            <button type="button" class="wallet-btn" id="argentBtn">
-                                <i class="fas fa-wallet wallet-icon"></i>
-                                <span>Argent X</span>
-                            </button>
-                            <button type="button" class="wallet-btn" id="braavosBtn">
-                                <i class="fas fa-wallet wallet-icon"></i>
-                                <span>Braavos</span>
+                            
                             </button>
                         </div>
                     </form>
@@ -797,6 +872,8 @@
         </div>
     </footer>
 
+
+
     <!-- Success Modal -->
     <div class="modal" id="successModal">
         <div class="modal-content">
@@ -811,6 +888,82 @@
     </div>
 
     <script>
+        // Google Sign-In Configuration
+        // For local development, you can use a demo/test client ID
+        // Replace with your actual Google OAuth 2.0 Client ID from Google Cloud Console for production
+        const GOOGLE_CLIENT_ID = 'demo-client-id-for-testing';
+
+        // Initialize Google Sign-In
+        function initializeGoogleSignIn() {
+            try {
+                if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+                    google.accounts.id.initialize({
+                        client_id: GOOGLE_CLIENT_ID,
+                        callback: handleCredentialResponse,
+                        auto_select: false,
+                        cancel_on_tap_outside: true
+                    });
+
+                    console.log('Google Sign-In initialized successfully');
+                } else {
+                    console.warn('Google Sign-In API not loaded');
+                }
+            } catch (error) {
+                console.error('Error initializing Google Sign-In:', error);
+            }
+        }
+
+        // Handle Google Sign-In response
+        function handleCredentialResponse(response) {
+            try {
+                console.log('Google Sign-In response received:', response);
+
+                if (!response || !response.credential) {
+                    throw new Error('Invalid response from Google Sign-In');
+                }
+
+                // Decode the JWT token to get user information
+                const responsePayload = decodeJwtResponse(response.credential);
+
+                const userData = {
+                    name: responsePayload.name || 'Google User',
+                    email: responsePayload.email,
+                    avatar: responsePayload.picture || null,
+                    provider: "Google",
+                    googleId: responsePayload.sub,
+                    loginTime: new Date().toISOString()
+                };
+
+                // Store user data
+                localStorage.setItem('userData', JSON.stringify(userData));
+                console.log('User data stored:', userData);
+
+                // Show success modal
+                document.getElementById('successModal').style.display = 'flex';
+
+            } catch (error) {
+                console.error('Error processing Google Sign-In:', error);
+                alert('Sign-in failed. Please check your internet connection and try again.');
+            }
+        }
+
+        // Helper function to decode JWT
+        function decodeJwtResponse(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        }
+
+        // Initialize when Google script loads
+        window.onload = function() {
+            if (typeof google !== 'undefined') {
+                initializeGoogleSignIn();
+            }
+        };
+
         // Password visibility toggle
         const passwordToggle = document.getElementById('passwordToggle');
         const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
@@ -910,18 +1063,31 @@
         });
         
         // Wallet connection handlers
+        document.getElementById('googleBtn').addEventListener('click', function() {
+            if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+                google.accounts.id.prompt();
+            } else {
+                alert('Google Sign-In is not loaded yet. Please wait and try again.');
+            }
+        });
+
         document.getElementById('metamaskBtn').addEventListener('click', function() {
             simulateWalletRegistration('MetaMask');
         });
-        
+
         document.getElementById('argentBtn').addEventListener('click', function() {
             simulateWalletRegistration('Argent X');
         });
-        
+
         document.getElementById('braavosBtn').addEventListener('click', function() {
             simulateWalletRegistration('Braavos');
         });
         
+
+
+
+
+
         function simulateWalletRegistration(walletName) {
             // For demo purposes, simulate wallet registration
             const userData = {
@@ -930,19 +1096,22 @@
                 avatar: null,
                 wallet: walletName
             };
-            
+
             localStorage.setItem('userData', JSON.stringify(userData));
-            
+
             // Show success modal
             document.getElementById('successModal').style.display = 'flex';
         }
         
+
         // Close modal when clicking outside
         window.addEventListener('click', function(event) {
-            if (event.target === document.getElementById('successModal')) {
-                document.getElementById('successModal').style.display = 'none';
+            if (event.target.classList.contains('modal')) {
+                const modalId = event.target.id;
+                closeModal(modalId);
             }
         });
     </script>
 </body>
 </html>
+

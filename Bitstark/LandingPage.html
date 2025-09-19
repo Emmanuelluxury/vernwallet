@@ -141,6 +141,27 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
         }
+
+        .disconnect-wallet {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 2px solid #ef4444;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+        }
+
+        .disconnect-wallet:hover {
+            background: rgba(239, 68, 68, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+        }
         
         .mobile-menu-btn {
             display: none;
@@ -1105,6 +1126,10 @@
                     <i class="fas fa-wallet"></i>
                     Connect Wallet
                 </button>
+                <button class="disconnect-wallet" id="disconnectWallet" style="display: none;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Disconnect
+                </button>
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
                     <i class="fas fa-bars"></i>
                 </button>
@@ -1141,10 +1166,12 @@
                                 Start Bridging
                             </button>
                         </a>
+                        <a href="LearnMore.html">
                         <button class="btn btn-secondary">
                             <i class="fas fa-book"></i>
                             Learn More
                         </button>
+                        </a>
                     </div>
                 </div>
                 
@@ -1158,7 +1185,7 @@
                                 </div>
                                 <div class="chain">
                                     <div class="starknet-icon">
-                                        <i class="fas fa-link chain-icon"></i>
+                                        <i class="fas fa-link chain-icon"></i>                                                          
                                     </div>
                                     <div class="chain-name">Starknet</div>
                                 </div>
@@ -1338,7 +1365,7 @@
                 <div class="footer-links">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="#">Documentation</a></li>
+                        <li><a href="../Bitstark/Documentation.html">Documentation</a></li>
                         <li><a href="#">Tutorials</a></li>
                         <li><a href="#">API</a></li>
                         <li><a href="#">Support</a></li>
@@ -1410,9 +1437,15 @@
         <span id="notificationText"></span>
     </div>
 
+    <!-- Wallet Connection Libraries -->
+    <script src="https://unpkg.com/get-starknet@3.3.3/dist/index.js"></script>
+    <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+    <script src="https://unpkg.com/@coinbase/wallet-sdk@3.7.1/dist/index.js"></script>
+
     <script>
         // DOM Elements
         const connectWalletBtn = document.getElementById('connectWallet');
+        const disconnectWalletBtn = document.getElementById('disconnectWallet');
         const mobileConnectBtn = document.getElementById('mobileConnect');
         const walletModal = document.getElementById('walletModal');
         const closeModalBtn = document.getElementById('closeModal');
@@ -1425,9 +1458,10 @@
         const bridgeButton = document.getElementById('bridgeButton');
         const notification = document.getElementById('notification');
         const notificationText = document.getElementById('notificationText');
-        
+
         // Wallet connection state
         let connectedWallet = null;
+        let connectedAddress = null;
         
         // Header scroll effect
         window.addEventListener('scroll', () => {
@@ -1459,6 +1493,9 @@
         // Open modal when Connect Wallet button is clicked
         connectWalletBtn.addEventListener('click', openWalletModal);
         mobileConnectBtn.addEventListener('click', openWalletModal);
+
+        // Disconnect wallet
+        disconnectWalletBtn.addEventListener('click', disconnectWallet);
         
         function openWalletModal() {
             walletModal.style.display = 'flex';
@@ -1487,39 +1524,141 @@
             });
         });
         
-        // Simulate wallet connection
-        function connectWallet(walletType) {
-            // In a real implementation, this would use the appropriate wallet API
-            // For demonstration, we'll simulate the connection
-            
-            // Simulate different addresses based on wallet type
-            const addressMap = {
-                'metamask': '0x742d35Cc6634C0532925a3b844Bc454e4438F44e',
-                'argentx': '0x072D4D4F4Ca56e4f1B515E214c23399B7cA312a9aA4F02679871d5bdafa7c7c1',
-                'braavos': '0x05b6b3f8b518b4696b24d6b0e729b66e4d9c3d3a7d87c6f3c6f3d3a7d87c6f3c',
-                'walletconnect': '0x03d4d4F4Ca56e4f1B515E214c23399B7cA312a9aA4F02679871d5bdafa7c7c1',
-                'coinbase': '0x13d4d4F4Ca56e4f1B515E214c23399B7cA312a9aA4F02679871d5bdafa7c7c1'
-            };
-            
-            const address = addressMap[walletType] || '0x0000000000000000000000000000000000000000';
-            
-            // Update button text
-            connectWalletBtn.innerHTML = `<i class="fas fa-wallet"></i> ${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
-            
-            // Close modal
-            closeWalletModal();
-            
-            // Update state
-            connectedWallet = walletType;
-            
-            // Show success notification
-            showNotification(`Successfully connected to ${getWalletName(walletType)}`);
-            
-            // In a real implementation, you would:
-            // 1. Initialize the wallet provider
-            // 2. Request account access
-            // 3. Get the user's address
-            // 4. Set up event listeners for account changes
+        // Real wallet connection
+        async function connectWallet(walletType) {
+            try {
+                let address = null;
+
+                switch (walletType) {
+                    case 'metamask':
+                        address = await connectMetaMask();
+                        break;
+                    case 'argentx':
+                        address = await connectArgentX();
+                        break;
+                    case 'braavos':
+                        address = await connectBraavos();
+                        break;
+                    case 'walletconnect':
+                        address = await connectWalletConnect();
+                        break;
+                    case 'coinbase':
+                        address = await connectCoinbaseWallet();
+                        break;
+                    default:
+                        throw new Error('Unsupported wallet type');
+                }
+
+                if (address) {
+                    // Update button text
+                    connectWalletBtn.innerHTML = `<i class="fas fa-wallet"></i> ${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+
+                    // Toggle button visibility
+                    connectWalletBtn.style.display = 'none';
+                    disconnectWalletBtn.style.display = 'inline-flex';
+
+                    // Close modal
+                    closeWalletModal();
+
+                    // Update state
+                    connectedWallet = walletType;
+                    connectedAddress = address;
+
+                    // Show success notification
+                    showNotification(`Successfully connected to ${getWalletName(walletType)}`);
+                }
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                showNotification(`Failed to connect to ${getWalletName(walletType)}: ${error.message}`, true);
+            }
+        }
+
+        // Connect to MetaMask
+        async function connectMetaMask() {
+            if (typeof window.ethereum === 'undefined') {
+                throw new Error('MetaMask is not installed. Please install MetaMask extension.');
+            }
+
+            try {
+                // Request account access
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                return accounts[0];
+            } catch (error) {
+                if (error.code === 4001) {
+                    throw new Error('User rejected the connection request.');
+                }
+                throw new Error('Failed to connect to MetaMask.');
+            }
+        }
+
+        // Connect to Argent X
+        async function connectArgentX() {
+            try {
+                const starknet = window.starknet;
+                if (!starknet) {
+                    throw new Error('Argent X is not installed. Please install Argent X extension.');
+                }
+
+                // Enable the wallet
+                await starknet.enable();
+                return starknet.selectedAddress;
+            } catch (error) {
+                throw new Error('Failed to connect to Argent X.');
+            }
+        }
+
+        // Connect to Braavos
+        async function connectBraavos() {
+            try {
+                const starknet = window.starknet_braavos;
+                if (!starknet) {
+                    throw new Error('Braavos is not installed. Please install Braavos extension.');
+                }
+
+                // Enable the wallet
+                await starknet.enable();
+                return starknet.selectedAddress;
+            } catch (error) {
+                throw new Error('Failed to connect to Braavos.');
+            }
+        }
+
+        // Connect to WalletConnect
+        async function connectWalletConnect() {
+            try {
+                const provider = new WalletConnectProvider.default({
+                    infuraId: "27e484dcd9e3efcfd25a83a78777cdf1", // Replace with your Infura ID
+                });
+
+                await provider.enable();
+                const web3 = new Web3(provider);
+                const accounts = await web3.eth.getAccounts();
+                return accounts[0];
+            } catch (error) {
+                throw new Error('Failed to connect via WalletConnect.');
+            }
+        }
+
+        // Connect to Coinbase Wallet
+        async function connectCoinbaseWallet() {
+            try {
+                const coinbaseWallet = new CoinbaseWalletSDK({
+                    appName: 'Bitcoin-Starknet Bridge',
+                    appLogoUrl: '../images/image.png',
+                    darkMode: true
+                });
+
+                const ethereum = coinbaseWallet.makeWeb3Provider(
+                    'https://mainnet.infura.io/v3/YOUR_INFURA_ID', // Replace with your Infura ID
+                    1
+                );
+
+                await ethereum.request({ method: 'eth_requestAccounts' });
+                const accounts = await ethereum.request({ method: 'eth_accounts' });
+                return accounts[0];
+            } catch (error) {
+                throw new Error('Failed to connect to Coinbase Wallet.');
+            }
         }
         
         // Get wallet name from type
@@ -1563,29 +1702,75 @@
         
         // Bridge button
         bridgeButton.addEventListener('click', function() {
-            if (!connectedWallet) {
+            if (!connectedWallet || !connectedAddress) {
                 showNotification('Please connect your wallet first', true);
                 openWalletModal();
                 return;
             }
-            
+
             if (!fromAmount.value || parseFloat(fromAmount.value) <= 0) {
                 showNotification('Please enter a valid amount to bridge', true);
                 return;
             }
-            
-            // Simulate bridging process
+
+            // Check if wallet is still connected
+            if (!isWalletConnected()) {
+                showNotification('Wallet connection lost. Please reconnect.', true);
+                resetWalletConnection();
+                openWalletModal();
+                return;
+            }
+
+            // Real bridging process (placeholder for actual implementation)
             bridgeButton.disabled = true;
             bridgeButton.textContent = 'Bridging...';
-            
+
+            // Simulate bridging process with real wallet integration
             setTimeout(() => {
-                showNotification(`Successfully bridged ${fromAmount.value} BTC to StarkNet`);
+                showNotification(`Successfully initiated bridge transaction from ${connectedAddress.substring(0, 6)}...${connectedAddress.substring(connectedAddress.length - 4)}`);
                 fromAmount.value = '';
                 toAmount.value = '';
                 bridgeButton.disabled = false;
                 bridgeButton.textContent = 'Bridge Now';
             }, 2000);
         });
+
+        // Check if wallet is still connected
+        function isWalletConnected() {
+            try {
+                switch (connectedWallet) {
+                    case 'metamask':
+                        return window.ethereum && window.ethereum.selectedAddress;
+                    case 'argentx':
+                    case 'braavos':
+                        return window.starknet && window.starknet.isConnected;
+                    case 'walletconnect':
+                        return window.web3 && window.web3.currentProvider && window.web3.currentProvider.connected;
+                    case 'coinbase':
+                        return window.ethereum && window.ethereum.selectedAddress;
+                    default:
+                        return false;
+                }
+            } catch (error) {
+                console.error('Error checking wallet connection:', error);
+                return false;
+            }
+        }
+
+        // Reset wallet connection
+        function resetWalletConnection() {
+            connectedWallet = null;
+            connectedAddress = null;
+            connectWalletBtn.innerHTML = '<i class="fas fa-wallet"></i> Connect Wallet';
+            connectWalletBtn.style.display = 'inline-flex';
+            disconnectWalletBtn.style.display = 'none';
+        }
+
+        // Add wallet disconnect functionality
+        function disconnectWallet() {
+            resetWalletConnection();
+            showNotification('Wallet disconnected successfully');
+        }
         
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -1607,22 +1792,25 @@
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            // Check if wallet is already connected
+            checkExistingWalletConnection();
+
             // Add scroll event listener to highlight active section in navigation
             window.addEventListener('scroll', function() {
                 const sections = document.querySelectorAll('section');
                 const navLinks = document.querySelectorAll('.nav-links a, .mobile-nav-links a');
-                
+
                 let currentSection = '';
-                
+
                 sections.forEach(section => {
                     const sectionTop = section.offsetTop;
                     const sectionHeight = section.clientHeight;
-                    
+
                     if (pageYOffset >= sectionTop - 100) {
                         currentSection = section.getAttribute('id');
                     }
                 });
-                
+
                 navLinks.forEach(link => {
                     link.classList.remove('active');
                     if (link.getAttribute('href') === `#${currentSection}`) {
@@ -1631,6 +1819,49 @@
                 });
             });
         });
+
+        // Check for existing wallet connection on page load
+        async function checkExistingWalletConnection() {
+            try {
+                // Check MetaMask
+                if (window.ethereum && window.ethereum.selectedAddress) {
+                    connectedWallet = 'metamask';
+                    connectedAddress = window.ethereum.selectedAddress;
+                    updateWalletUI();
+                    return;
+                }
+
+                // Check Starknet wallets
+                if (window.starknet && window.starknet.isConnected) {
+                    connectedWallet = window.starknet.name === 'Argent X' ? 'argentx' : 'braavos';
+                    connectedAddress = window.starknet.selectedAddress;
+                    updateWalletUI();
+                    return;
+                }
+
+                // Check Coinbase Wallet
+                if (window.ethereum && window.ethereum.isCoinbaseWallet) {
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        connectedWallet = 'coinbase';
+                        connectedAddress = accounts[0];
+                        updateWalletUI();
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking existing wallet connection:', error);
+            }
+        }
+
+        // Update wallet UI
+        function updateWalletUI() {
+            if (connectedWallet && connectedAddress) {
+                connectWalletBtn.innerHTML = `<i class="fas fa-wallet"></i> ${connectedAddress.substring(0, 6)}...${connectedAddress.substring(connectedAddress.length - 4)}`;
+                connectWalletBtn.style.display = 'none';
+                disconnectWalletBtn.style.display = 'inline-flex';
+            }
+        }
     </script>
 </body>
 </html>

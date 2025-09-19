@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bridge Status - Bitcoin-Starknet Bridge</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7c3aed; /* Bridge purple */
+            --primary-dark: #6d28d9;
+            --bitcoin: #f7931a; /* Bitcoin orange */
+            --starknet: #ff6b35; /* Starknet orange-red */
+            --secondary: #1a1f2e; /* Dark blue */
+            --dark: #0d1318;
+            --light: #f5f5f5;
+            --gray: #9ca3af;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #0d1318;
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 260px;
+            background: rgba(26, 31, 46, 0.8);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(124, 58, 237, 0.2);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--gray);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: rgba(124, 58, 237, 0.1);
+            color: white;
+            border-left-color: var(--primary);
+        }
+        
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .header-title i {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(26, 31, 46, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .stat-title {
+            font-size: 0.9rem;
+            color: var(--gray);
+            font-weight: 600;
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            background: rgba(124, 58, 237, 0.2);
+            color: var(--primary);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-change {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .positive {
+            color: var(--success);
+        }
+        
+        .negative {
+            color: var(--danger);
+        }
+        
+        /* Cards */
+        .card {
+            background: rgba(26, 31, 46, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .card-title i {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Tables */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th {
+            text-align: left;
+            padding: 12px 15px;
+            font-size: 0.9rem;
+            color: var(--gray);
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-completed {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+        
+        .status-pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+        
+        .status-processing {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+        
+        .status-failed {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+        
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        /* Progress bars */
+        .progress-container {
+            margin: 15px 0;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .progress-label {
+            font-size: 0.9rem;
+        }
+        
+        .progress-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: var(--primary);
+        }
+        
+        /* Bridge visualization */
+        .bridge-visualization {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 30px;
+            background: rgba(26, 31, 46, 0.4);
+            border-radius: 16px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .network-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            z-index: 2;
+        }
+        
+        .network-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        
+        .bitcoin-node {
+            background: rgba(247, 147, 26, 0.2);
+            color: var(--bitcoin);
+        }
+        
+        .starknet-node {
+            background: rgba(255, 107, 53, 0.2);
+            color: var(--starknet);
+        }
+        
+        .network-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .bridge-connection {
+            position: absolute;
+            top: 50%;
+            left: 100px;
+            right: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--bitcoin), var(--primary), var(--starknet));
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+        
+        .bridge-transfer {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            animation: transferAnimation 5s linear infinite;
+            z-index: 2;
+        }
+        
+        @keyframes transferAnimation {
+            0% { left: 100px; }
+            100% { left: calc(100% - 130px); }
+        }
+        
+        /* Transfer list */
+        .transfer-list {
+            list-style: none;
+        }
+        
+        .transfer-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .transfer-item:last-child {
+            border-bottom: none;
+        }
+        
+        .transfer-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .transfer-to-starknet {
+            background: rgba(255, 107, 53, 0.2);
+            color: var(--starknet);
+        }
+        
+        .transfer-to-bitcoin {
+            background: rgba(247, 147, 26, 0.2);
+            color: var(--bitcoin);
+        }
+        
+        .transfer-details {
+            flex: 1;
+        }
+        
+        .transfer-amount {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .transfer-meta {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        /* Alerts */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .alert-info {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 4px solid var(--info);
+        }
+        
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.2);
+            border-left: 4px solid var(--warning);
+        }
+        
+        .alert-icon {
+            font-size: 1.2rem;
+        }
+        
+        .alert-content {
+            flex: 1;
+        }
+        
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .alert-description {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                width: 80px;
+            }
+            
+            .nav-item span {
+                display: none;
+            }
+            
+            .bridge-visualization {
+                padding: 20px;
+            }
+            
+            .network-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .bridge-visualization {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .bridge-connection {
+                top: 80px;
+                left: 50%;
+                right: auto;
+                width: 3px;
+                height: 100px;
+                background: linear-gradient(0deg, var(--bitcoin), var(--primary), var(--starknet));
+                transform: translateX(-50%);
+            }
+            
+            .bridge-transfer {
+                top: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                animation: transferAnimationMobile 5s linear infinite;
+            }
+            
+            @keyframes transferAnimationMobile {
+                0% { top: 80px; }
+                100% { top: calc(100% - 100px); }
+            }
+        }
+        
+        /* Animation for status updates */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        
+        .processing {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <i class="fas fa-link logo-icon"></i>
+                    <span>Bridge Status</span>
+                </a>
+            </div>
+            
+            <a href="../Bitstark/StarknetNode.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            
+            <a href="#" class="nav-item active">
+                <i class="fas fa-link"></i>
+                <span>Bridge Status</span>
+            </a>
+            
+            <a href="../Wallet/BridgeTranscations.html" class="nav-item">
+                <i class="fas fa-exchange-alt"></i>
+                <span>Bridge Transactions</span>
+            </a>
+            
+            <a href="../Bitstark/Lock-Screen.html" class="nav-item">
+                <i class="fas fa-wallet"></i>
+                <span>Wallet</span>
+            </a>
+            
+            <a href="../Bitstark/Settings.html" class="nav-item">
+                <i class="fas fa-cogs"></i>
+                <span>Settings</span>
+            </a>
+            
+            <a href="../Bitstark/Security.html" class="nav-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Security</span>
+            </a>
+            
+            <a href="../Bitstark/ApiDocs.html" class="nav-item">
+                <i class="fas fa-code"></i>
+                <span>API Docs</span>
+            </a>
+            
+            <div style="flex: 1;"></div>
+            
+            <a href="../Bitstark/Dashboard.html" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="header-title"><i class="fas fa-link"></i> Bridge Status Dashboard</h1>
+                <div class="header-actions">
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                    <button class="btn">
+                        <i class="fas fa-exchange-alt"></i>
+                        New Transfer
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Bridge Visualization -->
+            <div class="bridge-visualization">
+                <div class="network-node">
+                    <div class="network-icon bitcoin-node">
+                        <i class="fab fa-bitcoin"></i>
+                    </div>
+                    <div class="network-name">Bitcoin</div>
+                    <div class="network-status status-badge status-completed">
+                        <i class="fas fa-check-circle"></i>
+                        Connected
+                    </div>
+                </div>
+                
+                <div class="bridge-connection"></div>
+                <div class="bridge-transfer">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                
+                <div class="network-node">
+                    <div class="network-icon starknet-node">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="network-name">Starknet</div>
+                    <div class="network-status status-badge status-completed">
+                        <i class="fas fa-check-circle"></i>
+                        Connected
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">TOTAL TRANSFERS</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">12,487</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +124 today
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">TOTAL VALUE</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">₿3,842</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +₿12.5 today
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">PENDING TRANSFERS</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">18</div>
+                    <div class="stat-change negative">
+                        <i class="fas fa-arrow-up"></i>
+                        +5 today
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">AVG PROCESSING TIME</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">42 min</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-down"></i>
+                        -8 min
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Alerts Section -->
+            <div class="alert alert-info">
+                <div class="alert-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">Bridge Operational</div>
+                    <div class="alert-description">The Bitcoin-Starknet bridge is running normally with no issues detected.</div>
+                </div>
+            </div>
+            
+            <div class="alert alert-warning">
+                <div class="alert-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">High Volume Notice</div>
+                    <div class="alert-description">Higher than usual transaction volume may cause slightly longer processing times.</div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Left Column -->
+                <div>
+                    <!-- Recent Transfers Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-exchange-alt"></i> Recent Transfers</h2>
+                            <div class="card-actions">
+                                <button class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-download"></i>
+                                    Export
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Direction</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>BTC → STRK</td>
+                                    <td>1.25 BTC</td>
+                                    <td><span class="status-badge status-completed">Completed</span></td>
+                                    <td>12 min ago</td>
+                                </tr>
+                                <tr>
+                                    <td>STRK → BTC</td>
+                                    <td>8,450 STRK</td>
+                                    <td><span class="status-badge status-processing">Processing</span></td>
+                                    <td>23 min ago</td>
+                                </tr>
+                                <tr>
+                                    <td>BTC → STRK</td>
+                                    <td>0.87 BTC</td>
+                                    <td><span class="status-badge status-pending">Pending</span></td>
+                                    <td>38 min ago</td>
+                                </tr>
+                                <tr>
+                                    <td>STRK → BTC</td>
+                                    <td>12,845 STRK</td>
+                                    <td><span class="status-badge status-completed">Completed</span></td>
+                                    <td>2 hrs ago</td>
+                                </tr>
+                                <tr>
+                                    <td>BTC → STRK</td>
+                                    <td>2.31 BTC</td>
+                                    <td><span class="status-badge status-failed">Failed</span></td>
+                                    <td>3 hrs ago</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Bridge Fees Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-percentage"></i> Bridge Fees & Limits</h2>
+                        </div>
+                        
+                        <table class="table">
+                            <tr>
+                                <td>BTC → STRK Fee</td>
+                                <td>0.10%</td>
+                                <td>Min: 0.001 BTC</td>
+                            </tr>
+                            <tr>
+                                <td>STRK → BTC Fee</td>
+                                <td>0.15%</td>
+                                <td>Min: 10 STRK</td>
+                            </tr>
+                            <tr>
+                                <td>Max per Transaction</td>
+                                <td colspan="2">10 BTC / 100,000 STRK</td>
+                            </tr>
+                            <tr>
+                                <td>Daily Limit</td>
+                                <td colspan="2">50 BTC / 500,000 STRK</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Right Column -->
+                <div>
+                    <!-- Bridge Status Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-server"></i> Bridge Status</h2>
+                            <div class="card-actions">
+                                <button class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-history"></i>
+                                    View Logs
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">Bitcoin Node Connection</div>
+                                <div class="progress-value">100%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%; background: var(--bitcoin);"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">Starknet Node Connection</div>
+                                <div class="progress-value">100%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%; background: var(--starknet);"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <div class="progress-label">Bridge Capacity</div>
+                                <div class="progress-value">78%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 78%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Active Transfers Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-list"></i> Active Transfers</h2>
+                        </div>
+                        
+                        <ul class="transfer-list">
+                            <li class="transfer-item">
+                                <div class="transfer-icon transfer-to-starknet">
+                                    <i class="fab fa-bitcoin"></i>
+                                </div>
+                                <div class="transfer-details">
+                                    <div class="transfer-amount">0.87 BTC → STRK</div>
+                                    <div class="transfer-meta">Pending confirmation • 38 min ago</div>
+                                </div>
+                                <span class="status-badge status-pending">
+                                    <i class="fas fa-clock"></i>
+                                    Pending
+                                </span>
+                            </li>
+                            
+                            <li class="transfer-item">
+                                <div class="transfer-icon transfer-to-bitcoin">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <div class="transfer-details">
+                                    <div class="transfer-amount">8,450 STRK → BTC</div>
+                                    <div class="transfer-meta">Processing • 23 min ago</div>
+                                </div>
+                                <span class="status-badge status-processing">
+                                    <i class="fas fa-sync-alt"></i>
+                                    Processing
+                                </span>
+                            </li>
+                            
+                            <li class="transfer-item">
+                                <div class="transfer-icon transfer-to-starknet">
+                                    <i class="fab fa-bitcoin"></i>
+                                </div>
+                                <div class="transfer-details">
+                                    <div class="transfer-amount">2.15 BTC → STRK</div>
+                                    <div class="transfer-meta">Waiting for finalization • 15 min ago</div>
+                                </div>
+                                <span class="status-badge status-processing">
+                                    <i class="fas fa-sync-alt"></i>
+                                    Processing
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Bridge Information Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-info-circle"></i> Bridge Information</h2>
+                        </div>
+                        
+                        <table class="table">
+                            <tr>
+                                <td>Bridge Version</td>
+                                <td>v2.1.4</td>
+                            </tr>
+                            <tr>
+                                <td>Bitcoin Block</td>
+                                <td>788,543</td>
+                            </tr>
+                            <tr>
+                                <td>Starknet Block</td>
+                                <td>1,243,872</td>
+                            </tr>
+                            <tr>
+                                <td>Last Transfer</td>
+                                <td>12 minutes ago</td>
+                            </tr>
+                            <tr>
+                                <td>Uptime</td>
+                                <td>99.8%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Bridge Status Dashboard - Real Data Integration
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize data fetching
+            fetchBridgeData();
+            fetchTransferData();
+            updateBridgeVisualization();
+
+            // Refresh button functionality
+            const refreshBtn = document.querySelector('.header-actions .btn-secondary');
+            refreshBtn.addEventListener('click', function() {
+                this.querySelector('i').classList.add('fa-spin');
+                fetchBridgeData();
+                fetchTransferData();
+                setTimeout(() => {
+                    this.querySelector('i').classList.remove('fa-spin');
+                }, 1000);
+            });
+
+            // New Transfer button
+            const newTransferBtn = document.querySelector('.header-actions .btn');
+            if (newTransferBtn && newTransferBtn.textContent.includes('New Transfer')) {
+                newTransferBtn.addEventListener('click', function() {
+                    showNewTransferModal();
+                });
+            }
+
+            // View Logs button
+            const viewLogsBtn = document.querySelector('.card-actions .btn-secondary');
+            if (viewLogsBtn && viewLogsBtn.textContent.includes('View Logs')) {
+                viewLogsBtn.addEventListener('click', function() {
+                    showLogsModal();
+                });
+            }
+
+            // Export button
+            const exportBtn = document.querySelector('.card-actions .btn-secondary');
+            if (exportBtn && exportBtn.textContent.includes('Export')) {
+                exportBtn.addEventListener('click', function() {
+                    exportTransferData();
+                });
+            }
+
+            // Real-time updates every 30 seconds
+            setInterval(() => {
+                fetchBridgeData();
+                updateActiveTransfers();
+            }, 30000);
+        });
+
+        // Fetch bridge data
+        async function fetchBridgeData() {
+            try {
+                // Fetch real Bitcoin block height
+                const bitcoinResponse = await fetch('https://blockchain.info/q/getblockcount');
+                const bitcoinBlock = await bitcoinResponse.text();
+
+                // Fetch real Starknet block height
+                const starknetResponse = await fetch('https://alpha-mainnet.starknet.io/feeder_gateway/get_block?blockNumber=latest');
+                const starknetData = await starknetResponse.json();
+                const starknetBlock = starknetData.block_number;
+
+                // Simulate other stats (in a real bridge, these would come from bridge API)
+                const totalTransfers = 12487 + Math.floor(Math.random() * 10);
+                const totalValue = 3842 + (Math.random() * 2);
+                const pendingTransfers = Math.floor(Math.random() * 5) + 15;
+
+                // Update stats
+                document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = totalTransfers.toLocaleString();
+                document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = `₿${totalValue.toFixed(0)}`;
+                document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = pendingTransfers;
+
+                // Update bridge capacity
+                const capacity = Math.min(95, 70 + Math.random() * 20).toFixed(0);
+                document.querySelector('.progress-container:nth-child(3) .progress-value').textContent = `${capacity}%`;
+                document.querySelector('.progress-container:nth-child(3) .progress-fill').style.width = `${capacity}%`;
+
+                // Update bridge information with real block heights
+                const bitcoinBlockElement = document.querySelector('.table tr:nth-child(3) td');
+                const starknetBlockElement = document.querySelector('.table tr:nth-child(4) td');
+                if (bitcoinBlockElement) bitcoinBlockElement.textContent = parseInt(bitcoinBlock).toLocaleString();
+                if (starknetBlockElement) starknetBlockElement.textContent = parseInt(starknetBlock).toLocaleString();
+
+            } catch (error) {
+                console.error('Error fetching bridge data:', error);
+                // Fallback to simulated data if APIs fail
+                const totalTransfers = 12487 + Math.floor(Math.random() * 10);
+                const totalValue = 3842 + (Math.random() * 2);
+                const pendingTransfers = Math.floor(Math.random() * 5) + 15;
+
+                document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = totalTransfers.toLocaleString();
+                document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = `₿${totalValue.toFixed(0)}`;
+                document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = pendingTransfers;
+
+                const capacity = Math.min(95, 70 + Math.random() * 20).toFixed(0);
+                document.querySelector('.progress-container:nth-child(3) .progress-value').textContent = `${capacity}%`;
+                document.querySelector('.progress-container:nth-child(3) .progress-fill').style.width = `${capacity}%`;
+            }
+        }
+
+        // Fetch transfer data
+        async function fetchTransferData() {
+            try {
+                // In a real implementation, this would fetch from a bridge API
+                // For demo purposes, we'll simulate data
+                updateRecentTransfers();
+                updateActiveTransfers();
+            } catch (error) {
+                console.error('Error fetching transfer data:', error);
+            }
+        }
+
+        // Update recent transfers table
+        function updateRecentTransfers() {
+            const tbody = document.querySelector('.table tbody');
+            if (!tbody) return;
+
+            const statuses = ['completed', 'processing', 'pending', 'failed'];
+            const statusClasses = ['status-completed', 'status-processing', 'status-pending', 'status-failed'];
+            const statusText = ['Completed', 'Processing', 'Pending', 'Failed'];
+            
+            tbody.innerHTML = Array.from({length: 5}, (_, i) => {
+                const direction = Math.random() > 0.5 ? 'BTC → STRK' : 'STRK → BTC';
+                const amount = direction === 'BTC → STRK' 
+                    ? `${(0.5 + Math.random() * 3).toFixed(2)} BTC` 
+                    : `${Math.floor(5000 + Math.random() * 10000).toLocaleString()} STRK`;
+                
+                const statusIndex = Math.floor(Math.random() * 4);
+                const status = statusText[statusIndex];
+                const statusClass = statusClasses[statusIndex];
+                
+                const timeText = i === 0 ? '12 min ago' : 
+                               i === 1 ? '23 min ago' :
+                               i === 2 ? '38 min ago' :
+                               i === 3 ? '2 hrs ago' : '3 hrs ago';
+                
+                return `
+                    <tr>
+                        <td>${direction}</td>
+                        <td>${amount}</td>
+                        <td><span class="status-badge ${statusClass}">${status}</span></td>
+                        <td>${timeText}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Update active transfers
+        function updateActiveTransfers() {
+            const transferList = document.querySelector('.transfer-list');
+            if (!transferList) return;
+
+            transferList.innerHTML = Array.from({length: 3}, (_, i) => {
+                if (i === 0) {
+                    return `
+                        <li class="transfer-item">
+                            <div class="transfer-icon transfer-to-starknet">
+                                <i class="fab fa-bitcoin"></i>
+                            </div>
+                            <div class="transfer-details">
+                                <div class="transfer-amount">${(0.8 + Math.random() * 0.5).toFixed(2)} BTC → STRK</div>
+                                <div class="transfer-meta">Pending confirmation • ${Math.floor(30 + Math.random() * 20)} min ago</div>
+                            </div>
+                            <span class="status-badge status-pending">
+                                <i class="fas fa-clock"></i>
+                                Pending
+                            </span>
+                        </li>
+                    `;
+                } else if (i === 1) {
+                    return `
+                        <li class="transfer-item">
+                            <div class="transfer-icon transfer-to-bitcoin">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div class="transfer-details">
+                                <div class="transfer-amount">${Math.floor(8000 + Math.random() * 2000).toLocaleString()} STRK → BTC</div>
+                                <div class="transfer-meta">Processing • ${Math.floor(20 + Math.random() * 15)} min ago</div>
+                            </div>
+                            <span class="status-badge status-processing">
+                                <i class="fas fa-sync-alt"></i>
+                                Processing
+                            </span>
+                        </li>
+                    `;
+                } else {
+                    return `
+                        <li class="transfer-item">
+                            <div class="transfer-icon transfer-to-starknet">
+                                <i class="fab fa-bitcoin"></i>
+                            </div>
+                            <div class="transfer-details">
+                                <div class="transfer-amount">${(2 + Math.random() * 1).toFixed(2)} BTC → STRK</div>
+                                <div class="transfer-meta">Waiting for finalization • ${Math.floor(10 + Math.random() * 10)} min ago</div>
+                            </div>
+                            <span class="status-badge status-processing">
+                                <i class="fas fa-sync-alt"></i>
+                                Processing
+                            </span>
+                        </li>
+                    `;
+                }
+            }).join('');
+        }
+
+        // Update bridge visualization
+        function updateBridgeVisualization() {
+            // In a real implementation, this would update based on actual bridge status
+            // For demo purposes, we'll just ensure the animation continues
+            const transferElement = document.querySelector('.bridge-transfer');
+            if (transferElement) {
+                transferElement.style.animation = 'none';
+                setTimeout(() => {
+                    transferElement.style.animation = '';
+                }, 10);
+            }
+        }
+
+        // Show new transfer modal
+        function showNewTransferModal() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.8); display: flex; align-items: center;
+                justify-content: center; z-index: 1000;
+            `;
+            modal.innerHTML = `
+                <div style="background: var(--dark); padding: 20px; border-radius: 16px; max-width: 400px; width: 90%;">
+                    <h3 style="color: var(--primary); margin-bottom: 15px;">New Bridge Transfer</h3>
+                    <select style="width: 100%; padding: 10px; margin-bottom: 15px; background: rgba(255,255,255,0.1); border: 1px solid rgba(124,58,237,0.2); border-radius: 8px; color: white;">
+                        <option value="btc-to-stark">Bitcoin → Starknet</option>
+                        <option value="stark-to-btc">Starknet → Bitcoin</option>
+                    </select>
+                    <input type="text" placeholder="Amount" style="width: 100%; padding: 10px; margin-bottom: 15px; background: rgba(255,255,255,0.1); border: 1px solid rgba(124,58,237,0.2); border-radius: 8px; color: white;">
+                    <input type="text" placeholder="Recipient Address" style="width: 100%; padding: 10px; margin-bottom: 15px; background: rgba(255,255,255,0.1); border: 1px solid rgba(124,58,237,0.2); border-radius: 8px; color: white;">
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="initiateTransfer(this.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.value, this.parentElement.previousElementSibling.previousElementSibling.value, this.parentElement.previousElementSibling.value); this.parentElement.parentElement.parentElement.remove()" style="background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer;">Initiate</button>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background: rgba(255,255,255,0.1); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer;">Cancel</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Initiate transfer function
+        function initiateTransfer(direction, amount, recipient) {
+            if (direction && amount && recipient) {
+                alert(`Initiating ${direction} transfer of ${amount} to ${recipient}\n(This is a simulation - in a real bridge, this would initiate the transfer process)`);
+            }
+        }
+
+        // Show logs modal
+        function showLogsModal() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.8); display: flex; align-items: center;
+                justify-content: center; z-index: 1000;
+            `;
+            modal.innerHTML = `
+                <div style="background: var(--dark); padding: 20px; border-radius: 16px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                    <h3 style="color: var(--primary); margin-bottom: 15px;">Bridge Logs</h3>
+                    <pre style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; font-size: 0.9rem; white-space: pre-wrap;">
+2024-01-15 10:30:15 - Bitcoin-Starknet Bridge v2.1.4 starting
+2024-01-15 10:30:16 - Connecting to Bitcoin node at 192.168.1.15:8333
+2024-01-15 10:30:17 - Bitcoin node connection established
+2024-01-15 10:30:18 - Connecting to Starknet node at 0.0.0.0:9545
+2024-01-15 10:30:19 - Starknet node connection established
+2024-01-15 10:30:20 - Bridge operational
+2024-01-15 10:31:05 - Processing transfer: 1.25 BTC → STRK
+2024-01-15 10:31:10 - Transfer completed: txid 0x023f5d...c8a2
+2024-01-15 10:45:22 - Processing transfer: 8,450 STRK → BTC
+2024-01-15 10:45:25 - Transfer pending confirmation
+                    </pre>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; margin-top: 15px;">Close</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Export transfer data
+        function exportTransferData() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                transfers: []
+            };
+
+            const rows = document.querySelectorAll('.table tbody tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                data.transfers.push({
+                    direction: cells[0].textContent,
+                    amount: cells[1].textContent,
+                    status: cells[2].textContent,
+                    time: cells[3].textContent
+                });
+            });
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'bridge-transfers-export.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

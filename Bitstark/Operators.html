@@ -6,6 +6,7 @@
     <title>Operators Dashboard - Bitcoin-Starknet Bridge</title>
     <link rel="icon" href="../images/image.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #3b82f6; /* Blue for operators */
@@ -171,6 +172,7 @@
             font-size: 1.8rem;
             font-weight: 700;
             margin-bottom: 5px;
+            transition: all 0.3s ease;
         }
         
         .stat-change {
@@ -197,6 +199,13 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(59, 130, 246, 0.1);
             margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(59, 130, 246, 0.3);
         }
         
         .card-header {
@@ -360,6 +369,7 @@
             height: 100%;
             border-radius: 4px;
             background: var(--primary);
+            transition: width 0.5s ease;
         }
         
         /* Operator list */
@@ -373,6 +383,15 @@
             gap: 12px;
             padding: 12px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .operator-item:hover {
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 8px;
+            padding-left: 8px;
+            margin-left: -8px;
+            margin-right: -8px;
         }
         
         .operator-item:last-child {
@@ -430,6 +449,18 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            animation: alertSlideIn 0.5s ease-out;
+        }
+
+        @keyframes alertSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
         
         .alert-info {
@@ -506,6 +537,137 @@
         .signing {
             animation: pulse 2s infinite;
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: rgba(31, 41, 55, 0.95);
+            backdrop-filter: blur(10px);
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--light);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--light);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .form-error {
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-input.error {
+            border-color: var(--danger);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
@@ -562,11 +724,11 @@
             <div class="header">
                 <h1 class="header-title"><i class="fas fa-server"></i> Operators Dashboard</h1>
                 <div class="header-actions">
-                    <button class="btn btn-secondary">
+                    <button class="btn btn-secondary" aria-label="Refresh operator data">
                         <i class="fas fa-sync-alt"></i>
                         Refresh
                     </button>
-                    <button class="btn">
+                    <button class="btn" aria-label="Add new operator">
                         <i class="fas fa-plus"></i>
                         Add Operator
                     </button>
@@ -710,6 +872,17 @@
                                     Export
                                 </button>
                             </div>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                            <input type="text" id="operatorSearch" class="form-input" placeholder="Search operators..." style="flex: 1; padding: 8px;">
+                            <select id="operatorFilter" class="form-select" style="width: 150px; padding: 8px;">
+                                <option value="all">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="signing">Signing</option>
+                                <option value="offline">Offline</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
                         </div>
                         
                         <table class="table">
@@ -1001,32 +1174,843 @@
         </div>
     </div>
 
+    <!-- Modals -->
+    <!-- Add Operator Modal -->
+    <div id="addOperatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add New Operator</h2>
+                <button class="modal-close" onclick="closeModal('addOperatorModal')">&times;</button>
+            </div>
+            <form id="addOperatorForm" role="form" aria-labelledby="addOperatorModal modal-title">
+                <div class="form-group">
+                    <label class="form-label" for="operatorName">Operator Name</label>
+                    <input type="text" id="operatorName" class="form-input" placeholder="e.g., Operator 05" required aria-describedby="operatorNameError">
+                    <div class="form-error" id="operatorNameError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="operatorBond">Bond Amount (BTC)</label>
+                    <input type="number" id="operatorBond" class="form-input" step="0.1" min="1.5" placeholder="1.5" required>
+                    <div class="form-error" id="operatorBondError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="operatorLocation">Location</label>
+                    <input type="text" id="operatorLocation" class="form-input" placeholder="City, Country" required>
+                    <div class="form-error" id="operatorLocationError"></div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addOperatorModal')">Cancel</button>
+                    <button type="submit" class="btn">Add Operator</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Node Modal -->
+    <div id="addNodeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add New Node</h2>
+                <button class="modal-close" onclick="closeModal('addNodeModal')">&times;</button>
+            </div>
+            <form id="addNodeForm">
+                <div class="form-group">
+                    <label class="form-label" for="nodeName">Node Name</label>
+                    <input type="text" id="nodeName" class="form-input" placeholder="e.g., Node-05" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="nodeIP">IP Address</label>
+                    <input type="text" id="nodeIP" class="form-input" placeholder="192.168.1.100" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="nodePort">Port</label>
+                    <input type="number" id="nodePort" class="form-input" placeholder="8333" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addNodeModal')">Cancel</button>
+                    <button type="submit" class="btn">Add Node</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Session Modal -->
+    <div id="newSessionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Create New Signing Session</h2>
+                <button class="modal-close" onclick="closeModal('newSessionModal')">&times;</button>
+            </div>
+            <form id="newSessionForm">
+                <div class="form-group">
+                    <label class="form-label" for="sessionType">Session Type</label>
+                    <select id="sessionType" class="form-select" required>
+                        <option value="withdrawal">Withdrawal</option>
+                        <option value="deposit">Deposit</option>
+                        <option value="maintenance">Maintenance</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="sessionAmount">Amount (BTC)</label>
+                    <input type="number" id="sessionAmount" class="form-input" step="0.00000001" placeholder="0.00000000" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="requiredOperators">Required Operators</label>
+                    <input type="number" id="requiredOperators" class="form-input" min="3" max="7" value="5" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('newSessionModal')">Cancel</button>
+                    <button type="submit" class="btn">Create Session</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View History Modal -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Operator Performance History</h2>
+                <button class="modal-close" onclick="closeModal('historyModal')">&times;</button>
+            </div>
+            <div class="chart-container">
+                <canvas id="performanceChart"></canvas>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="refreshChart()">Refresh Chart</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('historyModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="confirmTitle">Confirm Action</h2>
+                <button class="modal-close" onclick="closeModal('confirmModal')">&times;</button>
+            </div>
+            <p id="confirmMessage">Are you sure you want to perform this action?</p>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('confirmModal')">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Operator Details Modal -->
+    <div id="operatorDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Operator Details</h2>
+                <button class="modal-close" onclick="closeModal('operatorDetailsModal')">&times;</button>
+            </div>
+            <form id="operatorDetailsForm">
+                <div class="form-group">
+                    <label class="form-label" for="editOperatorName">Operator Name</label>
+                    <input type="text" id="editOperatorName" class="form-input" required>
+                    <div class="form-error" id="editOperatorNameError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editOperatorBond">Bond Amount (BTC)</label>
+                    <input type="number" id="editOperatorBond" class="form-input" step="0.1" min="1.5" required>
+                    <div class="form-error" id="editOperatorBondError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editOperatorLocation">Location</label>
+                    <input type="text" id="editOperatorLocation" class="form-input" required>
+                    <div class="form-error" id="editOperatorLocationError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editOperatorStatus">Status</label>
+                    <select id="editOperatorStatus" class="form-select" required>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="offline">Offline</option>
+                        <option value="signing">Signing</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('operatorDetailsModal')">Cancel</button>
+                    <button type="submit" class="btn">Save Changes</button>
+                    <button type="button" class="btn btn-danger" id="deleteOperatorBtn">Delete Operator</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // Simple interactivity for demonstration
+        // Global variables
+        let operators = [
+            { id: 1, name: 'Operator 01', bond: 2.5, location: 'Munich, DE', status: 'active' },
+            { id: 2, name: 'Operator 02', bond: 2.0, location: 'Tokyo, JP', status: 'signing' },
+            { id: 3, name: 'Operator 03', bond: 1.8, location: 'Virginia, US', status: 'offline' },
+            { id: 4, name: 'Operator 04', bond: 2.2, location: 'Singapore, SG', status: 'active' }
+        ];
+
+        let currentOperator = null;
+
+        // localStorage functions
+        function saveData() {
+            localStorage.setItem('operators', JSON.stringify(operators));
+            localStorage.setItem('signingSessions', JSON.stringify(signingSessions));
+        }
+
+        function loadData() {
+            const savedOperators = localStorage.getItem('operators');
+            if (savedOperators) {
+                operators = JSON.parse(savedOperators);
+            }
+            const savedSessions = localStorage.getItem('signingSessions');
+            if (savedSessions) {
+                signingSessions = JSON.parse(savedSessions);
+            }
+        }
+
+        let signingSessions = [
+            { id: 'MS2-4521', participants: '5/7', progress: 80, status: 'active' },
+            { id: 'MS2-4520', participants: '7/7', progress: 100, status: 'completed' }
+        ];
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Form submissions
         document.addEventListener('DOMContentLoaded', function() {
-            // Refresh button animation
-            const refreshBtn = document.querySelector('.header-actions .btn-secondary');
-            refreshBtn.addEventListener('click', function() {
-                this.querySelector('i').classList.add('fa-spin');
-                setTimeout(() => {
-                    this.querySelector('i').classList.remove('fa-spin');
-                }, 1000);
+            loadData(); // Load saved data
+
+            // Add Operator Form
+            document.getElementById('addOperatorForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (!validateOperatorForm('addOperatorForm')) return;
+
+                const name = document.getElementById('operatorName').value;
+                const bond = parseFloat(document.getElementById('operatorBond').value);
+                const location = document.getElementById('operatorLocation').value;
+
+                const newOperator = {
+                    id: Math.max(...operators.map(o => o.id), 0) + 1,
+                    name: name,
+                    bond: bond,
+                    location: location,
+                    status: 'active'
+                };
+
+                operators.push(newOperator);
+                saveData();
+                updateOperatorTables();
+                updateStats();
+                closeModal('addOperatorModal');
+                clearFormErrors('addOperatorForm');
+                this.reset();
+                showNotification('Operator added successfully!', 'success');
             });
-            
-            // Simulate live updates for operator status
-            setInterval(() => {
-                const offlineOperator = document.querySelector('.status-offline');
-                if (offlineOperator) {
-                    offlineOperator.classList.remove('status-offline');
-                    offlineOperator.classList.add('status-active');
-                    offlineOperator.innerHTML = '<i class="fas fa-check-circle"></i> Active';
-                    
-                    const statusIndicator = document.querySelectorAll('.operator-status')[2];
-                    statusIndicator.classList.remove('status-offline');
-                    statusIndicator.classList.add('status-online');
+
+            // Real-time validation for add form
+            ['operatorName', 'operatorBond', 'operatorLocation'].forEach(id => {
+                document.getElementById(id).addEventListener('input', () => validateOperatorForm('addOperatorForm'));
+            });
+
+            // Add Node Form
+            document.getElementById('addNodeForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const name = document.getElementById('nodeName').value;
+                const ip = document.getElementById('nodeIP').value;
+                const port = document.getElementById('nodePort').value;
+
+                // Simulate adding node
+                closeModal('addNodeModal');
+                this.reset();
+                showNotification('Node added successfully!', 'success');
+            });
+
+            // New Session Form
+            document.getElementById('newSessionForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const type = document.getElementById('sessionType').value;
+                const amount = document.getElementById('sessionAmount').value;
+                const required = document.getElementById('requiredOperators').value;
+
+                const newSession = {
+                    id: 'MS2-' + (4522 + signingSessions.length),
+                    participants: '0/' + required,
+                    progress: 0,
+                    status: 'pending'
+                };
+
+                signingSessions.unshift(newSession);
+                saveData();
+                updateSigningSessions();
+                closeModal('newSessionModal');
+                this.reset();
+                showNotification('Signing session created!', 'success');
+            });
+
+            // Operator Details Form
+            document.getElementById('operatorDetailsForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (!currentOperator) return;
+                if (!validateOperatorForm('operatorDetailsForm', true)) return;
+
+                currentOperator.name = document.getElementById('editOperatorName').value;
+                currentOperator.bond = parseFloat(document.getElementById('editOperatorBond').value);
+                currentOperator.location = document.getElementById('editOperatorLocation').value;
+                currentOperator.status = document.getElementById('editOperatorStatus').value;
+
+                saveData();
+                updateOperatorTables();
+                updateStats();
+                closeModal('operatorDetailsModal');
+                showNotification('Operator updated successfully!', 'success');
+            });
+
+            // Real-time validation for edit form
+            ['editOperatorName', 'editOperatorBond', 'editOperatorLocation'].forEach(id => {
+                document.getElementById(id).addEventListener('input', () => validateOperatorForm('operatorDetailsForm', true));
+            });
+
+            // Delete Operator Button
+            document.getElementById('deleteOperatorBtn').addEventListener('click', function() {
+                if (!currentOperator) return;
+                showConfirmation('Delete this operator permanently?', () => {
+                    operators = operators.filter(op => op.id !== currentOperator.id);
+                    saveData();
+                    updateOperatorTables();
+                    updateStats();
+                    closeModal('operatorDetailsModal');
+                    showNotification('Operator deleted!', 'danger');
+                });
+            });
+
+            // Button event listeners
+            document.querySelector('.header-actions .btn-secondary').addEventListener('click', function() {
+                refreshData();
+            });
+
+            document.querySelector('.header-actions .btn').addEventListener('click', function() {
+                openModal('addOperatorModal');
+            });
+
+            document.querySelectorAll('.card-actions .btn')[0].addEventListener('click', function() {
+                openModal('historyModal');
+                loadHistoryChart();
+            });
+
+            document.querySelectorAll('.card-actions .btn')[1].addEventListener('click', function() {
+                exportOperators();
+            });
+
+            document.querySelectorAll('.card-actions .btn')[2].addEventListener('click', function() {
+                openModal('newSessionModal');
+            });
+
+            document.querySelectorAll('.card-actions .btn')[3].addEventListener('click', function() {
+                openModal('addNodeModal');
+            });
+
+            // Operator action buttons
+            const actionBtns = document.querySelectorAll('.card:last-child .btn');
+            actionBtns[0].addEventListener('click', function() {
+                showConfirmation('Start a new signing session?', () => {
+                    openModal('newSessionModal');
+                });
+            });
+
+            actionBtns[1].addEventListener('click', function() {
+                showConfirmation('Pause all operators?', () => {
+                    pauseAllOperators();
+                });
+            });
+
+            actionBtns[2].addEventListener('click', function() {
+                showConfirmation('Restart all nodes?', () => {
+                    restartNodes();
+                });
+            });
+
+            actionBtns[3].addEventListener('click', function() {
+                showConfirmation('Slash selected operator?', () => {
+                    slashOperator();
+                });
+            });
+
+            // Resume session buttons
+            document.querySelectorAll('.btn-success').forEach(btn => {
+                if (btn.textContent.includes('Resume')) {
+                    btn.addEventListener('click', function() {
+                        resumeSession(this.closest('tr'));
+                    });
                 }
-            }, 10000);
+            });
+
+            // Simulate live updates
+            setInterval(() => {
+                updateLiveData();
+            }, 3000);
+
+            // Search and Filter
+            document.getElementById('operatorSearch').addEventListener('input', updateOperatorTables);
+            document.getElementById('operatorFilter').addEventListener('change', updateOperatorTables);
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Escape to close modals
+                if (e.key === 'Escape') {
+                    const modals = ['addOperatorModal', 'addNodeModal', 'newSessionModal', 'operatorDetailsModal', 'historyModal', 'confirmModal'];
+                    modals.forEach(modalId => {
+                        const modal = document.getElementById(modalId);
+                        if (modal && modal.style.display === 'block') {
+                            closeModal(modalId);
+                        }
+                    });
+                }
+
+                // Ctrl+R to refresh
+                if (e.ctrlKey && e.key === 'r') {
+                    e.preventDefault();
+                    refreshData();
+                }
+
+                // Ctrl+N for new operator
+                if (e.ctrlKey && e.key === 'n') {
+                    e.preventDefault();
+                    openModal('addOperatorModal');
+                }
+
+                // Ctrl+S for new session
+                if (e.ctrlKey && e.key === 's') {
+                    e.preventDefault();
+                    openModal('newSessionModal');
+                }
+            });
+
+            // Initial setup
+            updateStats();
         });
+
+        // Utility functions
+        function refreshData() {
+            const refreshBtn = document.querySelector('.header-actions .btn-secondary');
+            refreshBtn.querySelector('i').classList.add('fa-spin');
+            setTimeout(() => {
+                refreshBtn.querySelector('i').classList.remove('fa-spin');
+                updateStats();
+                updateOperatorTables();
+                showNotification('Data refreshed!', 'info');
+            }, 1000);
+        }
+
+        function updateStats() {
+            const activeCount = operators.filter(op => op.status === 'active' || op.status === 'signing').length;
+            document.querySelector('.stat-value').textContent = `${activeCount}/${operators.length}`;
+
+            const totalBond = operators.reduce((sum, op) => sum + op.bond, 0);
+            document.querySelectorAll('.stat-value')[1].textContent = `${totalBond.toFixed(1)} BTC`;
+        }
+
+        function getFilteredOperators() {
+            const searchTerm = document.getElementById('operatorSearch').value.toLowerCase();
+            const filterStatus = document.getElementById('operatorFilter').value;
+
+            return operators.filter(op => {
+                const matchesSearch = op.name.toLowerCase().includes(searchTerm) ||
+                                    op.location.toLowerCase().includes(searchTerm);
+                const matchesFilter = filterStatus === 'all' || op.status === filterStatus;
+                return matchesSearch && matchesFilter;
+            });
+        }
+
+        function updateOperatorTables() {
+            const filteredOps = getFilteredOperators();
+
+            // Update table
+            const tbody = document.querySelector('.table tbody');
+            tbody.innerHTML = filteredOps.map(op => `
+                <tr onclick="openOperatorDetails(operators.find(o => o.id === ${op.id}))" style="cursor: pointer;">
+                    <td>${op.name}</td>
+                    <td>${op.bond} BTC</td>
+                    <td>
+                        <span class="status-badge status-${op.status}">
+                            <i class="fas fa-${op.status === 'active' ? 'check-circle' : op.status === 'signing' ? 'file-signature' : 'exclamation-circle'}"></i>
+                            ${op.status.charAt(0).toUpperCase() + op.status.slice(1)}
+                        </span>
+                    </td>
+                    <td>${op.location}</td>
+                </tr>
+            `).join('');
+
+            // Update operator list
+            const operatorList = document.querySelector('.operator-list');
+            operatorList.innerHTML = filteredOps.map(op => `
+                <li class="operator-item" onclick="openOperatorDetails(operators.find(o => o.id === ${op.id}))" style="cursor: pointer;">
+                    <div class="operator-avatar">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="operator-details">
+                        <div class="operator-name">${op.name}</div>
+                        <div class="operator-meta">Bond: ${op.bond} BTC • ${op.location}</div>
+                        <div class="bond-meter">
+                            <div class="bond-fill" style="width: ${(op.bond / 2.5) * 100}%"></div>
+                        </div>
+                    </div>
+                    <div class="operator-status status-${op.status === 'offline' ? 'offline' : 'online'}"></div>
+                </li>
+            `).join('');
+        }
+
+        function updateSigningSessions() {
+            const tbody = document.querySelectorAll('.table')[1].querySelector('tbody');
+            tbody.innerHTML = signingSessions.map(session => `
+                <tr>
+                    <td>${session.id}</td>
+                    <td>${session.participants}</td>
+                    <td>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${session.progress}%; background: ${session.status === 'completed' ? 'var(--success)' : 'var(--primary)'}"></div>
+                        </div>
+                    </td>
+                    <td>
+                        ${session.status === 'completed' ?
+                            '<button class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i> View</button>' :
+                            '<button class="btn btn-sm btn-success"><i class="fas fa-play"></i> Resume</button>'
+                        }
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateLiveData() {
+            // Simulate progress updates with variable speed
+            signingSessions.forEach(session => {
+                if (session.status === 'active' && session.progress < 100) {
+                    const progressIncrease = Math.random() * 8 + 2; // 2-10%
+                    session.progress = Math.min(100, session.progress + progressIncrease);
+                    if (session.progress >= 100) {
+                        session.status = 'completed';
+                        session.participants = session.participants.replace(/^\d+/, '7');
+                        showNotification(`Signing session ${session.id} completed!`, 'success');
+                    }
+                }
+            });
+            updateSigningSessions();
+
+            // Random status changes
+            if (Math.random() < 0.05) { // Reduced frequency
+                const randomOp = operators[Math.floor(Math.random() * operators.length)];
+                if (randomOp.status === 'offline') {
+                    randomOp.status = 'active';
+                    updateOperatorTables();
+                    showNotification(`${randomOp.name} is back online!`, 'success');
+                } else if (randomOp.status === 'active' && Math.random() < 0.1) {
+                    randomOp.status = 'offline';
+                    updateOperatorTables();
+                    showNotification(`${randomOp.name} went offline!`, 'warning');
+                }
+            }
+
+            // Update dynamic stats
+            updateDynamicStats();
+
+            // Random alerts
+            if (Math.random() < 0.02) { // Occasional alerts
+                const alerts = [
+                    { type: 'warning', title: 'High CPU Usage', desc: 'Operator 02 CPU usage above 80%' },
+                    { type: 'info', title: 'New Block Mined', desc: 'Block 845123 mined by Operator 04' },
+                    { type: 'success', title: 'Bond Increased', desc: 'Operator 01 increased bond by 0.5 BTC' }
+                ];
+                const alert = alerts[Math.floor(Math.random() * alerts.length)];
+                showAlert(alert.type, alert.title, alert.desc);
+            }
+        }
+
+        function updateDynamicStats() {
+            // Simulate response time changes
+            const currentResponseTime = parseInt(document.querySelectorAll('.stat-value')[3].textContent);
+            const newResponseTime = Math.max(200, currentResponseTime + (Math.random() - 0.5) * 100);
+            document.querySelectorAll('.stat-value')[3].textContent = Math.round(newResponseTime) + ' ms';
+
+            // Simulate success rate changes
+            const currentSuccessRate = parseFloat(document.querySelectorAll('.stat-value')[2].textContent);
+            const newSuccessRate = Math.max(95, Math.min(100, currentSuccessRate + (Math.random() - 0.5) * 0.5));
+            document.querySelectorAll('.stat-value')[2].textContent = newSuccessRate.toFixed(1) + '%';
+
+            // Update CPU/Memory/Network
+            const cpuEl = document.querySelector('.progress-value');
+            const memEl = document.querySelectorAll('.progress-value')[1];
+            const netEl = document.querySelectorAll('.progress-value')[2];
+
+            if (cpuEl) {
+                const newCpu = Math.max(10, Math.min(90, parseInt(cpuEl.textContent) + (Math.random() - 0.5) * 20));
+                cpuEl.textContent = Math.round(newCpu) + '%';
+                cpuEl.parentElement.nextElementSibling.querySelector('.progress-fill').style.width = newCpu + '%';
+            }
+
+            if (memEl) {
+                const newMem = Math.max(40, Math.min(95, parseInt(memEl.textContent) + (Math.random() - 0.5) * 10));
+                memEl.textContent = Math.round(newMem) + '%';
+                memEl.parentElement.nextElementSibling.querySelector('.progress-fill').style.width = newMem + '%';
+                memEl.parentElement.nextElementSibling.querySelector('.progress-fill').style.background = newMem > 80 ? 'var(--warning)' : 'var(--primary)';
+            }
+
+            if (netEl) {
+                const newNet = Math.max(50, Math.min(100, parseInt(netEl.textContent) + (Math.random() - 0.5) * 30));
+                netEl.textContent = Math.round(newNet) + '%';
+                netEl.parentElement.nextElementSibling.querySelector('.progress-fill').style.width = newNet + '%';
+            }
+        }
+
+        function showAlert(type, title, desc) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <div class="alert-icon">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">${title}</div>
+                    <div class="alert-description">${desc}</div>
+                </div>
+            `;
+
+            const alertsSection = document.querySelector('.main-content > .alert').parentElement;
+            alertsSection.insertBefore(alert, alertsSection.firstChild);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 10000); // Longer duration for alerts
+        }
+
+        function exportOperators() {
+            const dataStr = JSON.stringify(operators, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+
+            const exportFileDefaultName = 'operators.json';
+
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+
+            showNotification('Operators exported!', 'success');
+        }
+
+        let performanceChart;
+
+        function loadHistoryChart() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const uptimeData = labels.map(() => 95 + Math.random() * 5);
+            const responseData = labels.map(() => 95 + Math.random() * 5);
+
+            performanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Uptime %',
+                        data: uptimeData,
+                        borderColor: 'var(--primary)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Response Rate %',
+                        data: responseData,
+                        borderColor: 'var(--success)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 90,
+                            max: 100
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(1) + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function refreshChart() {
+            if (performanceChart) {
+                performanceChart.data.datasets.forEach(dataset => {
+                    dataset.data = dataset.data.map(() => 95 + Math.random() * 5);
+                });
+                performanceChart.update();
+                showNotification('Chart refreshed!', 'info');
+            }
+        }
+
+        function showConfirmation(message, callback) {
+            document.getElementById('confirmMessage').textContent = message;
+            document.getElementById('confirmBtn').onclick = function() {
+                callback();
+                closeModal('confirmModal');
+            };
+            openModal('confirmModal');
+        }
+
+        function openOperatorDetails(operator) {
+            currentOperator = operator;
+            document.getElementById('editOperatorName').value = operator.name;
+            document.getElementById('editOperatorBond').value = operator.bond;
+            document.getElementById('editOperatorLocation').value = operator.location;
+            document.getElementById('editOperatorStatus').value = operator.status;
+            openModal('operatorDetailsModal');
+        }
+
+        function pauseAllOperators() {
+            operators.forEach(op => {
+                if (op.status === 'active') op.status = 'inactive';
+            });
+            updateOperatorTables();
+            showNotification('All operators paused!', 'warning');
+        }
+
+        function restartNodes() {
+            showNotification('Nodes restarting...', 'info');
+            setTimeout(() => {
+                showNotification('All nodes restarted!', 'success');
+            }, 2000);
+        }
+
+        function slashOperator() {
+            // Simulate slashing the first offline operator
+            const offlineOp = operators.find(op => op.status === 'offline');
+            if (offlineOp) {
+                operators = operators.filter(op => op.id !== offlineOp.id);
+                updateOperatorTables();
+                updateStats();
+                showNotification('Operator slashed!', 'danger');
+            } else {
+                showNotification('No offline operators to slash!', 'warning');
+            }
+        }
+
+        function resumeSession(row) {
+            const sessionId = row.cells[0].textContent;
+            const session = signingSessions.find(s => s.id === sessionId);
+            if (session) {
+                session.status = 'active';
+                updateSigningSessions();
+                showNotification('Session resumed!', 'success');
+            }
+        }
+
+        function showNotification(message, type) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type}`;
+            notification.innerHTML = `
+                <div class="alert-icon">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">${message}</div>
+                </div>
+            `;
+
+            // Insert at top of main content
+            const mainContent = document.querySelector('.main-content');
+            mainContent.insertBefore(notification, mainContent.firstChild);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function validateOperatorForm(formId, isEdit = false) {
+            const nameField = document.getElementById(isEdit ? 'editOperatorName' : 'operatorName');
+            const bondField = document.getElementById(isEdit ? 'editOperatorBond' : 'operatorBond');
+            const locationField = document.getElementById(isEdit ? 'editOperatorLocation' : 'operatorLocation');
+
+            const nameError = document.getElementById(isEdit ? 'editOperatorNameError' : 'operatorNameError');
+            const bondError = document.getElementById(isEdit ? 'editOperatorBondError' : 'operatorBondError');
+            const locationError = document.getElementById(isEdit ? 'editOperatorLocationError' : 'operatorLocationError');
+
+            let isValid = true;
+
+            // Name validation
+            if (!nameField.value.trim()) {
+                nameError.textContent = 'Operator name is required';
+                nameError.style.display = 'block';
+                nameField.classList.add('error');
+                isValid = false;
+            } else if (operators.some(op => op.name.toLowerCase() === nameField.value.toLowerCase() && (!isEdit || op.id !== currentOperator.id))) {
+                nameError.textContent = 'Operator name must be unique';
+                nameError.style.display = 'block';
+                nameField.classList.add('error');
+                isValid = false;
+            } else {
+                nameError.style.display = 'none';
+                nameField.classList.remove('error');
+            }
+
+            // Bond validation
+            const bond = parseFloat(bondField.value);
+            if (isNaN(bond) || bond < 1.5) {
+                bondError.textContent = 'Bond must be at least 1.5 BTC';
+                bondError.style.display = 'block';
+                bondField.classList.add('error');
+                isValid = false;
+            } else {
+                bondError.style.display = 'none';
+                bondField.classList.remove('error');
+            }
+
+            // Location validation
+            if (!locationField.value.trim()) {
+                locationError.textContent = 'Location is required';
+                locationError.style.display = 'block';
+                locationField.classList.add('error');
+                isValid = false;
+            } else {
+                locationError.style.display = 'none';
+                locationField.classList.remove('error');
+            }
+
+            return isValid;
+        }
+
+        function clearFormErrors(formId) {
+            const errors = document.querySelectorAll(`#${formId} .form-error`);
+            errors.forEach(error => error.style.display = 'none');
+            const inputs = document.querySelectorAll(`#${formId} .form-input`);
+            inputs.forEach(input => input.classList.remove('error'));
+        }
     </script>
 </body>
 </html>

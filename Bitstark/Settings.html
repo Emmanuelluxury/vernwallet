@@ -435,6 +435,132 @@
                 grid-template-columns: 1fr 1fr;
             }
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: rgba(31, 41, 55, 0.95);
+            backdrop-filter: blur(10px);
+            margin: 5% auto;
+            padding: 30px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .qr-code {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .qr-placeholder {
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--primary);
+        }
+
+        .device-list {
+            margin: 20px 0;
+        }
+
+        .device-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .device-info h4 {
+            margin: 0 0 5px 0;
+            font-size: 0.9rem;
+        }
+
+        .device-info p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .api-key-form {
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
@@ -847,67 +973,841 @@
     </div>
 
     <script>
-        // Simple interactivity for demonstration
-        document.addEventListener('DOMContentLoaded', function() {
-            // Save button animation
-            const saveBtn = document.querySelector('.btn-success');
-            saveBtn.addEventListener('click', function() {
-                const originalText = this.innerHTML;
-                this.innerHTML = '<i class="fas fa-check"></i> Saved';
-                this.style.background = 'var(--success)';
-                
-                setTimeout(() => {
-                    this.innerHTML = originalText;
-                    this.style.background = '';
-                }, 2000);
-            });
-            
-            // Toggle switch labels
-            const toggleSwitches = document.querySelectorAll('.toggle-switch input');
-            toggleSwitches.forEach(toggle => {
-                toggle.addEventListener('change', function() {
-                    const label = this.closest('.toggle-label');
-                    if (label) {
-                        label.style.color = this.checked ? 'var(--primary)' : '';
+        // Settings management with localStorage
+        class SettingsManager {
+            constructor() {
+                this.settings = this.loadSettings();
+                this.init();
+            }
+
+            loadSettings() {
+                const defaultSettings = {
+                    profile: {
+                        displayName: 'CryptoTrader92',
+                        email: 'user@example.com',
+                        bio: 'Crypto enthusiast and early adopter of Bitcoin-Starknet bridge technology.',
+                        privacy: 'Private'
+                    },
+                    notifications: {
+                        email: true,
+                        transactions: true,
+                        price: false,
+                        security: true
+                    },
+                    wallet: {
+                        currency: 'BTC',
+                        feePriority: 'Medium',
+                        autoLock: true,
+                        hideBalances: false
+                    },
+                    api: {
+                        access: true,
+                        rateLimits: true,
+                        keys: [
+                            { name: 'Trading Bot', key: 'sk_live_abc123••••••••••••••••' },
+                            { name: 'Analytics Dashboard', key: 'sk_live_def456••••••••••••••••' }
+                        ]
+                    }
+                };
+
+                const saved = localStorage.getItem('vernWalletSettings');
+                return saved ? { ...defaultSettings, ...JSON.parse(saved) } : defaultSettings;
+            }
+
+            saveSettings() {
+                localStorage.setItem('vernWalletSettings', JSON.stringify(this.settings));
+            }
+
+            updateSetting(category, key, value) {
+                if (!this.settings[category]) this.settings[category] = {};
+                this.settings[category][key] = value;
+                this.saveSettings();
+            }
+
+            getSetting(category, key) {
+                return this.settings[category]?.[key];
+            }
+
+            init() {
+                this.loadFormValues();
+                this.setupEventListeners();
+            }
+
+            loadFormValues() {
+                // Profile settings
+                const profile = this.settings.profile;
+                document.querySelector('input[value="' + profile.displayName + '"]').value = profile.displayName;
+                document.querySelector('input[type="email"]').value = profile.email;
+                document.querySelector('textarea').value = profile.bio;
+                document.querySelector('select').value = profile.privacy;
+
+                // Notifications
+                const notifications = this.settings.notifications;
+                document.querySelectorAll('.toggle-switch input')[0].checked = notifications.email;
+                document.querySelectorAll('.toggle-switch input')[1].checked = notifications.transactions;
+                document.querySelectorAll('.toggle-switch input')[2].checked = notifications.price;
+                document.querySelectorAll('.toggle-switch input')[3].checked = notifications.security;
+
+                // Wallet settings
+                const wallet = this.settings.wallet;
+                document.querySelectorAll('select')[1].value = wallet.currency;
+                document.querySelectorAll('select')[2].value = wallet.feePriority;
+                document.querySelectorAll('.toggle-switch input')[4].checked = wallet.autoLock;
+                document.querySelectorAll('.toggle-switch input')[5].checked = wallet.hideBalances;
+
+                // API settings
+                const api = this.settings.api;
+                document.querySelectorAll('.toggle-switch input')[6].checked = api.access;
+                document.querySelectorAll('.toggle-switch input')[7].checked = api.rateLimits;
+            }
+
+            setupEventListeners() {
+                // Save button
+                const saveBtn = document.querySelector('.btn-success');
+                saveBtn.addEventListener('click', () => this.saveAllSettings());
+
+                // Toggle switches
+                const toggleSwitches = document.querySelectorAll('.toggle-switch input');
+                toggleSwitches.forEach((toggle, index) => {
+                    toggle.addEventListener('change', (e) => {
+                        const label = e.target.closest('.toggle-label');
+                        if (label) {
+                            label.style.color = e.target.checked ? 'var(--primary)' : '';
+                        }
+                        this.updateToggleSetting(index, e.target.checked);
+                    });
+                });
+
+                // Form inputs
+                document.querySelectorAll('.form-input, .form-textarea, .form-select').forEach(input => {
+                    input.addEventListener('input', (e) => this.validateInput(e.target));
+                });
+
+                // Copy API key functionality
+                const copyButtons = document.querySelectorAll('.api-key-actions .btn:first-child');
+                copyButtons.forEach(button => {
+                    button.addEventListener('click', (e) => this.copyApiKey(e.target));
+                });
+
+                // Danger zone
+                const dangerButtons = document.querySelectorAll('.btn-danger, .btn-secondary');
+                dangerButtons.forEach(button => {
+                    if (button.closest('.card')?.querySelector('.card-title')?.textContent.includes('Danger Zone')) {
+                        button.addEventListener('click', (e) => this.handleDangerAction(e.target));
                     }
                 });
-            });
-            
-            // Copy API key functionality
-            const copyButtons = document.querySelectorAll('.api-key-actions .btn:first-child');
-            copyButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const originalHtml = this.innerHTML;
-                    this.innerHTML = '<i class="fas fa-check"></i>';
-                    
-                    setTimeout(() => {
-                        this.innerHTML = originalHtml;
-                    }, 2000);
+
+                // Other buttons
+                document.querySelectorAll('.btn').forEach(button => {
+                    if (!button.classList.contains('btn-success') && !button.classList.contains('btn-danger')) {
+                        button.addEventListener('click', (e) => this.handleButtonClick(e.target));
+                    }
                 });
-            });
-            
-            // Danger zone confirmation
-            const dangerButtons = document.querySelectorAll('.btn-danger, .btn-secondary');
-            dangerButtons.forEach(button => {
-                if (button.closest('.card').querySelector('.card-title').textContent.includes('Danger Zone')) {
-                    button.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const action = this.textContent.trim();
-                        if (confirm(`Are you sure you want to ${action}? This action cannot be undone.`)) {
-                            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-                            this.disabled = true;
-                            
-                            setTimeout(() => {
-                                this.innerHTML = '<i class="fas fa-check"></i> Done';
-                                setTimeout(() => {
-                                    this.innerHTML = action;
-                                    this.disabled = false;
-                                }, 1500);
-                            }, 2000);
+            }
+
+            validateInput(input) {
+                const value = input.value.trim();
+                let isValid = true;
+
+                if (input.type === 'email') {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    isValid = emailRegex.test(value);
+                } else if (input.tagName === 'TEXTAREA') {
+                    isValid = value.length <= 500; // Max 500 chars for bio
+                }
+
+                input.style.borderColor = isValid ? 'rgba(255, 255, 255, 0.1)' : 'var(--danger)';
+                return isValid;
+            }
+
+            saveAllSettings() {
+                const saveBtn = document.querySelector('.btn-success');
+                const originalText = saveBtn.innerHTML;
+
+                // Validate all inputs
+                const inputs = document.querySelectorAll('.form-input, .form-textarea');
+                let allValid = true;
+                inputs.forEach(input => {
+                    if (!this.validateInput(input)) allValid = false;
+                });
+
+                if (!allValid) {
+                    alert('Please correct the errors in the form before saving.');
+                    return;
+                }
+
+                // Save profile settings
+                this.updateSetting('profile', 'displayName', document.querySelector('input[type="text"]').value);
+                this.updateSetting('profile', 'email', document.querySelector('input[type="email"]').value);
+                this.updateSetting('profile', 'bio', document.querySelector('textarea').value);
+                this.updateSetting('profile', 'privacy', document.querySelector('select').value);
+
+                // Save wallet settings
+                this.updateSetting('wallet', 'currency', document.querySelectorAll('select')[1].value);
+                this.updateSetting('wallet', 'feePriority', document.querySelectorAll('select')[2].value);
+
+                // Animation
+                saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved';
+                saveBtn.style.background = 'var(--success)';
+
+                setTimeout(() => {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.style.background = '';
+                }, 2000);
+            }
+
+            updateToggleSetting(index, checked) {
+                const mappings = [
+                    ['notifications', 'email'],
+                    ['notifications', 'transactions'],
+                    ['notifications', 'price'],
+                    ['notifications', 'security'],
+                    ['wallet', 'autoLock'],
+                    ['wallet', 'hideBalances'],
+                    ['api', 'access'],
+                    ['api', 'rateLimits']
+                ];
+
+                if (mappings[index]) {
+                    this.updateSetting(mappings[index][0], mappings[index][1], checked);
+                }
+            }
+
+            copyApiKey(button) {
+                const apiKeyItem = button.closest('.api-key-item');
+                const keyValue = apiKeyItem.querySelector('.api-key-value').textContent;
+                navigator.clipboard.writeText(keyValue).then(() => {
+                    const originalHtml = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => button.innerHTML = originalHtml, 2000);
+                });
+            }
+
+            handleDangerAction(button) {
+                const action = button.textContent.trim();
+                if (confirm(`Are you sure you want to ${action}? This action cannot be undone.`)) {
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                    button.disabled = true;
+
+                    setTimeout(() => {
+                        button.innerHTML = '<i class="fas fa-check"></i> Done';
+                        setTimeout(() => {
+                            button.innerHTML = action;
+                            button.disabled = false;
+                        }, 1500);
+                    }, 2000);
+                }
+            }
+
+            handleButtonClick(button) {
+                const text = button.textContent.trim();
+                if (text === 'Change Password') {
+                    this.showPasswordModal();
+                } else if (text === 'Manage 2FA') {
+                    this.show2FAModal();
+                } else if (text === 'View Devices') {
+                    this.showDevicesModal();
+                } else if (text === 'New Key') {
+                    this.showNewApiKeyModal();
+                }
+            }
+
+            showPasswordModal() {
+                alert('Password change modal would open here. (Implement modal system for full functionality)');
+            }
+
+            show2FAModal() {
+                alert('2FA management modal would open here. (Implement modal system for full functionality)');
+            }
+
+            showDevicesModal() {
+                alert('Device management modal would open here. (Implement modal system for full functionality)');
+            }
+
+            showNewApiKeyModal() {
+                alert('New API key modal would open here. (Implement modal system for full functionality)');
+            }
+        }
+
+        // Initialize settings manager
+        document.addEventListener('DOMContentLoaded', function() {
+            new SettingsManager();
+        });
+
+        // Modal management
+        class ModalManager {
+            constructor() {
+                this.activeModal = null;
+                this.createModals();
+            }
+
+            createModals() {
+                this.createPasswordModal();
+                this.create2FAModal();
+                this.createDevicesModal();
+                this.createApiKeyModal();
+            }
+
+            createPasswordModal() {
+                const modal = document.createElement('div');
+                modal.id = 'passwordModal';
+                modal.className = 'modal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title"><i class="fas fa-lock"></i> Change Password</h2>
+                            <button class="modal-close">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label class="form-label">Current Password</label>
+                                <input type="password" class="form-input" id="currentPassword">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">New Password</label>
+                                    <input type="password" class="form-input" id="newPassword">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Confirm Password</label>
+                                    <input type="password" class="form-input" id="confirmPassword">
+                                </div>
+                            </div>
+                            <div id="passwordError" style="color: var(--danger); font-size: 0.8rem; display: none;"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" id="cancelPassword">Cancel</button>
+                            <button class="btn btn-success" id="savePassword">Update Password</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                this.setupPasswordModalEvents();
+            }
+
+            create2FAModal() {
+                const modal = document.createElement('div');
+                modal.id = 'twoFactorModal';
+                modal.className = 'modal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title"><i class="fas fa-mobile-alt"></i> Two-Factor Authentication</h2>
+                            <button class="modal-close">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <p style="margin-bottom: 20px; color: var(--gray);">2FA is currently <span style="color: var(--success);">enabled</span> on your account.</p>
+                            <div class="qr-code">
+                                <div class="qr-placeholder">
+                                    <i class="fas fa-qrcode"></i>
+                                </div>
+                                <p style="margin-top: 10px; font-size: 0.8rem; color: var(--gray);">Scan this QR code with your authenticator app</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Enter 6-digit code</label>
+                                <input type="text" class="form-input" id="twoFactorCode" maxlength="6" placeholder="000000">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" id="disable2FA">Disable 2FA</button>
+                            <button class="btn btn-success" id="verify2FA">Verify Code</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                this.setup2FAModalEvents();
+            }
+
+            createDevicesModal() {
+                const modal = document.createElement('div');
+                modal.id = 'devicesModal';
+                modal.className = 'modal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title"><i class="fas fa-device"></i> Connected Devices</h2>
+                            <button class="modal-close">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="device-list">
+                                <div class="device-item">
+                                    <div class="device-info">
+                                        <h4>Chrome on Windows</h4>
+                                        <p>Last active: 2 hours ago • Lagos, Nigeria</p>
+                                    </div>
+                                    <button class="btn btn-sm btn-danger">Revoke</button>
+                                </div>
+                                <div class="device-item">
+                                    <div class="device-info">
+                                        <h4>Mobile App (iOS)</h4>
+                                        <p>Last active: 1 day ago • Lagos, Nigeria</p>
+                                    </div>
+                                    <button class="btn btn-sm btn-danger">Revoke</button>
+                                </div>
+                                <div class="device-item">
+                                    <div class="device-info">
+                                        <h4>Firefox on Linux</h4>
+                                        <p>Last active: 3 days ago • Lagos, Nigeria</p>
+                                    </div>
+                                    <button class="btn btn-sm btn-danger">Revoke</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" id="closeDevices">Close</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                this.setupDevicesModalEvents();
+            }
+
+            createApiKeyModal() {
+                const modal = document.createElement('div');
+                modal.id = 'apiKeyModal';
+                modal.className = 'modal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title"><i class="fas fa-plus"></i> New API Key</h2>
+                            <button class="modal-close">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="api-key-form">
+                                <div class="form-group">
+                                    <label class="form-label">Key Name</label>
+                                    <input type="text" class="form-input" id="apiKeyName" placeholder="e.g., Trading Bot">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Permissions</label>
+                                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                                        <label class="toggle-label" style="margin: 0;">
+                                            <div class="toggle-text" style="font-size: 0.9rem;">Read</div>
+                                            <div class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="toggle-slider"></span>
+                                            </div>
+                                        </label>
+                                        <label class="toggle-label" style="margin: 0;">
+                                            <div class="toggle-text" style="font-size: 0.9rem;">Write</div>
+                                            <div class="toggle-switch">
+                                                <input type="checkbox">
+                                                <span class="toggle-slider"></span>
+                                            </div>
+                                        </label>
+                                        <label class="toggle-label" style="margin: 0;">
+                                            <div class="toggle-text" style="font-size: 0.9rem;">Trade</div>
+                                            <div class="toggle-switch">
+                                                <input type="checkbox">
+                                                <span class="toggle-slider"></span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" id="cancelApiKey">Cancel</button>
+                            <button class="btn btn-success" id="createApiKey">Create Key</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                this.setupApiKeyModalEvents();
+            }
+
+            showModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.style.display = 'block';
+                    this.activeModal = modal;
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+
+            hideModal() {
+                if (this.activeModal) {
+                    this.activeModal.style.display = 'none';
+                    this.activeModal = null;
+                    document.body.style.overflow = 'auto';
+                }
+            }
+
+            setupPasswordModalEvents() {
+                const modal = document.getElementById('passwordModal');
+                const closeBtn = modal.querySelector('.modal-close');
+                const cancelBtn = modal.querySelector('#cancelPassword');
+                const saveBtn = modal.querySelector('#savePassword');
+
+                [closeBtn, cancelBtn].forEach(btn => {
+                    btn.addEventListener('click', () => this.hideModal());
+                });
+
+                saveBtn.addEventListener('click', () => this.handlePasswordChange());
+            }
+
+            setup2FAModalEvents() {
+                const modal = document.getElementById('twoFactorModal');
+                const closeBtn = modal.querySelector('.modal-close');
+                const disableBtn = modal.querySelector('#disable2FA');
+                const verifyBtn = modal.querySelector('#verify2FA');
+
+                closeBtn.addEventListener('click', () => this.hideModal());
+                disableBtn.addEventListener('click', () => this.handleDisable2FA());
+                verifyBtn.addEventListener('click', () => this.handleVerify2FA());
+            }
+
+            setupDevicesModalEvents() {
+                const modal = document.getElementById('devicesModal');
+                const closeBtn = modal.querySelector('.modal-close');
+                const closeDevicesBtn = modal.querySelector('#closeDevices');
+
+                [closeBtn, closeDevicesBtn].forEach(btn => {
+                    btn.addEventListener('click', () => this.hideModal());
+                });
+
+                // Revoke device buttons
+                modal.querySelectorAll('.btn-danger').forEach(btn => {
+                    btn.addEventListener('click', (e) => this.handleRevokeDevice(e.target));
+                });
+            }
+
+            setupApiKeyModalEvents() {
+                const modal = document.getElementById('apiKeyModal');
+                const closeBtn = modal.querySelector('.modal-close');
+                const cancelBtn = modal.querySelector('#cancelApiKey');
+                const createBtn = modal.querySelector('#createApiKey');
+
+                [closeBtn, cancelBtn].forEach(btn => {
+                    btn.addEventListener('click', () => this.hideModal());
+                });
+
+                createBtn.addEventListener('click', () => this.handleCreateApiKey());
+            }
+
+            handlePasswordChange() {
+                const current = document.getElementById('currentPassword').value;
+                const newPass = document.getElementById('newPassword').value;
+                const confirm = document.getElementById('confirmPassword').value;
+                const errorDiv = document.getElementById('passwordError');
+
+                errorDiv.style.display = 'none';
+
+                if (!current || !newPass || !confirm) {
+                    errorDiv.textContent = 'All fields are required.';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+
+                if (newPass !== confirm) {
+                    errorDiv.textContent = 'New passwords do not match.';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+
+                if (newPass.length < 8) {
+                    errorDiv.textContent = 'Password must be at least 8 characters long.';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+
+                // Simulate API call
+                const saveBtn = document.getElementById('savePassword');
+                const originalText = saveBtn.innerHTML;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                saveBtn.disabled = true;
+
+                setTimeout(() => {
+                    saveBtn.innerHTML = '<i class="fas fa-check"></i> Updated';
+                    setTimeout(() => {
+                        this.hideModal();
+                        // Clear form
+                        document.getElementById('currentPassword').value = '';
+                        document.getElementById('newPassword').value = '';
+                        document.getElementById('confirmPassword').value = '';
+                        saveBtn.innerHTML = originalText;
+                        saveBtn.disabled = false;
+                    }, 1500);
+                }, 2000);
+            }
+
+            handleDisable2FA() {
+                if (confirm('Are you sure you want to disable 2FA? This will make your account less secure.')) {
+                    alert('2FA has been disabled. (This would normally require additional verification)');
+                    this.hideModal();
+                }
+            }
+
+            handleVerify2FA() {
+                const code = document.getElementById('twoFactorCode').value;
+                if (code.length === 6 && /^\d{6}$/.test(code)) {
+                    alert('2FA code verified successfully!');
+                    this.hideModal();
+                } else {
+                    alert('Please enter a valid 6-digit code.');
+                }
+            }
+
+            handleRevokeDevice(button) {
+                const deviceItem = button.closest('.device-item');
+                const deviceName = deviceItem.querySelector('h4').textContent;
+
+                if (confirm(`Revoke access for ${deviceName}?`)) {
+                    deviceItem.style.opacity = '0.5';
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    button.disabled = true;
+
+                    setTimeout(() => {
+                        deviceItem.remove();
+                        if (document.querySelectorAll('.device-item').length === 0) {
+                            document.querySelector('.device-list').innerHTML = '<p style="text-align: center; color: var(--gray);">No devices connected.</p>';
+                        }
+                    }, 1500);
+                }
+            }
+
+            handleCreateApiKey() {
+                const name = document.getElementById('apiKeyName').value.trim();
+                if (!name) {
+                    alert('Please enter a name for the API key.');
+                    return;
+                }
+
+                // Generate a fake API key
+                const apiKey = 'sk_live_' + Math.random().toString(36).substring(2, 15) + '••••••••••••••••';
+
+                // Add to settings
+                const newKey = { name, key: apiKey };
+                settingsManager.settings.api.keys.push(newKey);
+                settingsManager.saveSettings();
+
+                // Add to UI
+                const apiKeyList = document.querySelector('.api-key-list');
+                const newItem = document.createElement('div');
+                newItem.className = 'api-key-item';
+                newItem.innerHTML = `
+                    <div class="api-key-info">
+                        <div class="api-key-name">${name}</div>
+                        <div class="api-key-value">${apiKey}</div>
+                    </div>
+                    <div class="api-key-actions">
+                        <button class="btn btn-sm btn-secondary">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="btn btn-sm btn-secondary">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                `;
+                apiKeyList.appendChild(newItem);
+
+                // Setup copy functionality for new key
+                const copyBtn = newItem.querySelector('.btn:first-child');
+                copyBtn.addEventListener('click', () => settingsManager.copyApiKey(copyBtn));
+
+                this.hideModal();
+                document.getElementById('apiKeyName').value = '';
+            }
+        }
+
+        // Initialize modal manager
+        const modalManager = new ModalManager();
+
+        // Update SettingsManager to use modals
+        SettingsManager.prototype.showPasswordModal = function() {
+            modalManager.showModal('passwordModal');
+        };
+
+        SettingsManager.prototype.show2FAModal = function() {
+            modalManager.showModal('twoFactorModal');
+        };
+
+        SettingsManager.prototype.showDevicesModal = function() {
+            modalManager.showModal('devicesModal');
+        };
+
+        SettingsManager.prototype.showNewApiKeyModal = function() {
+            modalManager.showModal('apiKeyModal');
+        };
+
+        // Enhanced animations and feedback
+        class UIEnhancer {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                this.addHoverEffects();
+                this.addLoadingStates();
+                this.addSuccessAnimations();
+                this.startRealTimeUpdates();
+            }
+
+            addHoverEffects() {
+                // Enhanced card hover effects
+                document.querySelectorAll('.card').forEach(card => {
+                    card.addEventListener('mouseenter', () => {
+                        card.style.transform = 'translateY(-5px)';
+                        card.style.boxShadow = '0 15px 50px rgba(0, 0, 0, 0.3)';
+                    });
+
+                    card.addEventListener('mouseleave', () => {
+                        card.style.transform = 'translateY(0)';
+                        card.style.boxShadow = '';
+                    });
+                });
+
+                // Button hover enhancements
+                document.querySelectorAll('.btn').forEach(btn => {
+                    btn.addEventListener('mouseenter', () => {
+                        if (!btn.disabled) {
+                            btn.style.transform = 'translateY(-2px) scale(1.02)';
                         }
                     });
+
+                    btn.addEventListener('mouseleave', () => {
+                        btn.style.transform = '';
+                    });
+                });
+            }
+
+            addLoadingStates() {
+                // Add loading state to all buttons that perform actions
+                document.querySelectorAll('.btn').forEach(btn => {
+                    if (btn.textContent.trim() !== 'Cancel' && !btn.classList.contains('modal-close')) {
+                        btn.addEventListener('click', function() {
+                            if (this.disabled) return;
+
+                            const originalHtml = this.innerHTML;
+                            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                            this.disabled = true;
+
+                            setTimeout(() => {
+                                this.innerHTML = originalHtml;
+                                this.disabled = false;
+                            }, 2000);
+                        });
+                    }
+                });
+            }
+
+            addSuccessAnimations() {
+                // Success feedback for form submissions
+                document.querySelectorAll('form, .settings-section').forEach(section => {
+                    section.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.showSuccessFeedback(section);
+                    });
+                });
+            }
+
+            showSuccessFeedback(element) {
+                const feedback = document.createElement('div');
+                feedback.textContent = '✓ Settings updated successfully!';
+                feedback.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: var(--success);
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                    z-index: 1001;
+                    animation: slideInRight 0.3s ease-out;
+                `;
+
+                document.body.appendChild(feedback);
+
+                setTimeout(() => {
+                    feedback.style.animation = 'slideOutRight 0.3s ease-in';
+                    setTimeout(() => feedback.remove(), 300);
+                }, 3000);
+            }
+
+            startRealTimeUpdates() {
+                // Update security indicators periodically
+                setInterval(() => {
+                    this.updateSecurityStatus();
+                }, 30000); // Every 30 seconds
+
+                // Update last login time
+                setInterval(() => {
+                    this.updateLastLogin();
+                }, 60000); // Every minute
+            }
+
+            updateSecurityStatus() {
+                const indicators = document.querySelectorAll('.security-value');
+                indicators.forEach(indicator => {
+                    if (indicator.textContent.includes('ago')) {
+                        // Simulate updating time
+                        const timeParts = indicator.textContent.split(' ');
+                        if (timeParts[1] === 'hours') {
+                            const hours = parseInt(timeParts[0]) + 1;
+                            indicator.textContent = `${hours} hours ago`;
+                        }
+                    }
+                });
+            }
+
+            updateLastLogin() {
+                const lastLoginElement = document.querySelector('.security-value');
+                if (lastLoginElement && lastLoginElement.textContent.includes('ago')) {
+                    // Add subtle animation when updating
+                    lastLoginElement.style.transition = 'opacity 0.3s';
+                    lastLoginElement.style.opacity = '0.7';
+
+                    setTimeout(() => {
+                        lastLoginElement.style.opacity = '1';
+                    }, 300);
                 }
-            });
+            }
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+
+            .card {
+                transition: all 0.3s ease;
+            }
+
+            .btn {
+                transition: all 0.3s ease;
+            }
+
+            .form-input, .form-select, .form-textarea {
+                transition: border-color 0.3s ease;
+            }
+
+            .toggle-slider {
+                transition: all 0.3s ease;
+            }
+
+            .security-indicator {
+                transition: all 0.3s ease;
+            }
+
+            .security-indicator:hover {
+                transform: scale(1.05);
+                background: rgba(0, 0, 0, 0.3);
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize UI enhancer
+        document.addEventListener('DOMContentLoaded', function() {
+            new UIEnhancer();
         });
     </script>
 </body>

@@ -510,34 +510,175 @@
             background: var(--primary);
         }
         
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: rgba(31, 41, 55, 0.95);
+            border-radius: 16px;
+            padding: 0;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1001;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification-success {
+            background: rgba(16, 185, 129, 0.9);
+            border-left: 4px solid var(--success);
+        }
+
+        .notification-error {
+            background: rgba(239, 68, 68, 0.9);
+            border-left: 4px solid var(--danger);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Enhanced button interactions */
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Loading states */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
         /* Responsive adjustments */
         @media (max-width: 1024px) {
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .sidebar {
                 width: 80px;
             }
-            
+
             .nav-item span {
                 display: none;
             }
         }
-        
+
         @media (max-width: 768px) {
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .transaction-flow {
                 flex-wrap: wrap;
                 justify-content: center;
                 gap: 20px;
             }
-            
+
             .flow-connector {
                 display: none;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10px;
             }
         }
     </style>
@@ -1049,56 +1190,281 @@
     </div>
 
     <script>
-        // Simple interactivity for demonstration
+        // Enhanced interactivity for Transactions Dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            // Refresh button animation
+            // Sample transaction data
+            const transactions = [
+                { type: 'Deposit', amount: '+0.2500 BTC', status: 'Processing', date: '10 min ago', txid: 'txid:abc123def456ghi789jkl012mno345pqr678' },
+                { type: 'Withdrawal', amount: '-0.1000 BTC', status: 'Completed', date: '3 hours ago', txid: 'txid:def456ghi789jkl012mno345pqr678stu901' },
+                { type: 'Swap', amount: 'STRK → sBTC', status: 'Completed', date: '1 day ago', txid: 'txid:ghi789jkl012mno345pqr678stu901vwx234' },
+                { type: 'Deposit', amount: '+0.5000 BTC', status: 'Completed', date: '2 days ago', txid: 'txid:jkl012mno345pqr678stu901vwx234yz567' },
+                { type: 'Withdrawal', amount: '-0.7500 BTC', status: 'Failed', date: '3 days ago', txid: 'txid:mno345pqr678stu901vwx234yz567bcd890' }
+            ];
+
+            let filteredTransactions = [...transactions];
+
+            // Filter functionality
+            const typeFilter = document.querySelectorAll('.filter-select')[0];
+            const statusFilter = document.querySelectorAll('.filter-select')[1];
+            const searchInput = document.querySelector('.filter-input');
+            const applyBtn = document.querySelector('.filter-bar .btn');
+            const clearBtn = document.querySelector('.card-actions .btn-secondary');
+
+            function applyFilters() {
+                const typeValue = typeFilter.value;
+                const statusValue = statusFilter.value;
+                const searchValue = searchInput.value.toLowerCase();
+
+                filteredTransactions = transactions.filter(tx => {
+                    const typeMatch = typeValue === 'All Types' || tx.type === typeValue;
+                    const statusMatch = statusValue === 'All Statuses' || tx.status === statusValue;
+                    const searchMatch = !searchValue ||
+                        tx.txid.toLowerCase().includes(searchValue) ||
+                        tx.amount.toLowerCase().includes(searchValue) ||
+                        tx.type.toLowerCase().includes(searchValue);
+
+                    return typeMatch && statusMatch && searchMatch;
+                });
+
+                renderTransactions();
+            }
+
+            function renderTransactions() {
+                const tbody = document.querySelector('.table tbody');
+                tbody.innerHTML = '';
+
+                filteredTransactions.forEach(tx => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-${tx.type === 'Deposit' ? 'arrow-down' : tx.type === 'Withdrawal' ? 'arrow-up' : 'sync-alt'}"
+                                   style="color: var(--${tx.type === 'Deposit' ? 'success' : tx.type === 'Withdrawal' ? 'danger' : 'info'});"></i>
+                                ${tx.type}
+                            </div>
+                        </td>
+                        <td>${tx.amount}</td>
+                        <td>
+                            <span class="status-badge status-${tx.status.toLowerCase()}">
+                                <i class="fas fa-${tx.status === 'Processing' ? 'spinner fa-spin' : tx.status === 'Completed' ? 'check-circle' : tx.status === 'Failed' ? 'exclamation-circle' : 'clock'}"></i>
+                                ${tx.status}
+                            </span>
+                        </td>
+                        <td>${tx.date}</td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary view-btn" data-txid="${tx.txid}">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                // Re-attach view button listeners
+                attachViewListeners();
+            }
+
+            // Event listeners for filters
+            typeFilter.addEventListener('change', applyFilters);
+            statusFilter.addEventListener('change', applyFilters);
+            searchInput.addEventListener('input', applyFilters);
+            applyBtn.addEventListener('click', applyFilters);
+
+            clearBtn.addEventListener('click', function() {
+                typeFilter.value = 'All Types';
+                statusFilter.value = 'All Statuses';
+                searchInput.value = '';
+                filteredTransactions = [...transactions];
+                renderTransactions();
+            });
+
+            // Refresh button functionality
             const refreshBtn = document.querySelector('.header-actions .btn-secondary');
             refreshBtn.addEventListener('click', function() {
                 this.querySelector('i').classList.add('fa-spin');
+                this.disabled = true;
+
+                // Simulate data refresh
                 setTimeout(() => {
                     this.querySelector('i').classList.remove('fa-spin');
-                    
-                    // Simulate transaction update
+                    this.disabled = false;
+
+                    // Update stats randomly
+                    updateStats();
+
+                    // Simulate transaction progress
                     const processingBadge = document.querySelector('.status-processing');
                     if (processingBadge) {
-                        processingBadge.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing (3/6 confirmations)';
-                        
-                        // Update progress bar
+                        const currentConfirmations = Math.floor(Math.random() * 6) + 1;
+                        processingBadge.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing (${currentConfirmations}/6 confirmations)`;
+
                         const progressFill = document.querySelector('.progress-fill');
                         if (progressFill) {
-                            progressFill.style.width = '50%';
+                            progressFill.style.width = `${(currentConfirmations / 6) * 100}%`;
                         }
                     }
-                }, 1000);
+
+                    // Show success feedback
+                    showNotification('Data refreshed successfully', 'success');
+                }, 1500);
             });
-            
-            // View buttons
-            const viewButtons = document.querySelectorAll('.btn-sm');
-            viewButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    this.innerHTML = '<i class="fas fa-check"></i> Viewed';
-                    setTimeout(() => {
-                        this.innerHTML = '<i class="fas fa-eye"></i> View';
-                    }, 2000);
+
+            // Export CSV functionality
+            const exportBtn = document.querySelector('.header-actions .btn');
+            exportBtn.addEventListener('click', function() {
+                const csvContent = "data:text/csv;charset=utf-8,"
+                    + "Type,Amount,Status,Date,TXID\n"
+                    + filteredTransactions.map(tx =>
+                        `${tx.type},${tx.amount},${tx.status},${tx.date},${tx.txid}`
+                    ).join("\n");
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "transactions.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showNotification('CSV exported successfully', 'success');
+            });
+
+            // View button functionality
+            function attachViewListeners() {
+                const viewButtons = document.querySelectorAll('.view-btn');
+                viewButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const txid = this.getAttribute('data-txid');
+                        const tx = transactions.find(t => t.txid === txid);
+                        if (tx) {
+                            showTransactionModal(tx);
+                        }
+                    });
                 });
-            });
-            
-            // Simulate transaction progress
+            }
+
+            // Modal for transaction details
+            function showTransactionModal(tx) {
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Transaction Details</h3>
+                            <button class="modal-close">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="detail-row">
+                                <div class="detail-label">Transaction ID</div>
+                                <div class="detail-value">${tx.txid}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Type</div>
+                                <div class="detail-value">${tx.type}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Amount</div>
+                                <div class="detail-value">${tx.amount}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Status</div>
+                                <div class="detail-value">
+                                    <span class="status-badge status-${tx.status.toLowerCase()}">
+                                        <i class="fas fa-${tx.status === 'Processing' ? 'spinner fa-spin' : tx.status === 'Completed' ? 'check-circle' : tx.status === 'Failed' ? 'exclamation-circle' : 'clock'}"></i>
+                                        ${tx.status}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Date</div>
+                                <div class="detail-value">${tx.date}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                // Close modal
+                modal.querySelector('.modal-close').addEventListener('click', () => {
+                    document.body.removeChild(modal);
+                });
+
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        document.body.removeChild(modal);
+                    }
+                });
+            }
+
+            // Notification system
+            function showNotification(message, type) {
+                const notification = document.createElement('div');
+                notification.className = `notification notification-${type}`;
+                notification.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    ${message}
+                `;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 3000);
+            }
+
+            // Update stats randomly
+            function updateStats() {
+                const totalTx = document.querySelectorAll('.stat-value')[0];
+                const totalVol = document.querySelectorAll('.stat-value')[1];
+                const avgTx = document.querySelectorAll('.stat-value')[2];
+                const successRate = document.querySelectorAll('.stat-value')[3];
+
+                if (totalTx) {
+                    const current = parseInt(totalTx.textContent.replace(',', ''));
+                    totalTx.textContent = (current + Math.floor(Math.random() * 5)).toLocaleString();
+                }
+
+                if (totalVol) {
+                    const current = parseFloat(totalVol.textContent.split(' ')[0]);
+                    totalVol.textContent = (current + (Math.random() * 0.5)).toFixed(1) + ' BTC';
+                }
+
+                if (avgTx) {
+                    const current = parseFloat(avgTx.textContent.split(' ')[0]);
+                    avgTx.textContent = (current + (Math.random() * 0.02 - 0.01)).toFixed(2) + ' BTC';
+                }
+
+                if (successRate) {
+                    const current = parseFloat(successRate.textContent);
+                    successRate.textContent = (current + (Math.random() * 0.5 - 0.25)).toFixed(1) + '%';
+                }
+            }
+
+            // Real-time progress simulation
             setInterval(() => {
                 const progressFill = document.querySelector('.progress-fill');
                 if (progressFill && parseInt(progressFill.style.width) < 100) {
                     const currentWidth = parseInt(progressFill.style.width);
-                    progressFill.style.width = (currentWidth + 5) + '%';
-                    
+                    progressFill.style.width = Math.min(currentWidth + 2, 100) + '%';
+
                     // Update confirmation text
-                    if (currentWidth > 30 && currentWidth < 60) {
-                        const processingBadge = document.querySelector('.status-processing');
-                        if (processingBadge) {
-                            processingBadge.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing (4/6 confirmations)';
-                        }
+                    const confirmations = Math.min(Math.floor((parseInt(progressFill.style.width) / 100) * 6), 6);
+                    const processingBadge = document.querySelector('.status-processing');
+                    if (processingBadge && confirmations < 6) {
+                        processingBadge.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing (${confirmations}/6 confirmations)`;
+                    } else if (processingBadge && confirmations === 6) {
+                        processingBadge.className = 'status-badge status-completed';
+                        processingBadge.innerHTML = '<i class="fas fa-check-circle"></i> Completed';
                     }
                 }
-            }, 5000);
+            }, 3000);
+
+            // Initialize
+            renderTransactions();
         });
     </script>
 </body>

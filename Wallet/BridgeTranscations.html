@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bridge Transactions - Bitcoin-Starknet Bridge</title>
+    <link rel="icon" href="../images/image.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7c3aed; /* Bridge purple */
+            --primary-dark: #6d28d9;
+            --bitcoin: #f7931a; /* Bitcoin orange */
+            --starknet: #ff6b35; /* Starknet orange-red */
+            --secondary: #1a1f2e; /* Dark blue */
+            --dark: #0d1318;
+            --light: #f5f5f5;
+            --gray: #9ca3af;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #0d1318;
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 260px;
+            background: rgba(26, 31, 46, 0.8);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(124, 58, 237, 0.2);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--gray);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: rgba(124, 58, 237, 0.1);
+            color: white;
+            border-left-color: var(--primary);
+        }
+        
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .header-title i {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(26, 31, 46, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .stat-title {
+            font-size: 0.9rem;
+            color: var(--gray);
+            font-weight: 600;
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            background: rgba(124, 58, 237, 0.2);
+            color: var(--primary);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-change {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .positive {
+            color: var(--success);
+        }
+        
+        .negative {
+            color: var(--danger);
+        }
+        
+        /* Cards */
+        .card {
+            background: rgba(26, 31, 46, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .card-title i {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Tables */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th {
+            text-align: left;
+            padding: 12px 15px;
+            font-size: 0.9rem;
+            color: var(--gray);
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table tr {
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        
+        .table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-completed {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+        
+        .status-pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+        
+        .status-processing {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+        
+        .status-failed {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+        
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .filter-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .filter-select, .filter-input {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            border-radius: 8px;
+            color: white;
+            min-width: 150px;
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .pagination-info {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .page-btn {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .page-btn:hover {
+            background: rgba(124, 58, 237, 0.2);
+        }
+        
+        .page-btn.active {
+            background: var(--primary);
+        }
+        
+        /* Transaction details */
+        .transaction-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .detail-group {
+            margin-bottom: 15px;
+        }
+        
+        .detail-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 1rem;
+            word-break: break-all;
+        }
+        
+        /* Direction indicator */
+        .direction-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .direction-to-starknet {
+            background: rgba(255, 107, 53, 0.2);
+            color: var(--starknet);
+        }
+        
+        .direction-to-bitcoin {
+            background: rgba(247, 147, 26, 0.2);
+            color: var(--bitcoin);
+        }
+        
+        /* Alerts */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .alert-info {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 4px solid var(--info);
+        }
+        
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.2);
+            border-left: 4px solid var(--warning);
+        }
+        
+        .alert-icon {
+            font-size: 1.2rem;
+        }
+        
+        .alert-content {
+            flex: 1;
+        }
+        
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .alert-description {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: var(--dark);
+            padding: 25px;
+            border-radius: 16px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .nav-item span {
+                display: none;
+            }
+            
+            .transaction-details {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters {
+                flex-direction: column;
+            }
+            
+            .filter-select, .filter-input {
+                min-width: 100%;
+            }
+            
+            .pagination {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+        }
+        
+        /* Animation for status updates */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        
+        .processing {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <i class="fas fa-link logo-icon"></i>
+                    <span>Bridge Tx</span>
+                </a>
+            </div>
+            
+            <a href="../Bitstark/StarknetNode.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="#" class="nav-item active">
+                <i class="fas fa-exchange-alt"></i>
+                <span>Bridge Transactions</span>
+            </a>
+            
+            <a href="../Wallet/BridgeStatus.html" class="nav-item">
+                <i class="fas fa-link"></i>
+                <span>Bridge Status</span>
+            </a>
+            
+            <a href="../Bitstark/Lock-Screen.html" class="nav-item">
+                <i class="fas fa-wallet"></i>
+                <span>Wallet</span>
+            </a>
+            
+            <a href="../Bitstark/Settings.html" class="nav-item">
+                <i class="fas fa-cogs"></i>
+                <span>Settings</span>
+            </a>
+            
+            <a href="../Bitstark/Security.html" class="nav-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Security</span>
+            </a>
+            
+            <a href="../Bitstark/ApiDocs.html" class="nav-item">
+                <i class="fas fa-code"></i>
+                <span>API Docs</span>
+            </a>
+            
+            <div style="flex: 1;"></div>
+            
+            <a href="../Bitstark/Dashboard.html" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="header-title"><i class="fas fa-exchange-alt"></i> Bridge Transactions</h1>
+                <div class="header-actions">
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                    <button class="btn">
+                        <i class="fas fa-download"></i>
+                        Export CSV
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">TOTAL TRANSACTIONS</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">12,487</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +124 today
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">TOTAL VALUE</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">₿3,842</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +₿12.5 today
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">PENDING</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">18</div>
+                    <div class="stat-change negative">
+                        <i class="fas fa-arrow-up"></i>
+                        +5 today
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">SUCCESS RATE</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">98.7%</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +0.5%
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Alerts Section -->
+            <div class="alert alert-info">
+                <div class="alert-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">Transactions Overview</div>
+                    <div class="alert-description">Showing all bridge transactions. Use filters to narrow down results.</div>
+                </div>
+            </div>
+            
+            <!-- Filters -->
+            <div class="filters">
+                <div class="filter-group">
+                    <div class="filter-label">Direction</div>
+                    <select class="filter-select" id="direction-filter">
+                        <option value="all">All Directions</option>
+                        <option value="to-starknet">BTC → STRK</option>
+                        <option value="to-bitcoin">STRK → BTC</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <div class="filter-label">Status</div>
+                    <select class="filter-select" id="status-filter">
+                        <option value="all">All Statuses</option>
+                        <option value="completed">Completed</option>
+                        <option value="processing">Processing</option>
+                        <option value="pending">Pending</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <div class="filter-label">Time Range</div>
+                    <select class="filter-select" id="time-filter">
+                        <option value="all">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <div class="filter-label">Search</div>
+                    <input type="text" class="filter-input" placeholder="TX ID, Address..." id="search-input">
+                </div>
+            </div>
+            
+            <!-- Transactions Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-list"></i> Transaction History</h2>
+                    <div class="card-actions">
+                        <button class="btn btn-sm btn-secondary" id="clear-filters">
+                            <i class="fas fa-times"></i>
+                            Clear Filters
+                        </button>
+                    </div>
+                </div>
+                
+                <table class="table" id="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Direction</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Time</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-txid="txn_8f7e6d5c4b3a">
+                            <td>txn_8f7e6d5c4b3a</td>
+                            <td><span class="direction-indicator direction-to-starknet"><i class="fab fa-bitcoin"></i> → <i class="fas fa-layer-group"></i></span></td>
+                            <td>1.25 BTC</td>
+                            <td><span class="status-badge status-completed">Completed</span></td>
+                            <td>12 min ago</td>
+                            <td><button class="btn btn-sm" onclick="showTransactionDetails('txn_8f7e6d5c4b3a')">View</button></td>
+                        </tr>
+                        <tr data-txid="txn_7a6b5c4d3e2f">
+                            <td>txn_7a6b5c4d3e2f</td>
+                            <td><span class="direction-indicator direction-to-bitcoin"><i class="fas fa-layer-group"></i> → <i class="fab fa-bitcoin"></i></span></td>
+                            <td>8,450 STRK</td>
+                            <td><span class="status-badge status-processing">Processing</span></td>
+                            <td>23 min ago</td>
+                            <td><button class="btn btn-sm" onclick="showTransactionDetails('txn_7a6b5c4d3e2f')">View</button></td>
+                        </tr>
+                        <tr data-txid="txn_1a2b3c4d5e6f">
+                            <td>txn_1a2b3c4d5e6f</td>
+                            <td><span class="direction-indicator direction-to-starknet"><i class="fab fa-bitcoin"></i> → <i class="fas fa-layer-group"></i></span></td>
+                            <td>0.87 BTC</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>38 min ago</td>
+                            <td><button class="btn btn-sm" onclick="showTransactionDetails('txn_1a2b3c4d5e6f')">View</button></td>
+                        </tr>
+                        <tr data-txid="txn_9f8e7d6c5b4a">
+                            <td>txn_9f8e7d6c5b4a</td>
+                            <td><span class="direction-indicator direction-to-bitcoin"><i class="fas fa-layer-group"></i> → <i class="fab fa-bitcoin"></i></span></td>
+                            <td>12,845 STRK</td>
+                            <td><span class="status-badge status-completed">Completed</span></td>
+                            <td>2 hrs ago</td>
+                            <td><button class="btn btn-sm" onclick="showTransactionDetails('txn_9f8e7d6c5b4a')">View</button></td>
+                        </tr>
+                        <tr data-txid="txn_3c4d5e6f7a8b">
+                            <td>txn_3c4d5e6f7a8b</td>
+                            <td><span class="direction-indicator direction-to-starknet"><i class="fab fa-bitcoin"></i> → <i class="fas fa-layer-group"></i></span></td>
+                            <td>2.31 BTC</td>
+                            <td><span class="status-badge status-failed">Failed</span></td>
+                            <td>3 hrs ago</td>
+                            <td><button class="btn btn-sm" onclick="showTransactionDetails('txn_3c4d5e6f7a8b')">View</button></td>
+                        </tr>
+                        <tr data-txid="txn_5e6f7a8b9c0d">
+                            <td>txn_5e6f7a8b9c0d</td>
+                            <td><span class="direction-indicator direction-to-bitcoin"><i class="fas fa-layer-group"></i> → <i class="fab fa-bitcoin"></i></span></td>
+                            <td>5,200 STRK</td>
+                            <td><span class="status-badge status-completed">Completed</span></td>
+                            <td>5 hrs ago</td>
+                            <td><button class="btn btn-sm" onclick="showTransactionDetails('txn_5e6f7a8b9c0d')">View</button></td>
+                        </tr>
+                        <tr data-txid="txn_2b3c4d5e6f7a">
+                            <td>txn_2b3c4d5e6f7a</td>
+                            <td><span class="direction-indicator direction-to-starknet"><i class="fab fa-bitcoin"></i> → <i class="fas fa-layer-group"></i></span></td>
+                            <td>0.42 BTC</td>
+                            <td><span class="status-badge status-completed">Completed</span></td>
+                            <td>8 hrs ago</td>
+                            <td><button class="btn btn-sm" onclick="showTransactionDetails('txn_2b3c4d5e6f7a')">View</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <!-- Pagination -->
+                <div class="pagination">
+                    <div class="pagination-info">Showing 1-7 of 12487 transactions</div>
+                    <div class="pagination-controls">
+                        <button class="page-btn" disabled><i class="fas fa-chevron-left"></i></button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn">...</button>
+                        <button class="page-btn">1784</button>
+                        <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Details Modal -->
+    <div class="modal" id="transaction-modal" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeTransactionDetails()">&times;</button>
+            <h2 class="modal-title"><i class="fas fa-receipt"></i> Transaction Details</h2>
+            
+            <div class="transaction-details">
+                <div>
+                    <div class="detail-group">
+                        <div class="detail-label">Transaction ID</div>
+                        <div class="detail-value" id="detail-id">txn_8f7e6d5c4b3a</div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-label">Direction</div>
+                        <div class="detail-value" id="detail-direction">BTC → STRK</div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-label">Amount</div>
+                        <div class="detail-value" id="detail-amount">1.25 BTC</div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-label">Status</div>
+                        <div class="detail-value" id="detail-status"><span class="status-badge status-completed">Completed</span></div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-label">Fee</div>
+                        <div class="detail-value" id="detail-fee">0.00125 BTC</div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="detail-group">
+                        <div class="detail-label">Initiated</div>
+                        <div class="detail-value" id="detail-initiated">2024-01-15 10:31:05 UTC</div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-label">Completed</div>
+                        <div class="detail-value" id="detail-completed">2024-01-15 10:31:10 UTC</div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-label">Bitcoin TX Hash</div>
+                        <div class="detail-value" id="detail-btc-hash">a1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d</div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-label">Starknet TX Hash</div>
+                        <div class="detail-value" id="detail-stark-hash">0x023f5d7c8b1a4e6f3c9a2b8e7d6c5a4f3b2e1d0c9a8b7c6d5e4f3a2b1c0d9e8f7</div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-label">Sender/Receiver</div>
+                        <div class="detail-value" id="detail-addresses">
+                            <div>From: bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq</div>
+                            <div>To: 0x023f5d7c8b1a4e6f3c9a2b8e7d6c5a4f3b2e1d0c9a8b7c6d5e4f3a2b1c0d9e8f7</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button class="btn">
+                    <i class="fas fa-external-link-alt"></i>
+                    View on Explorer
+                </button>
+                <button class="btn btn-secondary">
+                    <i class="fas fa-copy"></i>
+                    Copy Details
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Bridge Transactions Dashboard - Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize data
+            loadTransactionData();
+            
+            // Refresh button functionality
+            const refreshBtn = document.querySelector('.header-actions .btn-secondary');
+            refreshBtn.addEventListener('click', function() {
+                this.querySelector('i').classList.add('fa-spin');
+                loadTransactionData();
+                setTimeout(() => {
+                    this.querySelector('i').classList.remove('fa-spin');
+                }, 1000);
+            });
+            
+            // Export CSV button
+            const exportBtn = document.querySelector('.header-actions .btn');
+            if (exportBtn && exportBtn.textContent.includes('Export CSV')) {
+                exportBtn.addEventListener('click', function() {
+                    exportToCSV();
+                });
+            }
+            
+            // Filter functionality
+            const directionFilter = document.getElementById('direction-filter');
+            const statusFilter = document.getElementById('status-filter');
+            const timeFilter = document.getElementById('time-filter');
+            const searchInput = document.getElementById('search-input');
+            const clearFiltersBtn = document.getElementById('clear-filters');
+            
+            [directionFilter, statusFilter, timeFilter, searchInput].forEach(filter => {
+                filter.addEventListener('change', applyFilters);
+            });
+            
+            searchInput.addEventListener('input', applyFilters);
+            
+            clearFiltersBtn.addEventListener('click', function() {
+                directionFilter.value = 'all';
+                statusFilter.value = 'all';
+                timeFilter.value = 'all';
+                searchInput.value = '';
+                applyFilters();
+            });
+            
+            // Pagination functionality
+            const pageButtons = document.querySelectorAll('.page-btn:not(:disabled)');
+            pageButtons.forEach(button => {
+                if (!button.classList.contains('active')) {
+                    button.addEventListener('click', function() {
+                        document.querySelector('.page-btn.active').classList.remove('active');
+                        this.classList.add('active');
+                        loadTransactionData();
+                    });
+                }
+            });
+
+            // Start real-time updates
+            startRealTimeUpdates();
+
+            // Add table sorting
+            addTableSorting();
+        });
+        
+        // Load transaction data
+        function loadTransactionData() {
+            // In a real implementation, this would fetch from an API
+            // For demo purposes, we'll generate dynamic transaction data
+            const tbody = document.querySelector('#transactions-table tbody');
+            if (!tbody) return;
+
+            // Generate dynamic transactions
+            const transactions = generateTransactionData(50); // Generate 50 transactions
+
+            tbody.innerHTML = transactions.map(tx => `
+                <tr data-txid="${tx.id}">
+                    <td>${tx.id}</td>
+                    <td><span class="direction-indicator ${tx.directionClass}"><i class="fab fa-bitcoin"></i> → <i class="fas fa-layer-group"></i></span></td>
+                    <td>${tx.amount}</td>
+                    <td><span class="status-badge ${tx.statusClass}">${tx.status}</span></td>
+                    <td>${tx.time}</td>
+                    <td><button class="btn btn-sm" onclick="showTransactionDetails('${tx.id}')">View</button></td>
+                </tr>
+            `).join('');
+
+            // Update stats
+            updateTransactionStats(transactions);
+
+            // Apply current filters
+            applyFilters();
+        }
+
+        // Generate dynamic transaction data
+        function generateTransactionData(count) {
+            const directions = [
+                { text: 'BTC → STRK', class: 'direction-to-starknet' },
+                { text: 'STRK → BTC', class: 'direction-to-bitcoin' }
+            ];
+            const statuses = [
+                { text: 'Completed', class: 'status-completed' },
+                { text: 'Processing', class: 'status-processing' },
+                { text: 'Pending', class: 'status-pending' },
+                { text: 'Failed', class: 'status-failed' }
+            ];
+            const timeOptions = ['2 min ago', '5 min ago', '12 min ago', '23 min ago', '38 min ago', '1 hr ago', '2 hrs ago', '3 hrs ago', '5 hrs ago', '8 hrs ago', '12 hrs ago', '1 day ago'];
+
+            const transactions = [];
+            for (let i = 0; i < count; i++) {
+                const direction = directions[Math.floor(Math.random() * directions.length)];
+                const status = statuses[Math.floor(Math.random() * statuses.length)];
+                const time = timeOptions[Math.floor(Math.random() * timeOptions.length)];
+
+                let amount;
+                if (direction.text === 'BTC → STRK') {
+                    amount = `${(0.1 + Math.random() * 5).toFixed(2)} BTC`;
+                } else {
+                    amount = `${Math.floor(1000 + Math.random() * 20000).toLocaleString()} STRK`;
+                }
+
+                transactions.push({
+                    id: `txn_${Math.random().toString(36).substring(2, 15)}`,
+                    direction: direction.text,
+                    directionClass: direction.class,
+                    amount: amount,
+                    status: status.text,
+                    statusClass: status.class,
+                    time: time
+                });
+            }
+
+            return transactions;
+        }
+
+        // Update transaction stats
+        function updateTransactionStats(transactions) {
+            const totalTx = transactions.length;
+            const completedTx = transactions.filter(tx => tx.status === 'Completed').length;
+            const pendingTx = transactions.filter(tx => tx.status === 'Pending').length;
+            const successRate = ((completedTx / totalTx) * 100).toFixed(1);
+
+            // Calculate total value (simplified)
+            let totalValue = 0;
+            transactions.forEach(tx => {
+                if (tx.amount.includes('BTC')) {
+                    totalValue += parseFloat(tx.amount) * 45000; // Approximate BTC to USD
+                } else {
+                    totalValue += parseFloat(tx.amount.replace(/,/g, '')) * 0.035; // Approximate STRK to USD
+                }
+            });
+
+            // Update stats cards
+            document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = totalTx.toLocaleString();
+            document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = `$${totalValue.toLocaleString()}`;
+            document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = pendingTx;
+            document.querySelector('.stat-card:nth-child(4) .stat-value').textContent = `${successRate}%`;
+        }
+        
+        // Apply filters to transaction table
+        function applyFilters() {
+            const direction = document.getElementById('direction-filter').value;
+            const status = document.getElementById('status-filter').value;
+            const timeRange = document.getElementById('time-filter').value;
+            const searchText = document.getElementById('search-input').value.toLowerCase();
+
+            const rows = document.querySelectorAll('#transactions-table tbody tr');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                let showRow = true;
+
+                // Direction filter
+                if (direction !== 'all') {
+                    const directionCell = row.querySelector('td:nth-child(2)');
+                    const directionText = directionCell.textContent.trim();
+                    if (direction === 'to-starknet' && !directionText.includes('BTC → STRK')) {
+                        showRow = false;
+                    } else if (direction === 'to-bitcoin' && !directionText.includes('STRK → BTC')) {
+                        showRow = false;
+                    }
+                }
+
+                // Status filter
+                if (status !== 'all' && showRow) {
+                    const statusCell = row.querySelector('td:nth-child(4)');
+                    const statusText = statusCell.textContent.trim().toLowerCase();
+                    if (!statusText.includes(status.toLowerCase())) {
+                        showRow = false;
+                    }
+                }
+
+                // Time range filter (simplified)
+                if (timeRange !== 'all' && showRow) {
+                    const timeCell = row.querySelector('td:nth-child(5)');
+                    const timeText = timeCell.textContent.trim().toLowerCase();
+                    const now = Date.now();
+
+                    if (timeRange === 'today') {
+                        // Show if time contains 'min', 'hr', or 'just'
+                        if (!timeText.includes('min') && !timeText.includes('hr') && !timeText.includes('just')) {
+                            showRow = false;
+                        }
+                    } else if (timeRange === 'week') {
+                        // Show if not 'day' ago
+                        if (timeText.includes('day')) {
+                            showRow = false;
+                        }
+                    }
+                    // 'month' would show all for this demo
+                }
+
+                // Search filter
+                if (searchText && showRow) {
+                    const rowText = row.textContent.toLowerCase();
+                    if (!rowText.includes(searchText)) {
+                        showRow = false;
+                    }
+                }
+
+                // Show or hide the row
+                row.style.display = showRow ? '' : 'none';
+                if (showRow) visibleCount++;
+            });
+
+            // Update pagination info
+            updatePaginationInfo(visibleCount);
+        }
+        
+        // Show transaction details modal
+        function showTransactionDetails(txId) {
+            // In a real implementation, this would fetch details from an API
+            // For demo purposes, we'll use mock data based on the txId
+            
+            const modal = document.getElementById('transaction-modal');
+            const details = getMockTransactionDetails(txId);
+            
+            // Populate modal with details
+            document.getElementById('detail-id').textContent = details.id;
+            document.getElementById('detail-direction').textContent = details.direction;
+            document.getElementById('detail-amount').textContent = details.amount;
+            document.getElementById('detail-status').innerHTML = details.status;
+            document.getElementById('detail-fee').textContent = details.fee;
+            document.getElementById('detail-initiated').textContent = details.initiated;
+            document.getElementById('detail-completed').textContent = details.completed;
+            document.getElementById('detail-btc-hash').textContent = details.btcHash;
+            document.getElementById('detail-stark-hash').textContent = details.starkHash;
+            document.getElementById('detail-addresses').innerHTML = `
+                <div>From: ${details.fromAddress}</div>
+                <div>To: ${details.toAddress}</div>
+            `;
+            
+            // Show the modal
+            modal.style.display = 'flex';
+        }
+        
+        // Close transaction details modal
+        function closeTransactionDetails() {
+            const modal = document.getElementById('transaction-modal');
+            modal.style.display = 'none';
+        }
+        
+        // Get mock transaction details (for demo purposes)
+        function getMockTransactionDetails(txId) {
+            // Find the transaction in the table
+            const row = document.querySelector(`tr[data-txid="${txId}"]`);
+            if (row) {
+                const cells = row.querySelectorAll('td');
+                const direction = cells[1].textContent.trim();
+                const amount = cells[2].textContent;
+                const statusText = cells[3].textContent.trim();
+                const time = cells[4].textContent;
+
+                // Determine status class
+                let statusClass = 'status-completed';
+                if (statusText === 'Processing') statusClass = 'status-processing';
+                else if (statusText === 'Pending') statusClass = 'status-pending';
+                else if (statusText === 'Failed') statusClass = 'status-failed';
+
+                // Generate mock details based on direction
+                const isBtcToStrk = direction.includes('BTC → STRK');
+                const fee = isBtcToStrk ?
+                    (parseFloat(amount) * 0.001).toFixed(6) + ' BTC' :
+                    (parseFloat(amount.replace(/,/g, '')) * 0.0015).toFixed(3) + ' STRK';
+
+                const initiated = new Date(Date.now() - Math.random() * 86400000).toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+                const completed = statusText === 'Completed' ?
+                    new Date(Date.now() - Math.random() * 3600000).toISOString().replace('T', ' ').substring(0, 19) + ' UTC' :
+                    'Pending';
+
+                const btcHash = isBtcToStrk || statusText === 'Completed' ?
+                    Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('') :
+                    'Pending';
+
+                const starkHash = statusText === 'Completed' ?
+                    '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('') :
+                    'Pending';
+
+                const fromAddress = isBtcToStrk ?
+                    'bc1q' + Array.from({length: 38}, () => Math.floor(Math.random() * 32).toString(32)).join('') :
+                    '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+
+                const toAddress = isBtcToStrk ?
+                    '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('') :
+                    'bc1q' + Array.from({length: 38}, () => Math.floor(Math.random() * 32).toString(32)).join('');
+
+                return {
+                    id: txId,
+                    direction: direction,
+                    amount: amount,
+                    status: `<span class="status-badge ${statusClass}">${statusText}</span>`,
+                    fee: fee,
+                    initiated: initiated,
+                    completed: completed,
+                    btcHash: btcHash,
+                    starkHash: starkHash,
+                    fromAddress: fromAddress,
+                    toAddress: toAddress
+                };
+            }
+
+            // Fallback
+            return {
+                id: txId,
+                direction: 'BTC → STRK',
+                amount: '1.25 BTC',
+                status: '<span class="status-badge status-completed">Completed</span>',
+                fee: '0.00125 BTC',
+                initiated: '2024-01-15 10:31:05 UTC',
+                completed: '2024-01-15 10:31:10 UTC',
+                btcHash: 'a1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d',
+                starkHash: '0x023f5d7c8b1a4e6f3c9a2b8e7d6c5a4f3b2e1d0c9a8b7c6d5e4f3a2b1c0d9e8f7',
+                fromAddress: 'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq',
+                toAddress: '0x023f5d7c8b1a4e6f3c9a2b8e7d6c5a4f3b2e1d0c9a8b7c6d5e4f3a2b1c0d9e8f7'
+            };
+        }
+        
+        // Start real-time updates
+        function startRealTimeUpdates() {
+            // Add a new transaction every 15-30 seconds
+            setInterval(() => {
+                addNewTransaction();
+            }, 15000 + Math.random() * 15000);
+        }
+
+        // Add a new transaction to the table
+        function addNewTransaction() {
+            const tbody = document.querySelector('#transactions-table tbody');
+            if (!tbody) return;
+
+            const newTx = generateTransactionData(1)[0];
+            const row = document.createElement('tr');
+            row.setAttribute('data-txid', newTx.id);
+            row.innerHTML = `
+                <td>${newTx.id}</td>
+                <td><span class="direction-indicator ${newTx.directionClass}"><i class="fab fa-bitcoin"></i> → <i class="fas fa-layer-group"></i></span></td>
+                <td>${newTx.amount}</td>
+                <td><span class="status-badge ${newTx.statusClass}">${newTx.status}</span></td>
+                <td>Just now</td>
+                <td><button class="btn btn-sm" onclick="showTransactionDetails('${newTx.id}')">View</button></td>
+            `;
+
+            // Insert at the beginning
+            tbody.insertBefore(row, tbody.firstChild);
+
+            // Update stats
+            const allRows = tbody.querySelectorAll('tr');
+            const transactions = Array.from(allRows).map(row => {
+                const cells = row.querySelectorAll('td');
+                return {
+                    id: row.getAttribute('data-txid'),
+                    direction: cells[1].textContent.trim(),
+                    amount: cells[2].textContent,
+                    status: cells[3].textContent.trim(),
+                    time: cells[4].textContent
+                };
+            });
+            updateTransactionStats(transactions);
+
+            // Remove oldest transaction if too many
+            if (allRows.length > 50) {
+                tbody.removeChild(allRows[allRows.length - 1]);
+            }
+
+            // Update pagination info
+            updatePaginationInfo(allRows.length);
+        }
+
+        // Update pagination info
+        function updatePaginationInfo(total) {
+            const paginationInfo = document.querySelector('.pagination-info');
+            if (paginationInfo) {
+                paginationInfo.textContent = `Showing 1-${Math.min(total, 50)} of ${total} transactions`;
+            }
+        }
+
+        // Add table sorting functionality
+        function addTableSorting() {
+            const headers = document.querySelectorAll('#transactions-table th');
+            headers.forEach((header, index) => {
+                if (index < 5) { // Don't sort Actions column
+                    header.style.cursor = 'pointer';
+                    header.addEventListener('click', () => sortTable(index));
+                    header.innerHTML += ' <i class="fas fa-sort"></i>';
+                }
+            });
+        }
+
+        // Sort table by column
+        function sortTable(columnIndex) {
+            const tbody = document.querySelector('#transactions-table tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            // Remove existing sort indicators
+            document.querySelectorAll('#transactions-table th i').forEach(icon => {
+                icon.className = 'fas fa-sort';
+            });
+
+            // Determine sort direction
+            const header = document.querySelectorAll('#transactions-table th')[columnIndex];
+            const currentIcon = header.querySelector('i');
+            let ascending = true;
+
+            if (currentIcon.classList.contains('fa-sort-up')) {
+                ascending = false;
+                currentIcon.className = 'fas fa-sort-down';
+            } else {
+                currentIcon.className = 'fas fa-sort-up';
+            }
+
+            // Sort rows
+            rows.sort((a, b) => {
+                const aValue = a.cells[columnIndex].textContent.trim();
+                const bValue = b.cells[columnIndex].textContent.trim();
+
+                // Special handling for different column types
+                if (columnIndex === 2) { // Amount column
+                    const aNum = parseFloat(aValue.replace(/[^\d.]/g, ''));
+                    const bNum = parseFloat(bValue.replace(/[^\d.]/g, ''));
+                    return ascending ? aNum - bNum : bNum - aNum;
+                } else if (columnIndex === 4) { // Time column
+                    // Simple time sorting (this could be improved)
+                    return ascending ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+                } else {
+                    return ascending ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+                }
+            });
+
+            // Re-append sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // Export to CSV
+        function exportToCSV() {
+            const rows = document.querySelectorAll('#transactions-table tbody tr');
+            if (rows.length === 0) {
+                alert('No transactions to export');
+                return;
+            }
+
+            let csvContent = 'Transaction ID,Direction,Amount,Status,Time\n';
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = [
+                    cells[0].textContent,
+                    cells[1].textContent.replace(/\s+/g, ' ').trim(),
+                    cells[2].textContent,
+                    cells[3].textContent.trim(),
+                    cells[4].textContent
+                ];
+                csvContent += rowData.map(field => `"${field}"`).join(',') + '\n';
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `bridge-transactions-${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Close modal if clicked outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('transaction-modal');
+            if (event.target === modal) {
+                closeTransactionDetails();
+            }
+        });
+    </script>
+</body>
+</html>

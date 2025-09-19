@@ -6,6 +6,7 @@
     <title>Bitcoin-StarkNet Bridge Analytics</title>
     <link rel="icon" href="../images/image.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #2c3e50;
@@ -72,6 +73,30 @@
             color: var(--starknet);
         }
         
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .refresh-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #2980b9;
+        }
+
         .network-status {
             display: flex;
             align-items: center;
@@ -203,6 +228,26 @@
             margin-bottom: 25px;
             padding-bottom: 15px;
             border-bottom: 1px solid #4a5568;
+        }
+
+        .transaction-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .filter-select {
+            background: #2d3748;
+            color: #e2e8f0;
+            border: 1px solid #4a5568;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--secondary);
         }
         
         .section-title {
@@ -424,9 +469,14 @@
                 <i class="fas fa-exchange-alt starknet-icon"></i>
                 <h1>Bitcoin-StarkNet Bridge Analytics</h1>
             </div>
-            <div class="network-status">
-                <div class="status-indicator"></div>
-                <span>Network Operational</span>
+            <div class="header-controls">
+                <button id="refreshBtn" class="refresh-btn">
+                    <i class="fas fa-sync-alt"></i> Refresh Data
+                </button>
+                <div class="network-status">
+                    <div class="status-indicator"></div>
+                    <span>Network Operational</span>
+                </div>
             </div>
         </header>
         
@@ -523,7 +573,15 @@
             <div class="transactions">
                 <div class="section-header">
                     <h2 class="section-title">Recent Transactions</h2>
-                    <a href="#" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
+                    <div class="transaction-controls">
+                        <select id="statusFilter" class="filter-select">
+                            <option value="all">All Status</option>
+                            <option value="completed">Completed</option>
+                            <option value="processing">Processing</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                        <a href="#" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
+                    </div>
                 </div>
                 
                 <div class="transaction-list">
@@ -596,12 +654,12 @@
             <div class="analytics-sidebar">
                 <div class="analytics-card">
                     <h2 class="section-title">Transfer Volume</h2>
-                    <div class="chart-placeholder">Volume Chart (Simulated)</div>
+                    <canvas id="volumeChart" width="400" height="200"></canvas>
                 </div>
                 
                 <div class="analytics-card">
                     <h2 class="section-title">Network Health</h2>
-                    <div class="chart-placeholder">Health Metrics (Simulated)</div>
+                    <canvas id="healthChart" width="400" height="200"></canvas>
                 </div>
             </div>
         </div>
@@ -613,13 +671,59 @@
     </div>
 
     <script>
+        // Initialize charts
+        const volumeCtx = document.getElementById('volumeChart').getContext('2d');
+        const healthCtx = document.getElementById('healthChart').getContext('2d');
+
+        const volumeChart = new Chart(volumeCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'BTC Transfer Volume',
+                    data: [1200, 1900, 3000, 5000, 2000, 3000],
+                    borderColor: '#f7931a',
+                    backgroundColor: 'rgba(247, 147, 26, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                }
+            }
+        });
+
+        const healthChart = new Chart(healthCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Operational', 'Maintenance', 'Issues'],
+                datasets: [{
+                    data: [85, 10, 5],
+                    backgroundColor: ['#2ecc71', '#f39c12', '#e74c3c'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
         // Simulate live data updates
         function updateData() {
             // Update connection nodes with random data to simulate live changes
             const connections = document.querySelectorAll('.connection-node .node-value');
             connections[0].textContent = Math.floor(Math.random() * 10 + 40);
             connections[2].textContent = Math.floor(Math.random() * 50 + 100);
-            
+
             // Randomly update status indicators
             if (Math.random() > 0.9) {
                 const indicator = document.querySelector('.status-indicator');
@@ -632,18 +736,65 @@
                 indicator.style.boxShadow = '0 0 10px #2ecc71';
                 document.querySelector('.network-status span').textContent = 'Network Operational';
             }
-            
+
             // Update transaction times
             const times = document.querySelectorAll('.transaction-time');
             times.forEach(time => {
                 const minutes = Math.floor(Math.random() * 10) + 1;
                 time.textContent = `${minutes} min ago`;
             });
+
+            // Update charts with new data
+            updateCharts();
+        }
+
+        function updateCharts() {
+            // Add new data point to volume chart
+            const newVolume = Math.floor(Math.random() * 1000 + 2000);
+            volumeChart.data.datasets[0].data.push(newVolume);
+            volumeChart.data.labels.push(new Date().toLocaleTimeString());
+            if (volumeChart.data.datasets[0].data.length > 10) {
+                volumeChart.data.datasets[0].data.shift();
+                volumeChart.data.labels.shift();
+            }
+            volumeChart.update();
+
+            // Update health chart
+            const operational = Math.floor(Math.random() * 10 + 80);
+            const maintenance = Math.floor(Math.random() * 5 + 5);
+            const issues = 100 - operational - maintenance;
+            healthChart.data.datasets[0].data = [operational, maintenance, issues];
+            healthChart.update();
         }
         
         // Update data every 5 seconds
         setInterval(updateData, 5000);
-        
+
+        // Refresh button event
+        document.getElementById('refreshBtn').addEventListener('click', () => {
+            updateData();
+            // Add spinning animation
+            const btn = document.getElementById('refreshBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
+            }, 1000);
+        });
+
+        // Transaction filter
+        document.getElementById('statusFilter').addEventListener('change', (e) => {
+            const filter = e.target.value;
+            const transactions = document.querySelectorAll('.transaction-item');
+            transactions.forEach(item => {
+                const status = item.querySelector('.status-badge').textContent.toLowerCase();
+                if (filter === 'all' || status.includes(filter)) {
+                    item.style.display = 'grid';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
         // Add hover effects to cards
         const cards = document.querySelectorAll('.card, .connection-node, .transaction-item');
         cards.forEach(card => {
@@ -651,7 +802,7 @@
                 card.style.transform = 'translateY(-5px)';
                 card.style.boxShadow = '0 15px 30px rgba(0, 0, 0, 0.3)';
             });
-            
+
             card.addEventListener('mouseleave', () => {
                 card.style.transform = 'translateY(0)';
                 card.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.3)';
