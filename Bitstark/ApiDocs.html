@@ -10,142 +10,89 @@
         :root {
             --primary: #7c3aed;
             --primary-dark: #6d28d9;
+            --primary-light: rgba(124, 58, 237, 0.1);
             --secondary: #1f2937;
             --dark: #0f172a;
+            --darker: #0a0f1a;
             --light: #f9fafb;
+            --lighter: #ffffff;
             --gray: #9ca3af;
+            --gray-light: #e5e7eb;
             --dark-gray: #4b5563;
-            --light-gray: #f3f4f6;
-            --danger: #ef4444;
-            --warning: #f59e0b;
             --success: #10b981;
-            --info: #3b82f6;
-            --bitcoin: #f7931a;
-            --starknet: #7c3aed;
-        }
-
-        /* Light theme */
-        [data-theme="light"] {
-            --primary: #7c3aed;
-            --primary-dark: #6d28d9;
-            --secondary: #e5e7eb;
-            --dark: #ffffff;
-            --light: #1f2937;
-            --gray: #6b7280;
-            --dark-gray: #374151;
-            --light-gray: #f9fafb;
-            --danger: #ef4444;
             --warning: #f59e0b;
-            --success: #10b981;
+            --danger: #ef4444;
             --info: #3b82f6;
-            --bitcoin: #f7931a;
-            --starknet: #7c3aed;
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
 
-        [data-theme="light"] body {
-            background-color: #f8fafc;
-            color: #1f2937;
-        }
-
-        [data-theme="light"] .sidebar {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-right: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        [data-theme="light"] .endpoint {
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        [data-theme="light"] .parameter {
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        [data-theme="light"] .code-block {
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        [data-theme="light"] .try-it {
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        [data-theme="light"] .stat-card {
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        [data-theme="light"] .modal-content {
-            background: #ffffff;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        [data-theme="light"] .search-input,
-        [data-theme="light"] .input-field {
-            background: rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            color: #1f2937;
-        }
-
-        [data-theme="light"] .response-area {
-            background: rgba(0, 0, 0, 0.05);
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
-        
+
         body {
-            background-color: #0f172a;
+            background-color: var(--dark);
             color: var(--light);
             line-height: 1.6;
             min-height: 100vh;
         }
-        
+
         .app-container {
             display: flex;
             min-height: 100vh;
         }
-        
+
         /* Sidebar Navigation */
         .sidebar {
-            width: 300px;
-            background: rgba(31, 41, 55, 0.8);
-            backdrop-filter: blur(10px);
-            border-right: 1px solid rgba(124, 58, 237, 0.2);
-            padding: 20px 0;
+            width: 280px;
+            background: var(--secondary);
+            padding: 24px 0;
             display: flex;
             flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: var(--transition);
             overflow-y: auto;
         }
-        
+
         .sidebar-header {
-            padding: 0 20px 20px;
+            padding: 0 24px 24px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
-        
+
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             font-weight: 700;
-            font-size: 1.2rem;
-            color: white;
+            font-size: 1.3rem;
+            color: var(--lighter);
+            text-decoration: none;
         }
-        
+
         .logo-icon {
             color: var(--primary);
-            font-size: 1.8rem;
+            font-size: 2rem;
+            background: var(--primary-light);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        
+
         .nav-item {
             display: flex;
             align-items: center;
@@ -153,25 +100,28 @@
             padding: 14px 20px;
             color: var(--gray);
             text-decoration: none;
-            transition: all 0.3s;
+            transition: var(--transition);
             border-left: 4px solid transparent;
+            margin: 0 10px;
+            border-radius: 6px;
         }
-        
+
         .nav-item:hover, .nav-item.active {
-            background: rgba(124, 58, 237, 0.1);
-            color: white;
+            background: var(--primary-light);
+            color: var(--lighter);
             border-left-color: var(--primary);
         }
-        
+
         .nav-item i {
             width: 20px;
             text-align: center;
+            font-size: 1.1rem;
         }
-        
+
         .nav-group {
             margin: 15px 0;
         }
-        
+
         .nav-group-title {
             padding: 10px 20px;
             font-size: 0.8rem;
@@ -180,87 +130,99 @@
             color: var(--gray);
             font-weight: 600;
         }
-        
+
         /* Main Content */
         .main-content {
             flex: 1;
-            padding: 20px;
-            overflow-y: auto;
+            padding: 30px;
+            margin-left: 280px;
+            transition: var(--transition);
         }
-        
+
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .header-title {
-            font-size: 1.8rem;
-            font-weight: 700;
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary) 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        
+
         .header-title i {
-            color: var(--primary);
-            margin-right: 10px;
+            margin-right: 12px;
         }
-        
+
         .header-actions {
             display: flex;
-            gap: 10px;
-            align-items: center;
+            gap: 12px;
         }
 
-        .search-container {
-            position: relative;
-            margin-right: 10px;
-        }
-
-        .search-input {
-            padding: 8px 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            color: var(--light);
-            font-size: 0.9rem;
-            width: 250px;
-            padding-left: 35px;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-
-        .theme-toggle {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            padding: 8px;
-            cursor: pointer;
-            color: var(--light);
-            transition: all 0.3s;
-        }
-
-        .theme-toggle:hover {
-            background: rgba(124, 58, 237, 0.1);
-            border-color: var(--primary);
+        /* Quick Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
         }
         
+        .stat-card {
+            background: var(--secondary);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
         /* API Content */
         .api-section {
             margin-bottom: 40px;
         }
-        
+
         .api-section-title {
             font-size: 1.5rem;
             font-weight: 600;
@@ -268,210 +230,207 @@
             padding-bottom: 10px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        
+
+        .api-section-title i {
+            font-size: 1.3rem;
+        }
+
         .endpoint {
-            background: rgba(31, 41, 55, 0.6);
-            border-radius: 12px;
-            padding: 20px;
+            background: var(--secondary);
+            border-radius: var(--border-radius);
+            padding: 24px;
             margin-bottom: 20px;
-            border: 1px solid rgba(124, 58, 237, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
         }
-        
+
+        .endpoint:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+
         .endpoint-header {
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
             cursor: pointer;
         }
 
-        .endpoint-content {
-            transition: all 0.3s ease;
-        }
-
-        .endpoint.collapsed .endpoint-content {
-            max-height: 0;
-            overflow: hidden;
-            margin-bottom: 0;
-            opacity: 0;
-        }
-
-        .endpoint.collapsed .endpoint-header {
-            margin-bottom: 0;
-        }
-
-        .collapse-btn {
-            margin-left: auto;
-            background: none;
-            border: none;
-            color: var(--gray);
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 5px;
-            transition: all 0.3s;
-        }
-
-        .collapse-btn:hover {
-            color: var(--primary);
-        }
-
-        .endpoint.collapsed .collapse-btn {
-            transform: rotate(180deg);
-        }
-        
         .method {
             display: inline-block;
             padding: 6px 12px;
             border-radius: 4px;
             font-weight: 600;
             font-size: 0.8rem;
-            margin-right: 10px;
+            margin-right: 12px;
+            min-width: 70px;
+            text-align: center;
         }
-        
+
         .method-get {
             background: var(--info);
             color: white;
         }
-        
+
         .method-post {
             background: var(--success);
             color: white;
         }
-        
+
         .method-put {
             background: var(--warning);
             color: black;
         }
-        
+
         .method-delete {
             background: var(--danger);
             color: white;
         }
-        
+
         .endpoint-path {
-            font-family: monospace;
+            font-family: 'Fira Code', monospace;
             font-size: 1rem;
-            color: var(--light);
-        }
-        
-        .endpoint-description {
-            margin-bottom: 15px;
-            color: var(--gray);
+            color: var(--lighter);
+            flex: 1;
         }
 
-        .btn {
-            font-size: 1rem;
-            border-radius: 5px;
-            padding: 10px 20px;
-            text-align: center;
-            font-weight: 400;
-            cursor: pointer;
+        .collapse-btn {
+            background: none;
             border: none;
+            color: var(--gray);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+            transition: var(--transition);
         }
-        
+
+        .collapse-btn:hover {
+            color: var(--primary);
+        }
+
+        .endpoint-content {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .endpoint.collapsed .endpoint-content {
+            max-height: 0;
+            opacity: 0;
+            margin-bottom: 0;
+        }
+
+        .endpoint-description {
+            margin-bottom: 20px;
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
         /* Parameters */
         .parameters {
-            margin: 15px 0;
+            margin: 20px 0;
         }
-        
+
         .parameters-title {
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
-            margin-bottom: 10px;
-            color: var(--light);
+            margin-bottom: 12px;
+            color: var(--lighter);
         }
-        
+
         .parameter {
             display: flex;
-            margin-bottom: 8px;
-            padding: 10px;
+            margin-bottom: 10px;
+            padding: 12px;
             background: rgba(0, 0, 0, 0.2);
             border-radius: 6px;
+            align-items: center;
         }
-        
+
         .parameter-name {
             width: 150px;
-            font-family: monospace;
+            font-family: 'Fira Code', monospace;
             font-weight: 600;
             color: var(--primary);
         }
-        
+
         .parameter-type {
             width: 100px;
             color: var(--info);
             font-size: 0.9rem;
         }
-        
+
         .parameter-description {
             flex: 1;
             color: var(--gray);
             font-size: 0.9rem;
         }
-        
+
         .parameter-required {
             width: 70px;
             text-align: center;
             font-size: 0.8rem;
-            padding: 2px 6px;
+            padding: 4px 8px;
             border-radius: 4px;
             background: var(--danger);
             color: white;
         }
-        
+
         .parameter-optional {
             width: 70px;
             text-align: center;
             font-size: 0.8rem;
-            padding: 2px 6px;
+            padding: 4px 8px;
             border-radius: 4px;
             background: var(--dark-gray);
             color: white;
         }
-        
-        /* Code blocks */
+
+        /* Code Tabs */
         .code-tabs {
             margin: 20px 0;
         }
-        
+
         .code-tab-header {
             display: flex;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .code-tab {
-            padding: 10px 15px;
+            padding: 10px 16px;
             cursor: pointer;
             font-size: 0.9rem;
             color: var(--gray);
             border-bottom: 2px solid transparent;
+            transition: var(--transition);
         }
-        
+
         .code-tab.active {
             color: var(--primary);
             border-bottom: 2px solid var(--primary);
         }
-        
+
+        .code-tab:hover {
+            color: var(--lighter);
+        }
+
         .code-block {
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
+            border-radius: 6px;
             padding: 20px;
             font-family: 'Fira Code', monospace;
             font-size: 0.9rem;
             overflow-x: auto;
             margin-top: 0;
+            position: relative;
         }
-        
+
         .code-block pre {
             margin: 0;
             line-height: 1.5;
-        }
-        
-        .code-block code {
-            color: var(--light);
-        }
-
-        .code-block {
-            position: relative;
         }
 
         .copy-btn {
@@ -486,7 +445,7 @@
             font-size: 0.8rem;
             cursor: pointer;
             opacity: 0.7;
-            transition: all 0.3s;
+            transition: var(--transition);
         }
 
         .copy-btn:hover {
@@ -499,7 +458,53 @@
             color: white;
         }
 
-        /* Validation styles */
+        /* Try It Section */
+        .try-it {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .try-it-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: var(--light);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
         .input-field.valid {
             border-color: var(--success);
         }
@@ -524,7 +529,47 @@
             display: block;
         }
 
-        /* Loading states */
+        .execute-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .execute-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .execute-btn:active {
+            transform: translateY(0);
+        }
+
+        .response-area {
+            margin-top: 20px;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .loading-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .loading-spinner {
             display: inline-block;
             width: 16px;
@@ -533,15 +578,10 @@
             border-radius: 50%;
             border-top-color: var(--primary);
             animation: spin 1s ease-in-out infinite;
-            margin-right: 8px;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            display: inline;
         }
 
         .error-response {
@@ -552,11 +592,268 @@
             color: var(--success);
         }
 
-        /* Animations and transitions */
-        * {
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
+        /* Search and Actions */
+        .search-container {
+            position: relative;
         }
 
+        .search-input {
+            padding: 10px 12px 10px 40px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: var(--light);
+            font-size: 0.9rem;
+            width: 250px;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            width: 300px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--secondary);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--light);
+        }
+
+        .api-key-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .api-key-info {
+            flex: 1;
+        }
+
+        .api-key-name {
+            font-weight: 600;
+            color: var(--light);
+            margin-bottom: 5px;
+        }
+
+        .api-key-value {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: var(--gray);
+            word-break: break-all;
+        }
+
+        .api-key-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 80px;
+                transform: translateX(0);
+            }
+            
+            .sidebar-header span, .nav-item span, .nav-group-title {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .search-input {
+                width: 100%;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 101;
+                background: var(--primary);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2rem;
+            }
+            
+            .parameter {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .parameter-name, .parameter-type, .parameter-description, .parameter-required {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
+
+        /* Mobile menu button */
+        .mobile-menu-btn {
+            display: none;
+        }
+
+        /* Code Syntax Highlighting */
+        .code-comment {
+            color: #6b7280;
+        }
+        
+        .code-keyword {
+            color: #f472b6;
+        }
+        
+        .code-string {
+            color: #fbbf24;
+        }
+        
+        .code-number {
+            color: #a78bfa;
+        }
+        
+        .code-function {
+            color: #34d399;
+        }
+
+        /* Animations */
         .endpoint {
             animation: fadeInUp 0.6s ease-out;
         }
@@ -621,353 +918,17 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
-
-        .nav-item {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.1), transparent);
-            transition: left 0.5s;
-        }
-
-        .nav-item:hover::before {
-            left: 100%;
-        }
-
-        .btn {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .btn:active::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        .search-input:focus {
-            transform: scale(1.02);
-        }
-
-        .endpoint:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.15);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.2);
-        }
-
-        .modal {
-            animation: modalFadeIn 0.3s ease-out;
-        }
-
-        @keyframes modalFadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .code-comment {
-            color: var(--gray);
-        }
-        
-        .code-keyword {
-            color: #ff79c6;
-        }
-        
-        .code-string {
-            color: #f1fa8c;
-        }
-        
-        .code-number {
-            color: #bd93f9;
-        }
-        
-        .code-function {
-            color: #50fa7b;
-        }
-        
-        /* Response */
-        .response {
-            margin: 20px 0;
-        }
-        
-        .response-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: var(--light);
-        }
-        
-        .response-box {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            padding: 20px;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.9rem;
-            overflow-x: auto;
-        }
-        
-        /* Try it section */
-        .try-it {
-            background: rgba(31, 41, 55, 0.6);
-            border-radius: 12px;
-            padding: 20px;
-            margin: 20px 0;
-            border: 1px solid rgba(124, 58, 237, 0.1);
-        }
-        
-        .try-it-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: var(--primary);
-        }
-        
-        .input-group {
-            margin-bottom: 15px;
-        }
-        
-        .input-label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        
-        .input-field {
-            width: 100%;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            color: white;
-            font-family: monospace;
-            font-size: 0.9rem;
-        }
-        
-        .input-field:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-        
-        .execute-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        
-        .execute-btn:hover {
-            background: var(--primary-dark);
-        }
-        
-        /* Response area */
-        .response-area {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 0.9rem;
-            max-height: 300px;
-            overflow-y: auto;
-            display: none;
-        }
-        
-        /* Quick stats */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background: rgba(31, 41, 55, 0.6);
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-            border: 1px solid rgba(124, 58, 237, 0.1);
-        }
-        
-        .stat-icon {
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-bottom: 10px;
-        }
-        
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-        
-        .stat-label {
-            font-size: 0.8rem;
-            color: var(--gray);
-        }
-        
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: var(--dark);
-            border-radius: 16px;
-            padding: 30px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(124, 58, 237, 0.2);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--gray);
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 5px;
-        }
-
-        .modal-close:hover {
-            color: var(--light);
-        }
-
-        .api-key-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: rgba(31, 41, 55, 0.6);
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .api-key-info {
-            flex: 1;
-        }
-
-        .api-key-name {
-            font-weight: 600;
-            color: var(--light);
-            margin-bottom: 5px;
-        }
-
-        .api-key-value {
-            font-family: monospace;
-            font-size: 0.9rem;
-            color: var(--gray);
-            word-break: break-all;
-        }
-
-        .api-key-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-small {
-            padding: 8px 12px;
-            font-size: 0.8rem;
-            border-radius: 6px;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 1024px) {
-            .sidebar {
-                width: 80px;
-            }
-
-            .nav-item span, .nav-group-title {
-                display: none;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .parameter {
-                flex-direction: column;
-            }
-
-            .parameter-name, .parameter-type, .parameter-description, .parameter-required {
-                width: 100%;
-                margin-bottom: 5px;
-            }
-        }
     </style>
 </head>
 <body>
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <i class="fas fa-bars"></i>
+    </button>
+
     <div class="app-container">
         <!-- Sidebar Navigation -->
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <a href="#" class="logo">
                     <i class="fas fa-code logo-icon"></i>
@@ -1060,14 +1021,11 @@
                         <i class="fas fa-search search-icon"></i>
                         <input type="text" class="search-input" placeholder="Search endpoints..." id="endpointSearch">
                     </div>
-                    <!-- <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
-                        <i class="fas fa-moon"></i>
-                    </button> -->
-                    <button class="btn" style="background: var(--primary);" onclick="showApiKeysModal()">
+                    <button class="btn btn-secondary" onclick="showApiKeysModal()">
                         <i class="fas fa-key"></i>
                         API Keys
                     </button>
-                    <button class="btn" style="background: var(--info);" onclick="exportDocumentation()">
+                    <button class="btn" onclick="exportDocumentation()">
                         <i class="fas fa-download"></i>
                         Export Docs
                     </button>
@@ -1111,7 +1069,7 @@
             
             <!-- API Section -->
             <div class="api-section">
-                <h2 class="api-section-title">Wallet Management</h2>
+                <h2 class="api-section-title"><i class="fas fa-wallet"></i> Wallet Management</h2>
                 
                 <!-- Endpoint 1 -->
                 <div class="endpoint">
@@ -1128,39 +1086,42 @@
                             Connect a user's Starknet wallet to the bridge service. Returns a connection token for authenticated requests.
                         </div>
                     
-                    <div class="parameters">
-                        <div class="parameters-title">Parameters</div>
-                        
-                        <div class="parameter">
-                            <div class="parameter-name">starknet_address</div>
-                            <div class="parameter-type">string</div>
-                            <div class="parameter-description">The Starknet wallet address to connect</div>
-                            <div class="parameter-required">required</div>
+                        <div class="parameters">
+                            <div class="parameters-title">Parameters</div>
+                            
+                            <div class="parameter">
+                                <div class="parameter-name">starknet_address</div>
+                                <div class="parameter-type">string</div>
+                                <div class="parameter-description">The Starknet wallet address to connect</div>
+                                <div class="parameter-required">required</div>
+                            </div>
+                            
+                            <div class="parameter">
+                                <div class="parameter-name">signature</div>
+                                <div class="parameter-type">string</div>
+                                <div class="parameter-description">Signature proving ownership of the wallet</div>
+                                <div class="parameter-required">required</div>
+                            </div>
+                            
+                            <div class="parameter">
+                                <div class="parameter-name">network</div>
+                                <div class="parameter-type">string</div>
+                                <div class="parameter-description">Network to connect to (mainnet, testnet)</div>
+                                <div class="parameter-optional">optional</div>
+                            </div>
                         </div>
                         
-                        <div class="parameter">
-                            <div class="parameter-name">signature</div>
-                            <div class="parameter-type">string</div>
-                            <div class="parameter-description">Signature proving ownership of the wallet</div>
-                            <div class="parameter-required">required</div>
-                        </div>
-                        
-                        <div class="parameter">
-                            <div class="parameter-name">network</div>
-                            <div class="parameter-type">string</div>
-                            <div class="parameter-description">Network to connect to (mainnet, testnet)</div>
-                            <div class="parameter-optional">optional</div>
-                        </div>
-                    </div>
-                    
-                    <div class="code-tabs">
-                        <div class="code-tab-header">
-                            <div class="code-tab active" onclick="changeTab(this, 'request-1')">Request</div>
-                            <div class="code-tab" onclick="changeTab(this, 'response-1')">Response</div>
-                        </div>
-                        
-                        <div id="request-1" class="code-block">
-                            <pre><code>POST /api/v1/wallets/connect HTTP/1.1
+                        <div class="code-tabs">
+                            <div class="code-tab-header">
+                                <div class="code-tab active" onclick="changeTab(this, 'request-1')">Request</div>
+                                <div class="code-tab" onclick="changeTab(this, 'response-1')">Response</div>
+                            </div>
+                            
+                            <div id="request-1" class="code-block">
+                                <button class="copy-btn" onclick="copyCode(this)" title="Copy to clipboard">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <pre><code>POST /api/v1/wallets/connect HTTP/1.1
 Host: api.sbtc-bridge.com
 Content-Type: application/json
 Authorization: Bearer &lt;api_key&gt;
@@ -1170,10 +1131,13 @@ Authorization: Bearer &lt;api_key&gt;
   <span class="code-string">"signature"</span>: <span class="code-string">"0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"</span>,
   <span class="code-string">"network"</span>: <span class="code-string">"testnet"</span>
 }</code></pre>
-                        </div>
-                        
-                        <div id="response-1" class="code-block" style="display: none;">
-                            <pre><code>HTTP/1.1 200 OK
+                            </div>
+                            
+                            <div id="response-1" class="code-block" style="display: none;">
+                                <button class="copy-btn" onclick="copyCode(this)" title="Copy to clipboard">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <pre><code>HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
@@ -1184,27 +1148,30 @@ Content-Type: application/json
     <span class="code-string">"wallet_status"</span>: <span class="code-string">"connected"</span>
   }
 }</code></pre>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="try-it">
-                        <div class="try-it-title">Try it out</div>
                         
-                        <div class="input-group">
-                            <label class="input-label">Starknet Address</label>
-                            <input type="text" class="input-field" id="connect-address" value="0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef" oninput="validateStarknetAddress(this)">
-                            <div class="validation-message" id="connect-address-msg"></div>
-                        </div>
+                        <div class="try-it">
+                            <div class="try-it-title"><i class="fas fa-play-circle"></i> Try it out</div>
+                            
+                            <div class="input-group">
+                                <label class="input-label">Starknet Address</label>
+                                <input type="text" class="input-field" id="connect-address" value="0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef" oninput="validateStarknetAddress(this)">
+                                <div class="validation-message" id="connect-address-msg"></div>
+                            </div>
 
-                        <div class="input-group">
-                            <label class="input-label">Signature</label>
-                            <input type="text" class="input-field" id="connect-signature" value="0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890" oninput="validateSignature(this)">
-                            <div class="validation-message" id="connect-signature-msg"></div>
-                        </div>
-                        
-                        <button class="execute-btn" onclick="executeRequest(this)">Execute</button>
-                        
-                        <div class="response-area" id="response-area-1"></div>
+                            <div class="input-group">
+                                <label class="input-label">Signature</label>
+                                <input type="text" class="input-field" id="connect-signature" value="0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890" oninput="validateSignature(this)">
+                                <div class="validation-message" id="connect-signature-msg"></div>
+                            </div>
+                            
+                            <button class="execute-btn" onclick="executeRequest(this)">
+                                <i class="fas fa-play"></i>
+                                Execute
+                            </button>
+                            
+                            <div class="response-area" id="response-area-1"></div>
                         </div>
                     </div>
                 </div>
@@ -1224,31 +1191,37 @@ Content-Type: application/json
                             Get the sBTC balance for a connected Starknet wallet.
                         </div>
                     
-                    <div class="parameters">
-                        <div class="parameters-title">Parameters</div>
-                        
-                        <div class="parameter">
-                            <div class="parameter-name">starknet_address</div>
-                            <div class="parameter-type">string</div>
-                            <div class="parameter-description">The Starknet wallet address (path parameter)</div>
-                            <div class="parameter-required">required</div>
-                        </div>
-                    </div>
-                    
-                    <div class="code-tabs">
-                        <div class="code-tab-header">
-                            <div class="code-tab active" onclick="changeTab(this, 'request-2')">Request</div>
-                            <div class="code-tab" onclick="changeTab(this, 'response-2')">Response</div>
+                        <div class="parameters">
+                            <div class="parameters-title">Parameters</div>
+                            
+                            <div class="parameter">
+                                <div class="parameter-name">starknet_address</div>
+                                <div class="parameter-type">string</div>
+                                <div class="parameter-description">The Starknet wallet address (path parameter)</div>
+                                <div class="parameter-required">required</div>
+                            </div>
                         </div>
                         
-                        <div id="request-2" class="code-block">
-                            <pre><code>GET /api/v1/wallets/0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef/balance HTTP/1.1
+                        <div class="code-tabs">
+                            <div class="code-tab-header">
+                                <div class="code-tab active" onclick="changeTab(this, 'request-2')">Request</div>
+                                <div class="code-tab" onclick="changeTab(this, 'response-2')">Response</div>
+                            </div>
+                            
+                            <div id="request-2" class="code-block">
+                                <button class="copy-btn" onclick="copyCode(this)" title="Copy to clipboard">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <pre><code>GET /api/v1/wallets/0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef/balance HTTP/1.1
 Host: api.sbtc-bridge.com
 Authorization: Bearer &lt;connection_token&gt;</code></pre>
-                        </div>
-                        
-                        <div id="response-2" class="code-block" style="display: none;">
-                            <pre><code>HTTP/1.1 200 OK
+                            </div>
+                            
+                            <div id="response-2" class="code-block" style="display: none;">
+                                <button class="copy-btn" onclick="copyCode(this)" title="Copy to clipboard">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <pre><code>HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
@@ -1260,266 +1233,32 @@ Content-Type: application/json
     <span class="code-string">"last_updated"</span>: <span class="code-string">"2023-10-25T14:30:22Z"</span>
   }
 }</code></pre>
-                        </div>
-                    </div>
-
-                    <div class="try-it">
-                        <div class="try-it-title">Try it out</div>
-
-                        <div class="input-group">
-                            <label class="input-label">Starknet Address</label>
-                            <input type="text" class="input-field" id="balance-address" value="0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef" oninput="validateStarknetAddress(this)">
-                            <div class="validation-message" id="balance-address-msg"></div>
-                        </div>
-
-                        <button class="execute-btn" onclick="executeBalanceRequest(this)">Execute</button>
-
-                        <div class="response-area" id="response-area-2"></div>
-                        </div>
-        
-                        <!-- Endpoint 4 -->
-                        <div class="endpoint">
-                            <div class="endpoint-header" onclick="toggleEndpoint(this)">
-                                <span class="method method-post">POST</span>
-                                <span class="endpoint-path">/api/v1/withdrawals/initiate</span>
-                                <button class="collapse-btn">
-                                    <i class="fas fa-chevron-down"></i>
-                                </button>
-                            </div>
-        
-                            <div class="endpoint-content">
-                                <div class="endpoint-description">
-                                    Initiate a withdrawal of sBTC from Starknet back to Bitcoin.
-                                </div>
-        
-                                <div class="parameters">
-                                    <div class="parameters-title">Parameters</div>
-        
-                                    <div class="parameter">
-                                        <div class="parameter-name">starknet_address</div>
-                                        <div class="parameter-type">string</div>
-                                        <div class="parameter-description">The Starknet wallet address to withdraw from</div>
-                                        <div class="parameter-required">required</div>
-                                    </div>
-        
-                                    <div class="parameter">
-                                        <div class="parameter-name">bitcoin_address</div>
-                                        <div class="parameter-type">string</div>
-                                        <div class="parameter-description">The Bitcoin address to receive BTC</div>
-                                        <div class="parameter-required">required</div>
-                                    </div>
-        
-                                    <div class="parameter">
-                                        <div class="parameter-name">amount_sbtc</div>
-                                        <div class="parameter-type">number</div>
-                                        <div class="parameter-description">Amount of sBTC to withdraw</div>
-                                        <div class="parameter-required">required</div>
-                                    </div>
-                                </div>
-        
-                                <div class="code-tabs">
-                                    <div class="code-tab-header">
-                                        <div class="code-tab active" onclick="changeTab(this, 'request-4')">Request</div>
-                                        <div class="code-tab" onclick="changeTab(this, 'response-4')">Response</div>
-                                    </div>
-        
-                                    <div id="request-4" class="code-block">
-                                        <button class="copy-btn" onclick="copyCode(this)" title="Copy to clipboard">
-                                            <i class="fas fa-copy"></i>
-                                        </button>
-                                        <pre><code>POST /api/v1/withdrawals/initiate HTTP/1.1
-        Host: api.sbtc-bridge.com
-        Content-Type: application/json
-        Authorization: Bearer <connection_token>
-        
-        {
-          <span class="code-string">"starknet_address"</span>: <span class="code-string">"0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"</span>,
-          <span class="code-string">"bitcoin_address"</span>: <span class="code-string">"bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh"</span>,
-          <span class="code-string">"amount_sbtc"</span>: <span class="code-number">0.5</span>
-        }</code></pre>
-                                    </div>
-        
-                                    <div id="response-4" class="code-block" style="display: none;">
-                                        <button class="copy-btn" onclick="copyCode(this)" title="Copy to clipboard">
-                                            <i class="fas fa-copy"></i>
-                                        </button>
-                                        <pre><code>HTTP/1.1 200 OK
-        Content-Type: application/json
-        
-        {
-          <span class="code-string">"status"</span>: <span class="code-string">"success"</span>,
-          <span class="code-string">"data"</span>: {
-            <span class="code-string">"withdrawal_id"</span>: <span class="code-string">"wdr_abc123def456"</span>,
-            <span class="code-string">"estimated_completion"</span>: <span class="code-string">"2023-10-25T16:30:22Z"</span>,
-            <span class="code-string">"fee_btc"</span>: <span class="code-number">"0.0001"</span>,
-            <span class="code-string">"status"</span>: <span class="code-string">"pending"</span>
-          }
-        }</code></pre>
-                                    </div>
-                                </div>
-        
-                                <div class="try-it">
-                                    <div class="try-it-title">Try it out</div>
-        
-                                    <div class="input-group">
-                                        <label class="input-label">Starknet Address</label>
-                                        <input type="text" class="input-field" id="withdrawal-starknet-address" value="0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef" oninput="validateStarknetAddress(this)">
-                                        <div class="validation-message" id="withdrawal-starknet-address-msg"></div>
-                                    </div>
-        
-                                    <div class="input-group">
-                                        <label class="input-label">Bitcoin Address</label>
-                                        <input type="text" class="input-field" id="withdrawal-bitcoin-address" value="bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh" oninput="validateBitcoinAddress(this)">
-                                        <div class="validation-message" id="withdrawal-bitcoin-address-msg"></div>
-                                    </div>
-        
-                                    <div class="input-group">
-                                        <label class="input-label">Amount (sBTC)</label>
-                                        <input type="number" class="input-field" id="withdrawal-amount" step="0.00000001" value="0.5" oninput="validateAmount(this)">
-                                        <div class="validation-message" id="withdrawal-amount-msg"></div>
-                                    </div>
-        
-                                    <button class="execute-btn" onclick="executeWithdrawalRequest(this)">Execute</button>
-        
-                                    <div class="response-area" id="response-area-4"></div>
-                                </div>
                             </div>
                         </div>
-                    </div>
-        
-                    <!-- Transaction History Section -->
-                    <div class="api-section">
-                        <h2 class="api-section-title">Transaction History</h2>
-        
-                        <!-- Endpoint 5 -->
-                        <div class="endpoint">
-                            <div class="endpoint-header" onclick="toggleEndpoint(this)">
-                                <span class="method method-get">GET</span>
-                                <span class="endpoint-path">/api/v1/transactions/{starknet_address}</span>
-                                <button class="collapse-btn">
-                                    <i class="fas fa-chevron-down"></i>
-                                </button>
+
+                        <div class="try-it">
+                            <div class="try-it-title"><i class="fas fa-play-circle"></i> Try it out</div>
+
+                            <div class="input-group">
+                                <label class="input-label">Starknet Address</label>
+                                <input type="text" class="input-field" id="balance-address" value="0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef" oninput="validateStarknetAddress(this)">
+                                <div class="validation-message" id="balance-address-msg"></div>
                             </div>
-        
-                            <div class="endpoint-content">
-                                <div class="endpoint-description">
-                                    Get transaction history for a Starknet wallet.
-                                </div>
-        
-                                <div class="parameters">
-                                    <div class="parameters-title">Parameters</div>
-        
-                                    <div class="parameter">
-                                        <div class="parameter-name">starknet_address</div>
-                                        <div class="parameter-type">string</div>
-                                        <div class="parameter-description">The Starknet wallet address</div>
-                                        <div class="parameter-required">required</div>
-                                    </div>
-        
-                                    <div class="parameter">
-                                        <div class="parameter-name">limit</div>
-                                        <div class="parameter-type">integer</div>
-                                        <div class="parameter-description">Number of transactions to return (max 100)</div>
-                                        <div class="parameter-optional">optional</div>
-                                    </div>
-        
-                                    <div class="parameter">
-                                        <div class="parameter-name">offset</div>
-                                        <div class="parameter-type">integer</div>
-                                        <div class="parameter-description">Number of transactions to skip</div>
-                                        <div class="parameter-optional">optional</div>
-                                    </div>
-                                </div>
-        
-                                <div class="code-tabs">
-                                    <div class="code-tab-header">
-                                        <div class="code-tab active" onclick="changeTab(this, 'request-5')">Request</div>
-                                        <div class="code-tab" onclick="changeTab(this, 'response-5')">Response</div>
-                                    </div>
-        
-                                    <div id="request-5" class="code-block">
-                                        <button class="copy-btn" onclick="copyCode(this)" title="Copy to clipboard">
-                                            <i class="fas fa-copy"></i>
-                                        </button>
-                                        <pre><code>GET /api/v1/transactions/0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef?limit=10 HTTP/1.1
-        Host: api.sbtc-bridge.com
-        Authorization: Bearer <connection_token></code></pre>
-                                    </div>
-        
-                                    <div id="response-5" class="code-block" style="display: none;">
-                                        <button class="copy-btn" onclick="copyCode(this)" title="Copy to clipboard">
-                                            <i class="fas fa-copy"></i>
-                                        </button>
-                                        <pre><code>HTTP/1.1 200 OK
-        Content-Type: application/json
-        
-        {
-          <span class="code-string">"status"</span>: <span class="code-string">"success"</span>,
-          <span class="code-string">"data"</span>: {
-            <span class="code-string">"transactions"</span>: [
-              {
-                <span class="code-string">"id"</span>: <span class="code-string">"tx_abc123"</span>,
-                <span class="code-string">"type"</span>: <span class="code-string">"deposit"</span>,
-                <span class="code-string">"amount"</span>: <span class="code-number">"0.5"</span>,
-                <span class="code-string">"status"</span>: <span class="code-string">"completed"</span>,
-                <span class="code-string">"created_at"</span>: <span class="code-string">"2023-10-25T14:30:22Z"</span>
-              }
-            ],
-            <span class="code-string">"total_count"</span>: <span class="code-number">1</span>,
-            <span class="code-string">"has_more"</span>: <span class="code-keyword">false</span>
-          }
-        }</code></pre>
-                                    </div>
-                                </div>
-        
-                                <div class="try-it">
-                                    <div class="try-it-title">Try it out</div>
-        
-                                    <div class="input-group">
-                                        <label class="input-label">Starknet Address</label>
-                                        <input type="text" class="input-field" id="history-address" value="0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef" oninput="validateStarknetAddress(this)">
-                                        <div class="validation-message" id="history-address-msg"></div>
-                                    </div>
-        
-                                    <div class="input-group">
-                                        <label class="input-label">Limit</label>
-                                        <input type="number" class="input-field" id="history-limit" min="1" max="100" value="10">
-                                    </div>
-        
-                                    <button class="execute-btn" onclick="executeHistoryRequest(this)">Execute</button>
-        
-                                    <div class="response-area" id="response-area-5"></div>
-                                </div>
-                            </div>
+
+                            <button class="execute-btn" onclick="executeBalanceRequest(this)">
+                                <i class="fas fa-play"></i>
+                                Execute
+                            </button>
+
+                            <div class="response-area" id="response-area-2"></div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        
-            <!-- API Keys Modal -->
-            <div class="modal" id="apiKeysModal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2 class="modal-title">API Keys Management</h2>
-                        <button class="modal-close" onclick="closeModal('apiKeysModal')">&times;</button>
-                    </div>
-        
-                    <div style="margin-bottom: 20px;">
-                        <button class="btn" style="background: var(--success);" onclick="generateNewApiKey()">
-                            <i class="fas fa-plus"></i>
-                            Generate New API Key
-                        </button>
-                    </div>
-        
-                    <div id="apiKeysList">
-                        <!-- API keys will be loaded here -->
                     </div>
                 </div>
             </div>
             
             <!-- Another API Section -->
             <div class="api-section">
-                <h2 class="api-section-title">Deposit Management</h2>
+                <h2 class="api-section-title"><i class="fas fa-exchange-alt"></i> Deposit Management</h2>
                 
                 <!-- Endpoint 3 -->
                 <div class="endpoint">
@@ -1536,32 +1275,35 @@ Content-Type: application/json
                             Initiate a Bitcoin deposit to generate a unique deposit address for a user.
                         </div>
                     
-                    <div class="parameters">
-                        <div class="parameters-title">Parameters</div>
-                        
-                        <div class="parameter">
-                            <div class="parameter-name">starknet_address</div>
-                            <div class="parameter-type">string</div>
-                            <div class="parameter-description">The Starknet wallet address to receive sBTC</div>
-                            <div class="parameter-required">required</div>
+                        <div class="parameters">
+                            <div class="parameters-title">Parameters</div>
+                            
+                            <div class="parameter">
+                                <div class="parameter-name">starknet_address</div>
+                                <div class="parameter-type">string</div>
+                                <div class="parameter-description">The Starknet wallet address to receive sBTC</div>
+                                <div class="parameter-required">required</div>
+                            </div>
+                            
+                            <div class="parameter">
+                                <div class="parameter-name">amount_btc</div>
+                                <div class="parameter-type">number</div>
+                                <div class="parameter-description">Amount of BTC to deposit (optional)</div>
+                                <div class="parameter-optional">optional</div>
+                            </div>
                         </div>
                         
-                        <div class="parameter">
-                            <div class="parameter-name">amount_btc</div>
-                            <div class="parameter-type">number</div>
-                            <div class="parameter-description">Amount of BTC to deposit (optional)</div>
-                            <div class="parameter-optional">optional</div>
-                        </div>
-                    </div>
-                    
-                    <div class="code-tabs">
-                        <div class="code-tab-header">
-                            <div class="code-tab active" onclick="changeTab(this, 'request-3')">Request</div>
-                            <div class="code-tab" onclick="changeTab(this, 'response-3')">Response</div>
-                        </div>
-                        
-                        <div id="request-3" class="code-block">
-                            <pre><code>POST /api/v1/deposits/initiate HTTP/1.1
+                        <div class="code-tabs">
+                            <div class="code-tab-header">
+                                <div class="code-tab active" onclick="changeTab(this, 'request-3')">Request</div>
+                                <div class="code-tab" onclick="changeTab(this, 'response-3')">Response</div>
+                            </div>
+                            
+                            <div id="request-3" class="code-block">
+                                <button class="copy-btn" onclick="copyCode(this)" title="Copy to clipboard">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <pre><code>POST /api/v1/deposits/initiate HTTP/1.1
 Host: api.sbtc-bridge.com
 Content-Type: application/json
 Authorization: Bearer &lt;connection_token&gt;
@@ -1570,10 +1312,13 @@ Authorization: Bearer &lt;connection_token&gt;
   <span class="code-string">"starknet_address"</span>: <span class="code-string">"0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"</span>,
   <span class="code-string">"amount_btc"</span>: <span class="code-number">0.5</span>
 }</code></pre>
-                        </div>
-                        
-                        <div id="response-3" class="code-block" style="display: none;">
-                            <pre><code>HTTP/1.1 200 OK
+                            </div>
+                            
+                            <div id="response-3" class="code-block" style="display: none;">
+                                <button class="copy-btn" onclick="copyCode(this)" title="Copy to clipboard">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <pre><code>HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
@@ -1585,27 +1330,30 @@ Content-Type: application/json
     <span class="code-string">"qr_code"</span>: <span class="code-string">"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA..."</span>
   }
 }</code></pre>
-                        </div>
-                    </div>
-
-                    <div class="try-it">
-                        <div class="try-it-title">Try it out</div>
-
-                        <div class="input-group">
-                            <label class="input-label">Starknet Address</label>
-                            <input type="text" class="input-field" id="deposit-address" value="0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef" oninput="validateStarknetAddress(this)">
-                            <div class="validation-message" id="deposit-address-msg"></div>
+                            </div>
                         </div>
 
-                        <div class="input-group">
-                            <label class="input-label">Amount (BTC)</label>
-                            <input type="number" class="input-field" id="deposit-amount" step="0.00000001" value="0.5" oninput="validateAmount(this)">
-                            <div class="validation-message" id="deposit-amount-msg"></div>
-                        </div>
+                        <div class="try-it">
+                            <div class="try-it-title"><i class="fas fa-play-circle"></i> Try it out</div>
 
-                        <button class="execute-btn" onclick="executeDepositRequest(this)">Execute</button>
+                            <div class="input-group">
+                                <label class="input-label">Starknet Address</label>
+                                <input type="text" class="input-field" id="deposit-address" value="0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef" oninput="validateStarknetAddress(this)">
+                                <div class="validation-message" id="deposit-address-msg"></div>
+                            </div>
 
-                        <div class="response-area" id="response-area-3"></div>
+                            <div class="input-group">
+                                <label class="input-label">Amount (BTC)</label>
+                                <input type="number" class="input-field" id="deposit-amount" step="0.00000001" value="0.5" oninput="validateAmount(this)">
+                                <div class="validation-message" id="deposit-amount-msg"></div>
+                            </div>
+
+                            <button class="execute-btn" onclick="executeDepositRequest(this)">
+                                <i class="fas fa-play"></i>
+                                Execute
+                            </button>
+
+                            <div class="response-area" id="response-area-3"></div>
                         </div>
                     </div>
                 </div>
@@ -1613,7 +1361,59 @@ Content-Type: application/json
         </div>
     </div>
 
+    <!-- API Keys Modal -->
+    <div class="modal" id="apiKeysModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">API Keys Management</h2>
+                <button class="modal-close" onclick="closeModal('apiKeysModal')">&times;</button>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <button class="btn" onclick="generateNewApiKey()">
+                    <i class="fas fa-plus"></i>
+                    Generate New API Key
+                </button>
+            </div>
+
+            <div id="apiKeysList">
+                <!-- API keys will be loaded here -->
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize code tabs
+            document.querySelectorAll('.code-tab.active').forEach(tab => {
+                const tabId = tab.getAttribute('onclick').split("'")[1];
+                document.getElementById(tabId).style.display = 'block';
+            });
+
+            // Load API keys
+            loadApiKeys();
+
+            // Initialize search functionality
+            initializeSearch();
+
+            // Add copy buttons to all code blocks
+            addCopyButtons();
+
+            // Start real-time stats updates
+            startRealtimeStats();
+
+            // Mobile menu functionality
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const sidebar = document.getElementById('sidebar');
+            
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                });
+            }
+        });
+
         // Tab switching functionality
         function changeTab(tabElement, tabId) {
             // Remove active class from all tabs
@@ -1631,295 +1431,6 @@ Content-Type: application/json
             document.getElementById(tabId).style.display = 'block';
         }
         
-        // Execute request simulation
-        function executeRequest(button) {
-            const responseArea = button.nextElementSibling;
-            const addressInput = document.getElementById('connect-address');
-            const signatureInput = document.getElementById('connect-signature');
-
-            // Validate inputs
-            if (addressInput.classList.contains('invalid') || signatureInput.classList.contains('invalid')) {
-                responseArea.style.display = 'block';
-                responseArea.innerHTML = '<div class="error-response">Please fix validation errors before executing.</div>';
-                return;
-            }
-
-            responseArea.style.display = 'block';
-            responseArea.innerHTML = '<div class="loading-text"><span class="loading-spinner"></span>Loading...</div>';
-
-            // Simulate API request delay
-            setTimeout(() => {
-                // Randomly simulate different responses
-                const random = Math.random();
-
-                if (random < 0.1) {
-                    // Network error
-                    responseArea.innerHTML = `<div class="error-response"><pre style="margin: 0; color: #ff5555;">HTTP/1.1 500 Internal Server Error
-Content-Type: application/json
-
-{
-   "status": "error",
-   "message": "Internal server error. Please try again later.",
-   "error_code": "INTERNAL_ERROR"
-}</pre></div>`;
-                } else if (random < 0.2) {
-                    // Invalid signature
-                    responseArea.innerHTML = `<div class="error-response"><pre style="margin: 0; color: #ff5555;">HTTP/1.1 400 Bad Request
-Content-Type: application/json
-
-{
-   "status": "error",
-   "message": "Invalid signature provided",
-   "error_code": "INVALID_SIGNATURE"
-}</pre></div>`;
-                } else if (random < 0.3) {
-                    // Rate limit
-                    responseArea.innerHTML = `<div class="error-response"><pre style="margin: 0; color: #ff5555;">HTTP/1.1 429 Too Many Requests
-Content-Type: application/json
-
-{
-   "status": "error",
-   "message": "Rate limit exceeded. Please try again in 60 seconds.",
-   "error_code": "RATE_LIMIT_EXCEEDED",
-   "retry_after": 60
-}</pre></div>`;
-                } else {
-                    // Success
-                    responseArea.innerHTML = `<div class="success-response"><pre style="margin: 0; color: #f8f8f2;">HTTP/1.1 200 OK
-Content-Type: application/json
-
-{
-   <span style="color: #ff79c6;">"status"</span>: <span style="color: #f1fa8c;">"success"</span>,
-   <span style="color: #ff79c6;">"data"</span>: {
-     <span style="color: #ff79c6;">"connection_token"</span>: <span style="color: #f1fa8c;">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdGFya25ldF9hZGRyZXNzIjoiMHgxMjM0NTY3ODkwYWJjZGVmMTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmIiwiaWF0IjoxNjk4MjI0MjIyLCJleHAiOjE2OTgyMjc4MjJ9.ABC123DEF456"</span>,
-     <span style="color: #ff79c6;">"expires_in"</span>: <span style="color: #bd93f9;">3600</span>,
-     <span style="color: #ff79c6;">"wallet_status"</span>: <span style="color: #f1fa8c;">"connected"</span>
-   }
-}</pre></div>`;
-                }
-            }, 1500 + Math.random() * 1000); // Random delay between 1.5-2.5 seconds
-        }
-
-        // Execute balance request simulation
-        function executeBalanceRequest(button) {
-            const responseArea = button.nextElementSibling;
-            const addressInput = document.getElementById('balance-address');
-
-            // Validate inputs
-            if (addressInput.classList.contains('invalid')) {
-                responseArea.style.display = 'block';
-                responseArea.innerHTML = '<div class="error-response">Please fix validation errors before executing.</div>';
-                return;
-            }
-
-            responseArea.style.display = 'block';
-            responseArea.innerHTML = '<div class="loading-text"><span class="loading-spinner"></span>Loading...</div>';
-
-            // Simulate API request delay
-            setTimeout(() => {
-                const address = document.getElementById('balance-address').value;
-                const random = Math.random();
-
-                if (random < 0.15) {
-                    // Wallet not found
-                    responseArea.innerHTML = `<div class="error-response"><pre style="margin: 0; color: #ff5555;">HTTP/1.1 404 Not Found
-Content-Type: application/json
-
-{
-   "status": "error",
-   "message": "Wallet not found or not connected",
-   "error_code": "WALLET_NOT_FOUND"
-}</pre></div>`;
-                } else if (random < 0.25) {
-                    // Service unavailable
-                    responseArea.innerHTML = `<div class="error-response"><pre style="margin: 0; color: #ff5555;">HTTP/1.1 503 Service Unavailable
-Content-Type: application/json
-
-{
-   "status": "error",
-   "message": "Balance service temporarily unavailable",
-   "error_code": "SERVICE_UNAVAILABLE"
-}</pre></div>`;
-                } else {
-                    // Success
-                    const balance = (Math.random() * 2).toFixed(3);
-                    const usdValue = (parseFloat(balance) * 45000).toFixed(2);
-                    responseArea.innerHTML = `<div class="success-response"><pre style="margin: 0; color: #f8f8f2;">HTTP/1.1 200 OK
-Content-Type: application/json
-
-{
-   <span style="color: #ff79c6;">"status"</span>: <span style="color: #f1fa8c;">"success"</span>,
-   <span style="color: #ff79c6;">"data"</span>: {
-     <span style="color: #ff79c6;">"starknet_address"</span>: <span style="color: #f1fa8c;">"${address}"</span>,
-     <span style="color: #ff79c6;">"sbtc_balance"</span>: <span style="color: #bd93f9;">"${balance}"</span>,
-     <span style="color: #ff79c6;">"sbtc_balance_usd"</span>: <span style="color: #bd93f9;">"${usdValue}"</span>,
-     <span style="color: #ff79c6;">"last_updated"</span>: <span style="color: #f1fa8c;">"${new Date().toISOString()}"</span>
-   }
-}</pre></div>`;
-                }
-            }, 1000 + Math.random() * 800); // Random delay between 1-1.8 seconds
-        }
-
-        // Execute deposit request simulation
-        function executeDepositRequest(button) {
-            const responseArea = button.nextElementSibling;
-            const addressInput = document.getElementById('deposit-address');
-            const amountInput = document.getElementById('deposit-amount');
-
-            // Validate inputs
-            if (addressInput.classList.contains('invalid') || amountInput.classList.contains('invalid')) {
-                responseArea.style.display = 'block';
-                responseArea.innerHTML = '<div class="error-response">Please fix validation errors before executing.</div>';
-                return;
-            }
-
-            responseArea.style.display = 'block';
-            responseArea.innerHTML = '<div class="loading-text"><span class="loading-spinner"></span>Loading...</div>';
-
-            // Simulate API request delay
-            setTimeout(() => {
-                const address = document.getElementById('deposit-address').value;
-                const amount = document.getElementById('deposit-amount').value;
-                const random = Math.random();
-
-                if (random < 0.1) {
-                    // Insufficient funds or invalid amount
-                    responseArea.innerHTML = `<div class="error-response"><pre style="margin: 0; color: #ff5555;">HTTP/1.1 400 Bad Request
-Content-Type: application/json
-
-{
-   "status": "error",
-   "message": "Invalid deposit amount",
-   "error_code": "INVALID_AMOUNT",
-   "min_amount": "0.00001",
-   "max_amount": "10.0"
-}</pre></div>`;
-                } else if (random < 0.2) {
-                    // Wallet not connected
-                    responseArea.innerHTML = `<div class="error-response"><pre style="margin: 0; color: #ff5555;">HTTP/1.1 403 Forbidden
-Content-Type: application/json
-
-{
-   "status": "error",
-   "message": "Wallet not connected. Please connect your wallet first.",
-   "error_code": "WALLET_NOT_CONNECTED"
-}</pre></div>`;
-                } else if (random < 0.3) {
-                    // Deposit limit exceeded
-                    responseArea.innerHTML = `<div class="error-response"><pre style="margin: 0; color: #ff5555;">HTTP/1.1 429 Too Many Requests
-Content-Type: application/json
-
-{
-   "status": "error",
-   "message": "Daily deposit limit exceeded",
-   "error_code": "DEPOSIT_LIMIT_EXCEEDED",
-   "limit": "5.0",
-   "used": "4.8",
-   "reset_in": "86400"
-}</pre></div>`;
-                } else {
-                    // Success
-                    const depositId = 'dep_' + Math.random().toString(36).substring(2, 10);
-                    const bitcoinAddress = 'bc1q' + Math.random().toString(36).substring(2, 30);
-                    responseArea.innerHTML = `<div class="success-response"><pre style="margin: 0; color: #f8f8f2;">HTTP/1.1 200 OK
-Content-Type: application/json
-
-{
-   <span style="color: #ff79c6;">"status"</span>: <span style="color: #f1fa8c;">"success"</span>,
-   <span style="color: #ff79c6;">"data"</span>: {
-     <span style="color: #ff79c6;">"deposit_id"</span>: <span style="color: #f1fa8c;">"${depositId}"</span>,
-     <span style="color: #ff79c6;">"bitcoin_address"</span>: <span style="color: #f1fa8c;">"${bitcoinAddress}"</span>,
-     <span style="color: #ff79c6;">"amount_btc"</span>: <span style="color: #bd93f9;">${amount}</span>,
-     <span style="color: #ff79c6;">"expires_at"</span>: <span style="color: #f1fa8c;">"${new Date(Date.now() + 3600000).toISOString()}"</span>,
-     <span style="color: #ff79c6;">"qr_code"</span>: <span style="color: #f1fa8c;">"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA..."</span>
-   }
-}</pre></div>`;
-                }
-            }, 2000 + Math.random() * 1500); // Random delay between 2-3.5 seconds
-        }
-        
-        // Initialize first code blocks as visible
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.code-tab.active').forEach(tab => {
-                const tabId = tab.getAttribute('onclick').split("'")[1];
-                document.getElementById(tabId).style.display = 'block';
-            });
-
-            // Load API keys
-            loadApiKeys();
-
-            // Initialize search functionality
-            initializeSearch();
-
-            // Initialize theme
-            initializeTheme();
-
-            // Add copy buttons to all code blocks
-            addCopyButtons();
-
-            // Start real-time stats updates
-            startRealtimeStats();
-        });
-
-        // Search functionality
-        function initializeSearch() {
-            const searchInput = document.getElementById('endpointSearch');
-            searchInput.addEventListener('input', filterEndpoints);
-        }
-
-        function filterEndpoints() {
-            const searchTerm = document.getElementById('endpointSearch').value.toLowerCase();
-            const endpoints = document.querySelectorAll('.endpoint');
-            const sections = document.querySelectorAll('.api-section');
-
-            endpoints.forEach(endpoint => {
-                const path = endpoint.querySelector('.endpoint-path').textContent.toLowerCase();
-                const description = endpoint.querySelector('.endpoint-description').textContent.toLowerCase();
-                const method = endpoint.querySelector('.method').textContent.toLowerCase();
-
-                if (path.includes(searchTerm) || description.includes(searchTerm) || method.includes(searchTerm)) {
-                    endpoint.style.display = 'block';
-                } else {
-                    endpoint.style.display = 'none';
-                }
-            });
-
-            // Hide sections that have no visible endpoints
-            sections.forEach(section => {
-                const visibleEndpoints = section.querySelectorAll('.endpoint[style*="block"]');
-                if (visibleEndpoints.length === 0) {
-                    section.style.display = 'none';
-                } else {
-                    section.style.display = 'block';
-                }
-            });
-        }
-
-        // Theme toggle functionality
-        function initializeTheme() {
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            updateThemeIcon(savedTheme);
-        }
-
-        function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
-        }
-
-        function updateThemeIcon(theme) {
-            const themeIcon = document.querySelector('.theme-toggle i');
-            if (theme === 'light') {
-                themeIcon.className = 'fas fa-sun';
-            } else {
-                themeIcon.className = 'fas fa-moon';
-            }
-        }
-
         // Collapsible endpoint functionality
         function toggleEndpoint(headerElement) {
             const endpoint = headerElement.closest('.endpoint');
@@ -1956,6 +1467,40 @@ Content-Type: application/json
                     copyBtn.title = 'Copy to clipboard';
                     copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
                     block.insertBefore(copyBtn, block.firstChild);
+                }
+            });
+        }
+
+        // Search functionality
+        function initializeSearch() {
+            const searchInput = document.getElementById('endpointSearch');
+            searchInput.addEventListener('input', filterEndpoints);
+        }
+
+        function filterEndpoints() {
+            const searchTerm = document.getElementById('endpointSearch').value.toLowerCase();
+            const endpoints = document.querySelectorAll('.endpoint');
+            const sections = document.querySelectorAll('.api-section');
+
+            endpoints.forEach(endpoint => {
+                const path = endpoint.querySelector('.endpoint-path').textContent.toLowerCase();
+                const description = endpoint.querySelector('.endpoint-description').textContent.toLowerCase();
+                const method = endpoint.querySelector('.method').textContent.toLowerCase();
+
+                if (path.includes(searchTerm) || description.includes(searchTerm) || method.includes(searchTerm)) {
+                    endpoint.style.display = 'block';
+                } else {
+                    endpoint.style.display = 'none';
+                }
+            });
+
+            // Hide sections that have no visible endpoints
+            sections.forEach(section => {
+                const visibleEndpoints = section.querySelectorAll('.endpoint[style*="block"]');
+                if (visibleEndpoints.length === 0) {
+                    section.style.display = 'none';
+                } else {
+                    section.style.display = 'block';
                 }
             });
         }
@@ -2058,43 +1603,14 @@ Content-Type: application/json
             }
         }
 
-        function validateBitcoinAddress(input) {
-            const value = input.value.trim();
-            const messageId = input.id + '-msg';
-            const messageElement = document.getElementById(messageId);
-
-            // Remove previous validation classes
-            input.classList.remove('valid', 'invalid');
-
-            if (value === '') {
-                messageElement.textContent = '';
-                messageElement.className = 'validation-message';
-                return;
-            }
-
-            // Basic Bitcoin address validation (supports legacy, segwit, and bech32)
-            const bitcoinRegex = /^(1[1-9A-HJ-NP-Za-km-z]{25,34}|3[1-9A-HJ-NP-Za-km-z]{25,34}|bc1[ac-hj-np-z02-9]{11,71})$/;
-
-            if (!bitcoinRegex.test(value)) {
-                input.classList.add('invalid');
-                messageElement.textContent = 'Invalid Bitcoin address format';
-                messageElement.className = 'validation-message error';
-            } else {
-                input.classList.add('valid');
-                messageElement.textContent = 'Valid Bitcoin address';
-                messageElement.className = 'validation-message success';
-            }
-        }
-
-        // Execute withdrawal request simulation
-        function executeWithdrawalRequest(button) {
+        // Execute request simulation
+        function executeRequest(button) {
             const responseArea = button.nextElementSibling;
-            const starknetInput = document.getElementById('withdrawal-starknet-address');
-            const bitcoinInput = document.getElementById('withdrawal-bitcoin-address');
-            const amountInput = document.getElementById('withdrawal-amount');
+            const addressInput = document.getElementById('connect-address');
+            const signatureInput = document.getElementById('connect-signature');
 
             // Validate inputs
-            if (starknetInput.classList.contains('invalid') || bitcoinInput.classList.contains('invalid') || amountInput.classList.contains('invalid')) {
+            if (addressInput.classList.contains('invalid') || signatureInput.classList.contains('invalid')) {
                 responseArea.style.display = 'block';
                 responseArea.innerHTML = '<div class="error-response">Please fix validation errors before executing.</div>';
                 return;
@@ -2105,53 +1621,61 @@ Content-Type: application/json
 
             // Simulate API request delay
             setTimeout(() => {
+                // Randomly simulate different responses
                 const random = Math.random();
 
-                if (random < 0.15) {
-                    // Insufficient balance
-                    responseArea.innerHTML = `<div class="error-response"><pre style="margin: 0; color: #ff5555;">HTTP/1.1 400 Bad Request
+                if (random < 0.1) {
+                    // Network error
+                    responseArea.innerHTML = `<div class="error-response"><pre style="margin: 0; color: #ff5555;">HTTP/1.1 500 Internal Server Error
 Content-Type: application/json
 
 {
    "status": "error",
-   "message": "Insufficient sBTC balance",
-   "error_code": "INSUFFICIENT_BALANCE",
-   "available_balance": "0.3"
+   "message": "Internal server error. Please try again later.",
+   "error_code": "INTERNAL_ERROR"
 }</pre></div>`;
-                } else if (random < 0.25) {
-                    // Invalid Bitcoin address
+                } else if (random < 0.2) {
+                    // Invalid signature
                     responseArea.innerHTML = `<div class="error-response"><pre style="margin: 0; color: #ff5555;">HTTP/1.1 400 Bad Request
 Content-Type: application/json
 
 {
    "status": "error",
-   "message": "Invalid Bitcoin address",
-   "error_code": "INVALID_BITCOIN_ADDRESS"
+   "message": "Invalid signature provided",
+   "error_code": "INVALID_SIGNATURE"
+}</pre></div>`;
+                } else if (random < 0.3) {
+                    // Rate limit
+                    responseArea.innerHTML = `<div class="error-response"><pre style="margin: 0; color: #ff5555;">HTTP/1.1 429 Too Many Requests
+Content-Type: application/json
+
+{
+   "status": "error",
+   "message": "Rate limit exceeded. Please try again in 60 seconds.",
+   "error_code": "RATE_LIMIT_EXCEEDED",
+   "retry_after": 60
 }</pre></div>`;
                 } else {
                     // Success
-                    const withdrawalId = 'wdr_' + Math.random().toString(36).substring(2, 10);
-                    const fee = (Math.random() * 0.001).toFixed(6);
                     responseArea.innerHTML = `<div class="success-response"><pre style="margin: 0; color: #f8f8f2;">HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-   <span style="color: #ff79c6;">"status"</span>: <span style="color: #f1fa8c;">"success"</span>,
-   <span style="color: #ff79c6;">"data"</span>: {
-     <span style="color: #ff79c6;">"withdrawal_id"</span>: <span style="color: #f1fa8c;">"${withdrawalId}"</span>,
-     <span style="color: #ff79c6;">"estimated_completion"</span>: <span style="color: #f1fa8c;">"${new Date(Date.now() + 7200000).toISOString()}"</span>,
-     <span style="color: #ff79c6;">"fee_btc"</span>: <span style="color: #bd93f9;">"${fee}"</span>,
-     <span style="color: #ff79c6;">"status"</span>: <span style="color: #f1fa8c;">"pending"</span>
+   <span style="color: #f472b6;">"status"</span>: <span style="color: #fbbf24;">"success"</span>,
+   <span style="color: #f472b6;">"data"</span>: {
+     <span style="color: #f472b6;">"connection_token"</span>: <span style="color: #fbbf24;">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdGFya25ldF9hZGRyZXNzIjoiMHgxMjM0NTY3ODkwYWJjZGVmMTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmIiwiaWF0IjoxNjk4MjI0MjIyLCJleHAiOjE2OTgyMjc4MjJ9.ABC123DEF456"</span>,
+     <span style="color: #f472b6;">"expires_in"</span>: <span style="color: #a78bfa;">3600</span>,
+     <span style="color: #f472b6;">"wallet_status"</span>: <span style="color: #fbbf24;">"connected"</span>
    }
 }</pre></div>`;
                 }
-            }, 2500 + Math.random() * 1000);
+            }, 1500 + Math.random() * 1000); // Random delay between 1.5-2.5 seconds
         }
 
-        // Execute history request simulation
-        function executeHistoryRequest(button) {
+        // Execute balance request simulation
+        function executeBalanceRequest(button) {
             const responseArea = button.nextElementSibling;
-            const addressInput = document.getElementById('history-address');
+            const addressInput = document.getElementById('balance-address');
 
             // Validate inputs
             if (addressInput.classList.contains('invalid')) {
@@ -2165,53 +1689,125 @@ Content-Type: application/json
 
             // Simulate API request delay
             setTimeout(() => {
-                const address = document.getElementById('history-address').value;
-                const limit = document.getElementById('history-limit').value;
+                const address = document.getElementById('balance-address').value;
                 const random = Math.random();
 
-                if (random < 0.1) {
-                    // No transactions found
-                    responseArea.innerHTML = `<div class="success-response"><pre style="margin: 0; color: #f8f8f2;">HTTP/1.1 200 OK
+                if (random < 0.15) {
+                    // Wallet not found
+                    responseArea.innerHTML = `<div class="error-response"><pre style="margin: 0; color: #ff5555;">HTTP/1.1 404 Not Found
 Content-Type: application/json
 
 {
-   <span style="color: #ff79c6;">"status"</span>: <span style="color: #f1fa8c;">"success"</span>,
-   <span style="color: #ff79c6;">"data"</span>: {
-     <span style="color: #ff79c6;">"transactions"</span>: [],
-     <span style="color: #ff79c6;">"total_count"</span>: <span style="color: #bd93f9;">0</span>,
-     <span style="color: #ff79c6;">"has_more"</span>: <span style="color: #bd93f9;">false</span>
-   }
+   "status": "error",
+   "message": "Wallet not found or not connected",
+   "error_code": "WALLET_NOT_FOUND"
+}</pre></div>`;
+                } else if (random < 0.25) {
+                    // Service unavailable
+                    responseArea.innerHTML = `<div class="error-response"><pre style="margin: 0; color: #ff5555;">HTTP/1.1 503 Service Unavailable
+Content-Type: application/json
+
+{
+   "status": "error",
+   "message": "Balance service temporarily unavailable",
+   "error_code": "SERVICE_UNAVAILABLE"
 }</pre></div>`;
                 } else {
-                    // Success with sample transactions
-                    const transactionCount = Math.floor(Math.random() * parseInt(limit)) + 1;
-                    const transactions = [];
-
-                    for (let i = 0; i < transactionCount; i++) {
-                        const types = ['deposit', 'withdrawal'];
-                        const statuses = ['completed', 'pending', 'failed'];
-                        transactions.push({
-                            id: 'tx_' + Math.random().toString(36).substring(2, 8),
-                            type: types[Math.floor(Math.random() * types.length)],
-                            amount: (Math.random() * 2).toFixed(6),
-                            status: statuses[Math.floor(Math.random() * statuses.length)],
-                            created_at: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()
-                        });
-                    }
-
+                    // Success
+                    const balance = (Math.random() * 2).toFixed(3);
+                    const usdValue = (parseFloat(balance) * 45000).toFixed(2);
                     responseArea.innerHTML = `<div class="success-response"><pre style="margin: 0; color: #f8f8f2;">HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-   <span style="color: #ff79c6;">"status"</span>: <span style="color: #f1fa8c;">"success"</span>,
-   <span style="color: #ff79c6;">"data"</span>: {
-     <span style="color: #ff79c6;">"transactions"</span>: ${JSON.stringify(transactions, null, 4).replace(/"/g, '<span style="color: #f1fa8c;">"</span>').replace(/,/g, '<span style="color: #f8f8f2;">,</span>')},
-     <span style="color: #ff79c6;">"total_count"</span>: <span style="color: #bd93f9;">${transactionCount}</span>,
-     <span style="color: #ff79c6;">"has_more"</span>: <span style="color: #bd93f9;">${transactionCount >= parseInt(limit)}</span>
+   <span style="color: #f472b6;">"status"</span>: <span style="color: #fbbf24;">"success"</span>,
+   <span style="color: #f472b6;">"data"</span>: {
+     <span style="color: #f472b6;">"starknet_address"</span>: <span style="color: #fbbf24;">"${address}"</span>,
+     <span style="color: #f472b6;">"sbtc_balance"</span>: <span style="color: #a78bfa;">"${balance}"</span>,
+     <span style="color: #f472b6;">"sbtc_balance_usd"</span>: <span style="color: #a78bfa;">"${usdValue}"</span>,
+     <span style="color: #f472b6;">"last_updated"</span>: <span style="color: #fbbf24;">"${new Date().toISOString()}"</span>
    }
 }</pre></div>`;
                 }
-            }, 1500 + Math.random() * 1000);
+            }, 1000 + Math.random() * 800); // Random delay between 1-1.8 seconds
+        }
+
+        // Execute deposit request simulation
+        function executeDepositRequest(button) {
+            const responseArea = button.nextElementSibling;
+            const addressInput = document.getElementById('deposit-address');
+            const amountInput = document.getElementById('deposit-amount');
+
+            // Validate inputs
+            if (addressInput.classList.contains('invalid') || amountInput.classList.contains('invalid')) {
+                responseArea.style.display = 'block';
+                responseArea.innerHTML = '<div class="error-response">Please fix validation errors before executing.</div>';
+                return;
+            }
+
+            responseArea.style.display = 'block';
+            responseArea.innerHTML = '<div class="loading-text"><span class="loading-spinner"></span>Loading...</div>';
+
+            // Simulate API request delay
+            setTimeout(() => {
+                const address = document.getElementById('deposit-address').value;
+                const amount = document.getElementById('deposit-amount').value;
+                const random = Math.random();
+
+                if (random < 0.1) {
+                    // Insufficient funds or invalid amount
+                    responseArea.innerHTML = `<div class="error-response"><pre style="margin: 0; color: #ff5555;">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+   "status": "error",
+   "message": "Invalid deposit amount",
+   "error_code": "INVALID_AMOUNT",
+   "min_amount": "0.00001",
+   "max_amount": "10.0"
+}</pre></div>`;
+                } else if (random < 0.2) {
+                    // Wallet not connected
+                    responseArea.innerHTML = `<div class="error-response"><pre style="margin: 0; color: #ff5555;">HTTP/1.1 403 Forbidden
+Content-Type: application/json
+
+{
+   "status": "error",
+   "message": "Wallet not connected. Please connect your wallet first.",
+   "error_code": "WALLET_NOT_CONNECTED"
+}</pre></div>`;
+                } else if (random < 0.3) {
+                    // Deposit limit exceeded
+                    responseArea.innerHTML = `<div class="error-response"><pre style="margin: 0; color: #ff5555;">HTTP/1.1 429 Too Many Requests
+Content-Type: application/json
+
+{
+   "status": "error",
+   "message": "Daily deposit limit exceeded",
+   "error_code": "DEPOSIT_LIMIT_EXCEEDED",
+   "limit": "5.0",
+   "used": "4.8",
+   "reset_in": "86400"
+}</pre></div>`;
+                } else {
+                    // Success
+                    const depositId = 'dep_' + Math.random().toString(36).substring(2, 10);
+                    const bitcoinAddress = 'bc1q' + Math.random().toString(36).substring(2, 30);
+                    responseArea.innerHTML = `<div class="success-response"><pre style="margin: 0; color: #f8f8f2;">HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+   <span style="color: #f472b6;">"status"</span>: <span style="color: #fbbf24;">"success"</span>,
+   <span style="color: #f472b6;">"data"</span>: {
+     <span style="color: #f472b6;">"deposit_id"</span>: <span style="color: #fbbf24;">"${depositId}"</span>,
+     <span style="color: #f472b6;">"bitcoin_address"</span>: <span style="color: #fbbf24;">"${bitcoinAddress}"</span>,
+     <span style="color: #f472b6;">"amount_btc"</span>: <span style="color: #a78bfa;">${amount}</span>,
+     <span style="color: #f472b6;">"expires_at"</span>: <span style="color: #fbbf24;">"${new Date(Date.now() + 3600000).toISOString()}"</span>,
+     <span style="color: #f472b6;">"qr_code"</span>: <span style="color: #fbbf24;">"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA..."</span>
+   }
+}</pre></div>`;
+                }
+            }, 2000 + Math.random() * 1500); // Random delay between 2-3.5 seconds
         }
 
         // Real-time stats updates
