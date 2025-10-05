@@ -1,0 +1,277 @@
+[
+  {
+    "type": "constructor",
+    "name": "constructor",
+    "inputs": [
+      {
+        "name": "admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "bitcoin_headers_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::SPVVerifier::SPVVerifier::MerkleProof",
+    "members": [
+      {
+        "name": "merkle_root",
+        "type": "core::felt252"
+      },
+      {
+        "name": "tx_hash",
+        "type": "core::felt252"
+      },
+      {
+        "name": "merkle_branch",
+        "type": "core::array::Array::<core::felt252>"
+      },
+      {
+        "name": "position",
+        "type": "core::integer::u32"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "core::bool",
+    "variants": [
+      {
+        "name": "False",
+        "type": "()"
+      },
+      {
+        "name": "True",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "verify_transaction_inclusion",
+    "inputs": [
+      {
+        "name": "merkle_proof",
+        "type": "starknet_bridge::contracts::SPVVerifier::SPVVerifier::MerkleProof"
+      },
+      {
+        "name": "block_height",
+        "type": "core::integer::u32"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::bool"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "verify_merkle_branch",
+    "inputs": [
+      {
+        "name": "tx_hash",
+        "type": "core::felt252"
+      },
+      {
+        "name": "merkle_branch",
+        "type": "core::array::Array::<core::felt252>"
+      },
+      {
+        "name": "expected_root",
+        "type": "core::felt252"
+      },
+      {
+        "name": "position",
+        "type": "core::integer::u32"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::bool"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::SPVVerifier::SPVVerifier::BitcoinTx",
+    "members": [
+      {
+        "name": "version",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "input_count",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "output_count",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "locktime",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "tx_id",
+        "type": "core::felt252"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "calculate_tx_hash",
+    "inputs": [
+      {
+        "name": "tx",
+        "type": "starknet_bridge::contracts::SPVVerifier::SPVVerifier::BitcoinTx"
+      },
+      {
+        "name": "inputs",
+        "type": "core::array::Array::<core::felt252>"
+      },
+      {
+        "name": "outputs",
+        "type": "core::array::Array::<core::felt252>"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "validate_bitcoin_transaction",
+    "inputs": [
+      {
+        "name": "tx",
+        "type": "starknet_bridge::contracts::SPVVerifier::SPVVerifier::BitcoinTx"
+      },
+      {
+        "name": "expected_txid",
+        "type": "core::felt252"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::bool"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "set_admin",
+    "inputs": [
+      {
+        "name": "new_admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "get_admin",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "set_bitcoin_headers_contract",
+    "inputs": [
+      {
+        "name": "new_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "get_bitcoin_headers_contract",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::SPVVerifier::SPVVerifier::TxVerified",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "tx_hash",
+        "type": "core::felt252",
+        "kind": "key"
+      },
+      {
+        "name": "block_height",
+        "type": "core::integer::u32",
+        "kind": "key"
+      },
+      {
+        "name": "merkle_root",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "verified",
+        "type": "core::bool",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::SPVVerifier::SPVVerifier::VerificationFailed",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "tx_hash",
+        "type": "core::felt252",
+        "kind": "key"
+      },
+      {
+        "name": "reason",
+        "type": "core::felt252",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::SPVVerifier::SPVVerifier::Event",
+    "kind": "enum",
+    "variants": [
+      {
+        "name": "TxVerified",
+        "type": "starknet_bridge::contracts::SPVVerifier::SPVVerifier::TxVerified",
+        "kind": "nested"
+      },
+      {
+        "name": "VerificationFailed",
+        "type": "starknet_bridge::contracts::SPVVerifier::SPVVerifier::VerificationFailed",
+        "kind": "nested"
+      }
+    ]
+  }
+]

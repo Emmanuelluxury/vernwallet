@@ -1189,13 +1189,13 @@
                 },
                 {
                     id: 'starknet',
-                    name: 'StarkNet Wallet',
+                    name: 'Ready Wallet',
                     type: 'StarkNet',
                     icon: 'fas fa-link',
                     isAvailable: () => window.starknet,
                     connect: async () => {
                         await window.starknet.enable();
-                        return { address: window.starknet.selectedAddress, name: window.starknet.name || 'StarkNet Wallet' };
+                        return { address: window.starknet.selectedAddress, name: window.starknet.name || 'Ready Wallet' };
                     }
                 }
             ];
@@ -1254,9 +1254,9 @@
         // Check for existing wallet connection on page load
         async function checkExistingWalletConnection() {
             try {
-                // Check StarkNet wallets first
+                // Check Ready wallets first
                 if (window.starknet && window.starknet.isConnected) {
-                    connectedWallet = window.starknet.name || 'StarkNet Wallet';
+                    connectedWallet = window.starknet.name || 'Ready Wallet';
                     connectedAddress = window.starknet.selectedAddress;
                     updateWalletUI();
                     return;

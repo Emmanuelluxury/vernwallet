@@ -707,6 +707,61 @@
             }
         }
 
+        /* Transaction Hash Copy Styles */
+        .hash-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .transaction-hash {
+            flex: 1;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            font-family: monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+        }
+
+        .transaction-hash:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+        }
+
+        .copy-hash-btn {
+            background: rgba(59, 130, 246, 0.2);
+            border: none;
+            color: var(--primary);
+            padding: 6px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.8rem;
+            min-width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-hash-btn:hover {
+            background: rgba(59, 130, 246, 0.3);
+            transform: scale(1.05);
+        }
+
+        .copy-hash-btn.copied {
+            background: var(--success);
+            color: white;
+        }
+
+        .copy-hash-btn.copied i::before {
+            content: "\f00c"; /* Check mark icon */
+        }
+
         /* Enhanced button interactions */
         .btn:active {
             transform: scale(0.98);
@@ -941,8 +996,11 @@
                         <div class="filter-bar">
                             <select class="filter-select">
                                 <option>All Types</option>
+                                <option>Bridge</option>
                                 <option>Deposit</option>
                                 <option>Withdrawal</option>
+                                <option>Send</option>
+                                <option>Receive</option>
                                 <option>Swap</option>
                             </select>
                             
@@ -1176,7 +1234,12 @@
                         <div class="transaction-details">
                             <div class="detail-row">
                                 <div class="detail-label">Transaction ID</div>
-                                <div class="detail-value">txid:abc123def456ghi789jkl012mno345pqr678</div>
+                                <div class="detail-value hash-container">
+                                    <span class="transaction-hash" onclick="copyTransactionHash(this)">txid:abc123def456ghi789jkl012mno345pqr678</span>
+                                    <button class="copy-hash-btn" onclick="copyTransactionHash(this.previousElementSibling)" title="Copy transaction ID">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
                             </div>
                             
                             <div class="detail-row">
@@ -1294,15 +1357,141 @@
     </div>
 
     <script>
+        // Copy transaction hash to clipboard
+        async function copyTransactionHash(element) {
+            const hashText = element.textContent.trim();
+
+            try {
+                // Use modern clipboard API if available
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(hashText);
+                } else {
+                    // Fallback for older browsers or non-HTTPS
+                    const textArea = document.createElement('textarea');
+                    textArea.value = hashText;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-999999px';
+                    textArea.style.top = '-999999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+
+                    try {
+                        document.execCommand('copy');
+                    } catch (err) {
+                        console.error('Fallback: Unable to copy', err);
+                        throw new Error('Copy failed');
+                    }
+
+                    textArea.remove();
+                }
+
+                // Visual feedback
+                const copyBtn = element.nextElementSibling;
+                if (copyBtn && copyBtn.classList.contains('copy-hash-btn')) {
+                    copyBtn.classList.add('copied');
+
+                    setTimeout(() => {
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                }
+
+                // Show notification
+                showNotification(`Transaction hash copied to clipboard!`, 'success');
+
+            } catch (error) {
+                console.error('Failed to copy transaction hash:', error);
+                showNotification('Failed to copy transaction hash. Please copy manually.', 'error');
+            }
+        }
+
+        // Helper functions for realistic data
+        function generateRandomHash(length) {
+            return Array.from({length}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+        }
+
+        function generateRealisticTime(minutesAgo) {
+            const now = new Date();
+            const txTime = new Date(now.getTime() - (minutesAgo * 60000));
+
+            const diffMinutes = Math.floor((now - txTime) / 60000);
+
+            if (diffMinutes < 1) {
+                return 'Just now';
+            } else if (diffMinutes < 60) {
+                return `${diffMinutes} min ago`;
+            } else if (diffMinutes < 1440) {
+                const hours = Math.floor(diffMinutes / 60);
+                return `${hours} hr${hours > 1 ? 's' : ''} ago`;
+            } else {
+                const days = Math.floor(diffMinutes / 1440);
+                return `${days} day${days > 1 ? 's' : ''} ago`;
+            }
+        }
+
+        function formatTimestamp(timestamp) {
+            return new Date(timestamp).toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+        }
+
         // Enhanced interactivity for Transactions Dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            // Sample transaction data
+            // Sample transaction data with realistic information
             const transactions = [
-                { type: 'Deposit', amount: '+0.2500 BTC', status: 'Processing', date: '10 min ago', txid: 'txid:abc123def456ghi789jkl012mno345pqr678' },
-                { type: 'Withdrawal', amount: '-0.1000 BTC', status: 'Completed', date: '3 hours ago', txid: 'txid:def456ghi789jkl012mno345pqr678stu901' },
-                { type: 'Swap', amount: 'STRK → sBTC', status: 'Completed', date: '1 day ago', txid: 'txid:ghi789jkl012mno345pqr678stu901vwx234' },
-                { type: 'Deposit', amount: '+0.5000 BTC', status: 'Completed', date: '2 days ago', txid: 'txid:jkl012mno345pqr678stu901vwx234yz567' },
-                { type: 'Withdrawal', amount: '-0.7500 BTC', status: 'Failed', date: '3 days ago', txid: 'txid:mno345pqr678stu901vwx234yz567bcd890' }
+                {
+                    type: 'Bridge',
+                    amount: '0.2500 BTC → 8,450 STRK',
+                    status: 'Processing',
+                    date: generateRealisticTime(10),
+                    txid: 'bridge_' + generateRandomHash(32),
+                    btcHash: generateRandomHash(64),
+                    starkHash: generateRandomHash(64),
+                    timestamp: Date.now() - (10 * 60000)
+                },
+                {
+                    type: 'Withdrawal',
+                    amount: '-0.1000 BTC',
+                    status: 'Completed',
+                    date: generateRealisticTime(180),
+                    txid: 'withdraw_' + generateRandomHash(32),
+                    btcHash: generateRandomHash(64),
+                    timestamp: Date.now() - (180 * 60000)
+                },
+                {
+                    type: 'Swap',
+                    amount: 'STRK → sBTC',
+                    status: 'Completed',
+                    date: generateRealisticTime(1440),
+                    txid: 'swap_' + generateRandomHash(32),
+                    starkHash: generateRandomHash(64),
+                    timestamp: Date.now() - (1440 * 60000)
+                },
+                {
+                    type: 'Receive',
+                    amount: '+0.5000 BTC',
+                    status: 'Completed',
+                    date: generateRealisticTime(2880),
+                    txid: 'receive_' + generateRandomHash(32),
+                    btcHash: generateRandomHash(64),
+                    timestamp: Date.now() - (2880 * 60000)
+                },
+                {
+                    type: 'Send',
+                    amount: '-0.7500 BTC',
+                    status: 'Failed',
+                    date: generateRealisticTime(4320),
+                    txid: 'send_' + generateRandomHash(32),
+                    btcHash: generateRandomHash(64),
+                    timestamp: Date.now() - (4320 * 60000)
+                },
+                {
+                    type: 'Deposit',
+                    amount: '+1.2500 BTC',
+                    status: 'Completed',
+                    date: generateRealisticTime(7200),
+                    txid: 'deposit_' + generateRandomHash(32),
+                    btcHash: generateRandomHash(64),
+                    timestamp: Date.now() - (7200 * 60000)
+                }
             ];
 
             let filteredTransactions = [...transactions];
@@ -1325,7 +1514,9 @@
                     const searchMatch = !searchValue ||
                         tx.txid.toLowerCase().includes(searchValue) ||
                         tx.amount.toLowerCase().includes(searchValue) ||
-                        tx.type.toLowerCase().includes(searchValue);
+                        tx.type.toLowerCase().includes(searchValue) ||
+                        (tx.btcHash && tx.btcHash.toLowerCase().includes(searchValue)) ||
+                        (tx.starkHash && tx.starkHash.toLowerCase().includes(searchValue));
 
                     return typeMatch && statusMatch && searchMatch;
                 });
@@ -1342,8 +1533,8 @@
                     row.innerHTML = `
                         <td>
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <i class="fas fa-${tx.type === 'Deposit' ? 'arrow-down' : tx.type === 'Withdrawal' ? 'arrow-up' : 'sync-alt'}"
-                                   style="color: var(--${tx.type === 'Deposit' ? 'success' : tx.type === 'Withdrawal' ? 'danger' : 'info'});"></i>
+                                <i class="fas fa-${getTransactionIcon(tx.type)}"
+                                   style="color: var(--${getTransactionColor(tx.type)});"></i>
                                 ${tx.type}
                             </div>
                         </td>
@@ -1356,7 +1547,7 @@
                         </td>
                         <td>${tx.date}</td>
                         <td>
-                            <button class="btn btn-sm btn-secondary view-btn" data-txid="${tx.txid}">
+                            <button class="btn btn-sm btn-secondary view-btn" data-txid="${tx.txid}" data-tx='${JSON.stringify(tx)}'>
                                 <i class="fas fa-eye"></i>
                                 View
                             </button>
@@ -1367,6 +1558,30 @@
 
                 // Re-attach view button listeners
                 attachViewListeners();
+            }
+
+            function getTransactionIcon(type) {
+                switch(type) {
+                    case 'Bridge': return 'bridge';
+                    case 'Deposit': return 'arrow-down';
+                    case 'Withdrawal': return 'arrow-up';
+                    case 'Send': return 'paper-plane';
+                    case 'Receive': return 'download';
+                    case 'Swap': return 'sync-alt';
+                    default: return 'exchange-alt';
+                }
+            }
+
+            function getTransactionColor(type) {
+                switch(type) {
+                    case 'Bridge': return 'starknet';
+                    case 'Deposit': return 'success';
+                    case 'Withdrawal': return 'danger';
+                    case 'Send': return 'warning';
+                    case 'Receive': return 'success';
+                    case 'Swap': return 'info';
+                    default: return 'primary';
+                }
             }
 
             // Event listeners for filters
@@ -1450,18 +1665,27 @@
 
             // Modal for transaction details
             function showTransactionModal(tx) {
+                const initiatedTime = formatTimestamp(tx.timestamp);
+                const completedTime = tx.status === 'Completed' ?
+                    formatTimestamp(tx.timestamp + Math.random() * 3600000) : 'Pending';
+
                 const modal = document.createElement('div');
                 modal.className = 'modal';
                 modal.innerHTML = `
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h3>Transaction Details</h3>
+                            <h3><i class="fas fa-receipt"></i> Transaction Details</h3>
                             <button class="modal-close">&times;</button>
                         </div>
                         <div class="modal-body">
                             <div class="detail-row">
                                 <div class="detail-label">Transaction ID</div>
-                                <div class="detail-value">${tx.txid}</div>
+                                <div class="detail-value hash-container">
+                                    <span class="transaction-hash" onclick="copyTransactionHash(this)">${tx.txid}</span>
+                                    <button class="copy-hash-btn" onclick="copyTransactionHash(this.previousElementSibling)" title="Copy transaction ID">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="detail-row">
                                 <div class="detail-label">Type</div>
@@ -1480,10 +1704,44 @@
                                     </span>
                                 </div>
                             </div>
+                            ${tx.btcHash ? `
                             <div class="detail-row">
-                                <div class="detail-label">Date</div>
-                                <div class="detail-value">${tx.date}</div>
+                                <div class="detail-label">Bitcoin TX Hash</div>
+                                <div class="detail-value hash-container">
+                                    <span class="transaction-hash" onclick="copyTransactionHash(this)">${tx.btcHash}</span>
+                                    <button class="copy-hash-btn" onclick="copyTransactionHash(this.previousElementSibling)" title="Copy Bitcoin hash">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>` : ''}
+                            ${tx.starkHash ? `
+                            <div class="detail-row">
+                                <div class="detail-label">Starknet TX Hash</div>
+                                <div class="detail-value hash-container">
+                                    <span class="transaction-hash" onclick="copyTransactionHash(this)">${tx.starkHash}</span>
+                                    <button class="copy-hash-btn" onclick="copyTransactionHash(this.previousElementSibling)" title="Copy Starknet hash">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>` : ''}
+                            <div class="detail-row">
+                                <div class="detail-label">Initiated</div>
+                                <div class="detail-value">${initiatedTime}</div>
                             </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Completed</div>
+                                <div class="detail-value">${completedTime}</div>
+                            </div>
+                        </div>
+                        <div style="padding: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; gap: 10px;">
+                            <button class="btn" onclick="openInExplorer('${tx.type}', '${tx.btcHash || tx.starkHash || tx.txid}')">
+                                <i class="fas fa-external-link-alt"></i>
+                                View in Explorer
+                            </button>
+                            <button class="btn btn-secondary" onclick="shareTransaction('${tx.txid}')">
+                                <i class="fas fa-share"></i>
+                                Share
+                            </button>
                         </div>
                     </div>
                 `;
@@ -1500,6 +1758,28 @@
                         document.body.removeChild(modal);
                     }
                 });
+            }
+
+            function openInExplorer(type, hash) {
+                if (hash && hash.startsWith('0x')) {
+                    window.open(`https://voyager.online/tx/${hash}`, '_blank');
+                } else if (hash) {
+                    window.open(`https://mempool.space/tx/${hash}`, '_blank');
+                }
+            }
+
+            function shareTransaction(txid) {
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Transaction Details',
+                        text: `Check out this transaction: ${txid}`,
+                        url: window.location.href
+                    });
+                } else {
+                    // Fallback: copy URL to clipboard
+                    copyTransactionHash({textContent: `${window.location.href}?tx=${txid}`});
+                    showNotification('Transaction link copied to clipboard!', 'success');
+                }
             }
 
             // Notification system

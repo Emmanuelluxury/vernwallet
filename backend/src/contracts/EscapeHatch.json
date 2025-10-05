@@ -1,0 +1,621 @@
+[
+  {
+    "type": "constructor",
+    "name": "constructor",
+    "inputs": [
+      {
+        "name": "admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "peg_out_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "sbtc_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "governance_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "emergency_timelock",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "dispute_timelock",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "min_evidence_length",
+        "type": "core::integer::u32"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "core::integer::u256",
+    "members": [
+      {
+        "name": "low",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "high",
+        "type": "core::integer::u128"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::EmergencyType",
+    "variants": [
+      {
+        "name": "OperatorFailure",
+        "type": "()"
+      },
+      {
+        "name": "TimelockExpired",
+        "type": "()"
+      },
+      {
+        "name": "InsufficientSignatures",
+        "type": "()"
+      },
+      {
+        "name": "MaliciousOperators",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "request_emergency_withdrawal",
+    "inputs": [
+      {
+        "name": "original_withdrawal_id",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "emergency_type",
+        "type": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::EmergencyType"
+      },
+      {
+        "name": "btc_address",
+        "type": "core::felt252"
+      },
+      {
+        "name": "proof_of_failure",
+        "type": "core::felt252"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::integer::u256"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "approve_emergency_withdrawal",
+    "inputs": [
+      {
+        "name": "emergency_id",
+        "type": "core::integer::u256"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "execute_emergency_withdrawal",
+    "inputs": [
+      {
+        "name": "emergency_id",
+        "type": "core::integer::u256"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "create_dispute",
+    "inputs": [
+      {
+        "name": "emergency_id",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "dispute_reason",
+        "type": "core::felt252"
+      },
+      {
+        "name": "evidence",
+        "type": "core::felt252"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "enum",
+    "name": "core::bool",
+    "variants": [
+      {
+        "name": "False",
+        "type": "()"
+      },
+      {
+        "name": "True",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "resolve_dispute",
+    "inputs": [
+      {
+        "name": "emergency_id",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "resolution",
+        "type": "core::felt252"
+      },
+      {
+        "name": "approve_emergency",
+        "type": "core::bool"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "pause_emergency",
+    "inputs": [],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "unpause_emergency",
+    "inputs": [],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "enum",
+    "name": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::EmergencyStatus",
+    "variants": [
+      {
+        "name": "Pending",
+        "type": "()"
+      },
+      {
+        "name": "Approved",
+        "type": "()"
+      },
+      {
+        "name": "Executed",
+        "type": "()"
+      },
+      {
+        "name": "Rejected",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::EmergencyWithdrawal",
+    "members": [
+      {
+        "name": "user",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "original_withdrawal_id",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "btc_address",
+        "type": "core::felt252"
+      },
+      {
+        "name": "emergency_type",
+        "type": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::EmergencyType"
+      },
+      {
+        "name": "status",
+        "type": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::EmergencyStatus"
+      },
+      {
+        "name": "created_at",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "executed_at",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "proof_of_failure",
+        "type": "core::felt252"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "get_emergency_withdrawal",
+    "inputs": [
+      {
+        "name": "emergency_id",
+        "type": "core::integer::u256"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::EmergencyWithdrawal"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "enum",
+    "name": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::DisputeStatus",
+    "variants": [
+      {
+        "name": "Active",
+        "type": "()"
+      },
+      {
+        "name": "Resolved",
+        "type": "()"
+      },
+      {
+        "name": "Rejected",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::Dispute",
+    "members": [
+      {
+        "name": "emergency_id",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "challenger",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "dispute_reason",
+        "type": "core::felt252"
+      },
+      {
+        "name": "evidence",
+        "type": "core::felt252"
+      },
+      {
+        "name": "status",
+        "type": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::DisputeStatus"
+      },
+      {
+        "name": "created_at",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "resolved_at",
+        "type": "core::integer::u64"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "get_dispute",
+    "inputs": [
+      {
+        "name": "emergency_id",
+        "type": "core::integer::u256"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::Dispute"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "is_emergency_paused",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::bool"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "set_emergency_timelock",
+    "inputs": [
+      {
+        "name": "timelock",
+        "type": "core::integer::u64"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "set_dispute_timelock",
+    "inputs": [
+      {
+        "name": "timelock",
+        "type": "core::integer::u64"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "set_governance_contract",
+    "inputs": [
+      {
+        "name": "governance",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "set_admin",
+    "inputs": [
+      {
+        "name": "new_admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "get_admin",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::EmergencyWithdrawalRequested",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "emergency_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "user",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "original_withdrawal_id",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "emergency_type",
+        "type": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::EmergencyType",
+        "kind": "data"
+      },
+      {
+        "name": "proof_of_failure",
+        "type": "core::felt252",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::EmergencyWithdrawalApproved",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "emergency_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "approved_by",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "approved_at",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::EmergencyWithdrawalExecuted",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "emergency_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "user",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "amount_refunded",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "executed_at",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::DisputeCreated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "emergency_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "challenger",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "dispute_reason",
+        "type": "core::felt252",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::DisputeResolved",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "emergency_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "resolved_by",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "resolution",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "resolved_at",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::EmergencyPaused",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "paused_by",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "paused_at",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::EmergencyUnpaused",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "unpaused_by",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "unpaused_at",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::Event",
+    "kind": "enum",
+    "variants": [
+      {
+        "name": "EmergencyWithdrawalRequested",
+        "type": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::EmergencyWithdrawalRequested",
+        "kind": "nested"
+      },
+      {
+        "name": "EmergencyWithdrawalApproved",
+        "type": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::EmergencyWithdrawalApproved",
+        "kind": "nested"
+      },
+      {
+        "name": "EmergencyWithdrawalExecuted",
+        "type": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::EmergencyWithdrawalExecuted",
+        "kind": "nested"
+      },
+      {
+        "name": "DisputeCreated",
+        "type": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::DisputeCreated",
+        "kind": "nested"
+      },
+      {
+        "name": "DisputeResolved",
+        "type": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::DisputeResolved",
+        "kind": "nested"
+      },
+      {
+        "name": "EmergencyPaused",
+        "type": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::EmergencyPaused",
+        "kind": "nested"
+      },
+      {
+        "name": "EmergencyUnpaused",
+        "type": "starknet_bridge::contracts::EscapeHatch::EscapeHatch::EmergencyUnpaused",
+        "kind": "nested"
+      }
+    ]
+  }
+]

@@ -1096,13 +1096,13 @@
                 },
                 {
                     id: 'starknet',
-                    name: 'StarkNet Wallet',
+                    name: 'Ready Wallet',
                     type: 'StarkNet',
                     icon: 'fas fa-link',
                     isAvailable: () => window.starknet,
                     connect: async () => {
                         await window.starknet.enable();
-                        return { address: window.starknet.selectedAddress, name: window.starknet.name || 'StarkNet Wallet' };
+                        return { address: window.starknet.selectedAddress, name: window.starknet.name || 'Ready Wallet' };
                     }
                 }
             ];
@@ -1161,9 +1161,9 @@
         // Check for existing wallet connection on page load
         async function checkExistingWalletConnection() {
             try {
-                // Check StarkNet wallets first
+                // Check Ready wallets first
                 if (window.starknet && window.starknet.isConnected) {
-                    connectedWallet = window.starknet.name || 'StarkNet Wallet';
+                    connectedWallet = window.starknet.name || 'Ready Wallet';
                     connectedAddress = window.starknet.selectedAddress;
                     updateWalletUI();
                     return;
@@ -1360,6 +1360,409 @@
         
         // Initialize the dashboard
         init();
+
+        // Initialize frontend integration for real contract interactions
+        window.VernWalletIntegration = new VernWalletFrontendIntegration({
+            apiUrl: 'http://localhost:3001',
+            websocketUrl: 'ws://localhost:3001/ws',
+            autoConnect: true,
+            enableRealTimeUpdates: true
+        });
+
+        // Set up real-time withdrawal integration
+        window.VernWalletIntegration.on('withdrawConnected', () => {
+            console.log('🔗 Connected to VernWallet Withdraw API');
+            showNotification('Connected to withdraw backend successfully');
+        });
+
+        window.VernWalletIntegration.on('withdrawError', (error) => {
+            console.error('Withdraw API Error:', error);
+            showNotification(`Withdraw error: ${error.message}`, true);
+        });
+
+        window.VernWalletIntegration.on('withdrawUpdate', (data) => {
+            console.log('Withdraw update:', data);
+            if (data.status === 'completed') {
+                showNotification('Withdrawal completed! Funds are now on Bitcoin network.');
+                // Update UI with real transaction data
+                updateWithdrawStatus(data);
+            }
+        });
+
+        window.VernWalletIntegration.on('balanceUpdate', (data) => {
+            console.log('Balance update:', data);
+            // Update balance displays with real data
+            updateBalances(data);
+        });
+
+        // Enhanced wallet connection with real contract integration
+        function connectWalletWithIntegration() {
+            if (connectedWallet) {
+                showNotification('Wallet already connected. Please disconnect first.', true);
+                return;
+            }
+            openWalletModal();
+        }
+
+        // Override wallet connection
+        connectWalletBtn.removeEventListener('click', connectWallet);
+        connectWalletBtn.addEventListener('click', connectWalletWithIntegration);
+
+        // Enhanced wallet connection handler
+        async function connectToRealWalletWithIntegration(wallet) {
+            try {
+                closeWalletModal();
+                showNotification(`Connecting to ${wallet.name}...`);
+
+                const result = await wallet.connect();
+
+                if (!result || !result.address) {
+                    throw new Error('No address returned from wallet');
+                }
+
+                connectedWallet = result.name;
+                connectedAddress = result.address;
+
+                updateWalletUI();
+
+                // Initialize real contract integration
+                await window.VernWalletIntegration.connectWallet({
+                    type: wallet.type.toLowerCase(),
+                    address: connectedAddress,
+                    name: connectedWallet
+                });
+
+                showNotification(`Successfully connected to ${connectedWallet}!`);
+
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                showNotification(`Failed to connect to ${wallet.name}: ${error.message}`, true);
+            }
+        }
+
+        // Override wallet connection in modal
+        const realWallets = [
+            {
+                id: 'metamask',
+                name: 'MetaMask',
+                type: 'Ethereum',
+                icon: 'fab fa-ethereum',
+                isAvailable: () => window.ethereum && !window.ethereum.isCoinbaseWallet && !window.ethereum.isTrust,
+                connect: async () => {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    return { address: accounts[0], name: 'MetaMask' };
+                }
+            },
+            {
+                id: 'phantom',
+                name: 'Phantom',
+                type: 'Solana',
+                icon: 'fas fa-ghost',
+                isAvailable: () => window.solana && window.solana.isPhantom,
+                connect: async () => {
+                    const response = await window.solana.connect();
+                    return { address: response.publicKey.toString(), name: 'Phantom' };
+                }
+            },
+            {
+                id: 'coinbase',
+                name: 'Coinbase Wallet',
+                type: 'Ethereum',
+                icon: 'fab fa-bitcoin',
+                isAvailable: () => window.ethereum && window.ethereum.isCoinbaseWallet,
+                connect: async () => {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    return { address: accounts[0], name: 'Coinbase Wallet' };
+                }
+            },
+            {
+                id: 'solflare',
+                name: 'Solflare',
+                type: 'Solana',
+                icon: 'fas fa-sun',
+                isAvailable: () => window.solflare && window.solflare.isSolflare,
+                connect: async () => {
+                    const response = await window.solflare.connect();
+                    return { address: response.publicKey.toString(), name: 'Solflare' };
+                }
+            },
+            {
+                id: 'trustwallet',
+                name: 'Trust Wallet',
+                type: 'Ethereum',
+                icon: 'fas fa-shield-alt',
+                isAvailable: () => window.ethereum && window.ethereum.isTrust,
+                connect: async () => {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    return { address: accounts[0], name: 'Trust Wallet' };
+                }
+            },
+            {
+                id: 'starknet',
+                name: 'Ready Wallet',
+                type: 'StarkNet',
+                icon: 'fas fa-link',
+                isAvailable: () => window.starknet,
+                connect: async () => {
+                    await window.starknet.enable();
+                    return { address: window.starknet.selectedAddress, name: window.starknet.name || 'Ready Wallet' };
+                }
+            }
+        ];
+
+        // Override wallet connection for each wallet
+        realWallets.forEach(wallet => {
+            if (wallet.isAvailable()) {
+                // Store original connect function
+                const originalConnect = wallet.connect;
+                // Override with enhanced version
+                wallet.connect = async () => {
+                    const result = await originalConnect();
+                    await window.VernWalletIntegration.connectWallet({
+                        type: wallet.type.toLowerCase(),
+                        address: result.address,
+                        name: result.name
+                    });
+                    return result;
+                };
+            }
+        });
+
+        // Enhanced withdrawal process with real contract integration
+        async function initiateRealWithdrawal() {
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const btcAddress = document.getElementById('btcAddress').value;
+            const speed = document.getElementById('withdrawSpeed').value;
+
+            if (!amount || amount <= 0 || !btcAddress) {
+                showNotification('Please enter a valid amount and Bitcoin address', true);
+                return;
+            }
+
+            // Validate Bitcoin address
+            const bitcoinPatterns = [
+                /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/, // Legacy (P2PKH)
+                /^[bc1][a-z0-9]{39,59}$/, // SegWit (Bech32)
+                /^[3][a-km-zA-HJ-NP-Z1-9]{25,34}$/ // P2SH
+            ];
+
+            if (!bitcoinPatterns.some(pattern => pattern.test(btcAddress))) {
+                showNotification('Please enter a valid Bitcoin address', true);
+                return;
+            }
+
+            if (!connectedAddress) {
+                showNotification('Please connect your wallet first', true);
+                return;
+            }
+
+            try {
+                withdrawBtn.disabled = true;
+                withdrawBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+                const result = await window.VernWalletIntegration.withdrawBitcoin({
+                    toAddress: btcAddress,
+                    amount: amount,
+                    speed: speed,
+                    fromAddress: connectedAddress
+                });
+
+                if (result.success) {
+                    showNotification(`Withdrawal initiated successfully! Processing... Transaction: ${result.transactionHash?.substring(0, 10)}...`);
+
+                    // Close the modal
+                    confirmationModal.style.display = 'none';
+
+                    // Reset the form
+                    document.getElementById('withdrawAmount').value = '';
+                    document.getElementById('btcAddress').value = '';
+
+                    // Update progress
+                    progressFill.style.width = '60%';
+                    progressValue.textContent = '60%';
+                } else {
+                    throw new Error(result.error || 'Withdrawal failed');
+                }
+
+            } catch (error) {
+                console.error('Real withdrawal error:', error);
+                showNotification(`Withdrawal failed: ${error.message}`, true);
+            } finally {
+                withdrawBtn.disabled = false;
+                withdrawBtn.innerHTML = 'Withdraw';
+            }
+        }
+
+        // Override withdrawal process
+        confirmWithdraw.removeEventListener('click', processWithdrawal);
+        confirmWithdraw.addEventListener('click', initiateRealWithdrawal);
+
+        // Enhanced preview with real-time fee calculation
+        async function showPreviewWithIntegration() {
+            const amount = document.getElementById('withdrawAmount').value;
+            const btcAddress = document.getElementById('btcAddress').value;
+            const speed = document.getElementById('withdrawSpeed').value;
+
+            if (!amount || amount <= 0 || !btcAddress) {
+                showNotification('Please enter a valid amount and Bitcoin address', true);
+                return;
+            }
+
+            try {
+                // Get real-time fee calculation
+                const feeResult = await window.VernWalletIntegration.calculateWithdrawalFees({
+                    amount: parseFloat(amount),
+                    speed: speed,
+                    toAddress: btcAddress
+                });
+
+                if (feeResult.success) {
+                    // Update confirmation modal with real fees
+                    const amountElement = document.querySelector('#confirmationModal .modal-content span[style*="font-weight: 600"][style*="1.250 BTC"]');
+                    const networkFeeElement = document.querySelector('#confirmationModal .modal-content div[style*="Network Fee"] span:last-child');
+                    const bridgeFeeElement = document.querySelector('#confirmationModal .modal-content div[style*="Bridge Fee"] span:last-child');
+                    const totalElement = document.querySelector('#confirmationModal .modal-content div[style*="font-weight: 600"][style*="padding-top: 10px"] span:last-child');
+
+                    if (amountElement) amountElement.textContent = `${amount} BTC`;
+                    if (networkFeeElement) networkFeeElement.textContent = `${feeResult.networkFee} BTC`;
+                    if (bridgeFeeElement) bridgeFeeElement.textContent = `${feeResult.bridgeFee} BTC`;
+                    if (totalElement) totalElement.textContent = `${feeResult.totalAmount} BTC`;
+
+                    // Update address in modal
+                    const addressElement = document.querySelector('#confirmationModal .modal-content span[style*="font-family: monospace"]');
+                    if (addressElement) addressElement.textContent = btcAddress;
+                }
+
+            } catch (error) {
+                console.error('Fee calculation error:', error);
+            }
+
+            confirmationModal.style.display = 'flex';
+        }
+
+        // Override preview functionality
+        previewBtn.removeEventListener('click', showPreview);
+        previewBtn.addEventListener('click', showPreviewWithIntegration);
+
+        // Enhanced balance loading with real data
+        async function loadRealBalances() {
+            if (!connectedAddress) return;
+
+            try {
+                // Get Starknet balance for withdrawal
+                const starknetBalanceResult = await window.VernWalletIntegration.getStarknetBalance(connectedAddress);
+                if (starknetBalanceResult.success) {
+                    const balanceElement = document.querySelector('.balance');
+                    if (balanceElement) {
+                        balanceElement.innerHTML = `${starknetBalanceResult.balance} <span class="currency">BTC</span>`;
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error loading balances:', error);
+            }
+        }
+
+        // Load real balances when wallet is connected
+        if (connectedAddress) {
+            loadRealBalances();
+        }
+
+        // Update balances when balance update event is received
+        function updateBalances(data) {
+            if (data.starknetBalance !== undefined) {
+                const balanceElement = document.querySelector('.balance');
+                if (balanceElement) {
+                    balanceElement.innerHTML = `${data.starknetBalance} <span class="currency">BTC</span>`;
+                }
+            }
+        }
+
+        // Update withdrawal status with real data
+        function updateWithdrawStatus(data) {
+            // Update progress
+            progressFill.style.width = '100%';
+            progressValue.textContent = '100%';
+
+            // Update status indicator
+            const statusDot = document.querySelector('.status-dot');
+            const statusText = document.querySelector('.status-indicator span');
+
+            if (statusDot && statusText) {
+                statusDot.className = 'status-dot status-confirmed';
+                statusText.textContent = 'Completed';
+            }
+
+            // Update transaction hash if available
+            if (data.transactionHash) {
+                // Add transaction to table or update existing one
+                addTransactionToTable(data);
+            }
+        }
+
+        // Add transaction to table with real data
+        function addTransactionToTable(data) {
+            const tableBody = document.querySelector('.transactions-table tbody');
+            if (!tableBody) return;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="tx-hash">${data.transactionHash}</td>
+                <td class="tx-amount">${data.amount} BTC</td>
+                <td>${new Date().toLocaleDateString()}</td>
+                <td><span class="tx-status status-completed">Completed</span></td>
+                <td>
+                    <button class="icon-btn"><i class="fas fa-eye"></i></button>
+                </td>
+            `;
+
+            // Insert at the beginning of the table
+            tableBody.insertBefore(row, tableBody.firstChild);
+        }
+
+        // Enhanced transaction monitoring
+        async function monitorWithdrawalTransactions() {
+            if (!connectedAddress) return;
+
+            try {
+                const transactionsResult = await window.VernWalletIntegration.getWithdrawalTransactions(connectedAddress);
+
+                if (transactionsResult.success && transactionsResult.transactions) {
+                    updateTransactionsTable(transactionsResult.transactions);
+                }
+
+            } catch (error) {
+                console.error('Error monitoring withdrawal transactions:', error);
+            }
+        }
+
+        // Update transactions table with real data
+        function updateTransactionsTable(transactions) {
+            const tableBody = document.querySelector('.transactions-table tbody');
+            if (!tableBody) return;
+
+            // Clear existing rows (except header)
+            tableBody.innerHTML = '';
+
+            transactions.forEach(tx => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="tx-hash">${tx.hash}</td>
+                    <td class="tx-amount">${tx.amount} BTC</td>
+                    <td>${new Date(tx.timestamp).toLocaleDateString()}</td>
+                    <td><span class="tx-status status-${tx.status}">${tx.status}</span></td>
+                    <td>
+                        <button class="icon-btn"><i class="fas fa-eye"></i></button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Monitor transactions periodically
+        setInterval(monitorWithdrawalTransactions, 30000); // Check every 30 seconds
+
+        console.log('🔗 VernWallet Withdraw integration initialized successfully');
     </script>
 </body>
 </html>

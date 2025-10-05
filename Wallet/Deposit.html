@@ -972,13 +972,13 @@
                 },
                 {
                     id: 'starknet',
-                    name: 'StarkNet Wallet',
+                    name: 'Ready Wallet',
                     type: 'StarkNet',
                     icon: 'fas fa-link',
                     isAvailable: () => window.starknet,
                     connect: async () => {
                         await window.starknet.enable();
-                        return { address: window.starknet.selectedAddress, name: window.starknet.name || 'StarkNet Wallet' };
+                        return { address: window.starknet.selectedAddress, name: window.starknet.name || 'Ready Wallet' };
                     }
                 }
             ];
@@ -1037,9 +1037,9 @@
         // Check for existing wallet connection on page load
         async function checkExistingWalletConnection() {
             try {
-                // Check StarkNet wallets first
+                // Check Ready wallets first
                 if (window.starknet && window.starknet.isConnected) {
-                    connectedWallet = window.starknet.name || 'StarkNet Wallet';
+                    connectedWallet = window.starknet.name || 'Ready Wallet';
                     connectedAddress = window.starknet.selectedAddress;
                     updateWalletUI();
                     return;
@@ -1236,6 +1236,377 @@
         
         // Initialize the dashboard
         init();
+
+        // Initialize frontend integration for real contract interactions
+        window.VernWalletIntegration = new VernWalletFrontendIntegration({
+            apiUrl: 'http://localhost:3001',
+            websocketUrl: 'ws://localhost:3001/ws',
+            autoConnect: true,
+            enableRealTimeUpdates: true
+        });
+
+        // Set up real-time deposit integration
+        window.VernWalletIntegration.on('depositConnected', () => {
+            console.log('🔗 Connected to VernWallet Deposit API');
+            showNotification('Connected to deposit backend successfully');
+        });
+
+        window.VernWalletIntegration.on('depositError', (error) => {
+            console.error('Deposit API Error:', error);
+            showNotification(`Deposit error: ${error.message}`, true);
+        });
+
+        window.VernWalletIntegration.on('depositUpdate', (data) => {
+            console.log('Deposit update:', data);
+            if (data.status === 'completed') {
+                showNotification('Deposit completed! Funds are now available on Starknet.');
+                // Update UI with real transaction data
+                updateDepositStatus(data);
+            }
+        });
+
+        window.VernWalletIntegration.on('balanceUpdate', (data) => {
+            console.log('Balance update:', data);
+            // Update balance displays with real data
+            updateBalances(data);
+        });
+
+        // Enhanced wallet connection with real contract integration
+        function connectWalletWithIntegration() {
+            if (connectedWallet) {
+                showNotification('Wallet already connected. Please disconnect first.', true);
+                return;
+            }
+            openWalletModal();
+        }
+
+        // Override wallet connection
+        connectWalletBtn.removeEventListener('click', connectWallet);
+        connectWalletBtn.addEventListener('click', connectWalletWithIntegration);
+
+        // Enhanced wallet connection handler
+        async function connectToRealWalletWithIntegration(wallet) {
+            try {
+                closeWalletModal();
+                showNotification(`Connecting to ${wallet.name}...`);
+
+                const result = await wallet.connect();
+
+                if (!result || !result.address) {
+                    throw new Error('No address returned from wallet');
+                }
+
+                connectedWallet = result.name;
+                connectedAddress = result.address;
+
+                updateWalletUI();
+
+                // Initialize real contract integration
+                await window.VernWalletIntegration.connectWallet({
+                    type: wallet.type.toLowerCase(),
+                    address: connectedAddress,
+                    name: connectedWallet
+                });
+
+                showNotification(`Successfully connected to ${connectedWallet}!`);
+
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                showNotification(`Failed to connect to ${wallet.name}: ${error.message}`, true);
+            }
+        }
+
+        // Override wallet connection in modal
+        const realWallets = [
+            {
+                id: 'metamask',
+                name: 'MetaMask',
+                type: 'Ethereum',
+                icon: 'fab fa-ethereum',
+                isAvailable: () => window.ethereum && !window.ethereum.isCoinbaseWallet && !window.ethereum.isTrust,
+                connect: async () => {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    return { address: accounts[0], name: 'MetaMask' };
+                }
+            },
+            {
+                id: 'phantom',
+                name: 'Phantom',
+                type: 'Solana',
+                icon: 'fas fa-ghost',
+                isAvailable: () => window.solana && window.solana.isPhantom,
+                connect: async () => {
+                    const response = await window.solana.connect();
+                    return { address: response.publicKey.toString(), name: 'Phantom' };
+                }
+            },
+            {
+                id: 'coinbase',
+                name: 'Coinbase Wallet',
+                type: 'Ethereum',
+                icon: 'fab fa-bitcoin',
+                isAvailable: () => window.ethereum && window.ethereum.isCoinbaseWallet,
+                connect: async () => {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    return { address: accounts[0], name: 'Coinbase Wallet' };
+                }
+            },
+            {
+                id: 'solflare',
+                name: 'Solflare',
+                type: 'Solana',
+                icon: 'fas fa-sun',
+                isAvailable: () => window.solflare && window.solflare.isSolflare,
+                connect: async () => {
+                    const response = await window.solflare.connect();
+                    return { address: response.publicKey.toString(), name: 'Solflare' };
+                }
+            },
+            {
+                id: 'trustwallet',
+                name: 'Trust Wallet',
+                type: 'Ethereum',
+                icon: 'fas fa-shield-alt',
+                isAvailable: () => window.ethereum && window.ethereum.isTrust,
+                connect: async () => {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    return { address: accounts[0], name: 'Trust Wallet' };
+                }
+            },
+            {
+                id: 'starknet',
+                name: 'Ready Wallet',
+                type: 'StarkNet',
+                icon: 'fas fa-link',
+                isAvailable: () => window.starknet,
+                connect: async () => {
+                    await window.starknet.enable();
+                    return { address: window.starknet.selectedAddress, name: window.starknet.name || 'Ready Wallet' };
+                }
+            }
+        ];
+
+        // Override wallet connection for each wallet
+        realWallets.forEach(wallet => {
+            if (wallet.isAvailable()) {
+                // Store original connect function
+                const originalConnect = wallet.connect;
+                // Override with enhanced version
+                wallet.connect = async () => {
+                    const result = await originalConnect();
+                    await window.VernWalletIntegration.connectWallet({
+                        type: wallet.type.toLowerCase(),
+                        address: result.address,
+                        name: result.name
+                    });
+                    return result;
+                };
+            }
+        });
+
+        // Enhanced address generation with real contract integration
+        async function generateNewAddressWithIntegration() {
+            const addressType = document.getElementById('addressType').value;
+            const addressLabel = document.getElementById('addressLabel').value;
+
+            try {
+                const result = await window.VernWalletIntegration.generateDepositAddress({
+                    type: addressType,
+                    label: addressLabel || 'Deposit Address'
+                });
+
+                if (result.success) {
+                    // Update UI with real address
+                    btcAddress.textContent = result.address;
+                    showNotification('New deposit address generated successfully!');
+
+                    // Close the modal
+                    generateAddressModal.style.display = 'none';
+
+                    // Reset the form
+                    addressForm.reset();
+                } else {
+                    throw new Error(result.error || 'Failed to generate address');
+                }
+
+            } catch (error) {
+                console.error('Address generation error:', error);
+                showNotification(`Failed to generate address: ${error.message}`, true);
+            }
+        }
+
+        // Override address generation
+        addressForm.removeEventListener('submit', generateNewAddress);
+        addressForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            generateNewAddressWithIntegration();
+        });
+
+        // Enhanced copy address with integration
+        function copyAddressToClipboardWithIntegration() {
+            const address = btcAddress.textContent;
+
+            if (window.VernWalletIntegration && window.VernWalletIntegration.copyToClipboard) {
+                window.VernWalletIntegration.copyToClipboard(address)
+                    .then(() => {
+                        showNotification('Address copied to clipboard!');
+                    })
+                    .catch(err => {
+                        showNotification('Failed to copy address', true);
+                        console.error('Failed to copy: ', err);
+                    });
+            } else {
+                // Fallback to native clipboard API
+                navigator.clipboard.writeText(address)
+                    .then(() => {
+                        showNotification('Address copied to clipboard!');
+                    })
+                    .catch(err => {
+                        showNotification('Failed to copy address', true);
+                        console.error('Failed to copy: ', err);
+                    });
+            }
+        }
+
+        // Override copy address functionality
+        copyAddressBtn.removeEventListener('click', copyAddressToClipboard);
+        copyAddressBtn.addEventListener('click', copyAddressToClipboardWithIntegration);
+
+        // Enhanced balance loading with real data
+        async function loadRealBalances() {
+            if (!connectedAddress) return;
+
+            try {
+                // Get Bitcoin balance
+                const btcBalanceResult = await window.VernWalletIntegration.getBitcoinBalance(connectedAddress);
+                if (btcBalanceResult.success) {
+                    const btcBalanceElement = document.querySelector('.balance');
+                    if (btcBalanceElement) {
+                        btcBalanceElement.innerHTML = `${btcBalanceResult.balance} <span class="currency">BTC</span>`;
+                    }
+                }
+
+                // Get Starknet balance
+                const starknetBalanceResult = await window.VernWalletIntegration.getStarknetBalance(connectedAddress);
+                if (starknetBalanceResult.success) {
+                    const starknetBalanceElement = document.querySelector('.card:nth-child(3) .balance');
+                    if (starknetBalanceElement) {
+                        starknetBalanceElement.innerHTML = `${starknetBalanceResult.balance} <span class="currency">BTC</span>`;
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error loading balances:', error);
+            }
+        }
+
+        // Load real balances when wallet is connected
+        if (connectedAddress) {
+            loadRealBalances();
+        }
+
+        // Update balances when balance update event is received
+        function updateBalances(data) {
+            if (data.bitcoinBalance !== undefined) {
+                const btcBalanceElement = document.querySelector('.balance');
+                if (btcBalanceElement) {
+                    btcBalanceElement.innerHTML = `${data.bitcoinBalance} <span class="currency">BTC</span>`;
+                }
+            }
+
+            if (data.starknetBalance !== undefined) {
+                const starknetBalanceElement = document.querySelector('.card:nth-child(3) .balance');
+                if (starknetBalanceElement) {
+                    starknetBalanceElement.innerHTML = `${data.starknetBalance} <span class="currency">BTC</span>`;
+                }
+            }
+        }
+
+        // Update deposit status with real data
+        function updateDepositStatus(data) {
+            // Update progress
+            progressFill.style.width = '100%';
+            progressValue.textContent = '100%';
+
+            // Update status indicator
+            const statusDot = document.querySelector('.status-dot');
+            const statusText = document.querySelector('.status-indicator span');
+
+            if (statusDot && statusText) {
+                statusDot.className = 'status-dot status-confirmed';
+                statusText.textContent = 'Completed';
+            }
+
+            // Update transaction hash if available
+            if (data.transactionHash) {
+                // Add transaction to table or update existing one
+                addTransactionToTable(data);
+            }
+        }
+
+        // Add transaction to table with real data
+        function addTransactionToTable(data) {
+            const tableBody = document.querySelector('.transactions-table tbody');
+            if (!tableBody) return;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="tx-hash">${data.transactionHash}</td>
+                <td class="tx-amount">${data.amount} BTC</td>
+                <td>${new Date().toLocaleDateString()}</td>
+                <td><span class="tx-status status-completed">Completed</span></td>
+                <td>
+                    <button class="icon-btn"><i class="fas fa-eye"></i></button>
+                </td>
+            `;
+
+            // Insert at the beginning of the table
+            tableBody.insertBefore(row, tableBody.firstChild);
+        }
+
+        // Enhanced transaction monitoring
+        async function monitorDepositTransactions() {
+            if (!connectedAddress) return;
+
+            try {
+                const transactionsResult = await window.VernWalletIntegration.getDepositTransactions(connectedAddress);
+
+                if (transactionsResult.success && transactionsResult.transactions) {
+                    updateTransactionsTable(transactionsResult.transactions);
+                }
+
+            } catch (error) {
+                console.error('Error monitoring transactions:', error);
+            }
+        }
+
+        // Update transactions table with real data
+        function updateTransactionsTable(transactions) {
+            const tableBody = document.querySelector('.transactions-table tbody');
+            if (!tableBody) return;
+
+            // Clear existing rows (except header)
+            tableBody.innerHTML = '';
+
+            transactions.forEach(tx => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="tx-hash">${tx.hash}</td>
+                    <td class="tx-amount">${tx.amount} BTC</td>
+                    <td>${new Date(tx.timestamp).toLocaleDateString()}</td>
+                    <td><span class="tx-status status-${tx.status}">${tx.status}</span></td>
+                    <td>
+                        <button class="icon-btn"><i class="fas fa-eye"></i></button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Monitor transactions periodically
+        setInterval(monitorDepositTransactions, 30000); // Check every 30 seconds
+
+        console.log('🔗 VernWallet Deposit integration initialized successfully');
     </script>
 </body>
 </html>

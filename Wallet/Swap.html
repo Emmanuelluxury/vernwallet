@@ -1049,13 +1049,13 @@
                 },
                 {
                     id: 'starknet',
-                    name: 'StarkNet Wallet',
+                    name: 'Ready Wallet',
                     type: 'StarkNet',
                     icon: 'fas fa-link',
                     isAvailable: () => window.starknet,
                     connect: async () => {
                         await window.starknet.enable();
-                        return { address: window.starknet.selectedAddress, name: window.starknet.name || 'StarkNet Wallet' };
+                        return { address: window.starknet.selectedAddress, name: window.starknet.name || 'Ready Wallet' };
                     }
                 }
             ];
@@ -1114,9 +1114,9 @@
         // Check for existing wallet connection on page load
         async function checkExistingWalletConnection() {
             try {
-                // Check StarkNet wallets first
+                // Check Ready wallets first
                 if (window.starknet && window.starknet.isConnected) {
-                    connectedWallet = window.starknet.name || 'StarkNet Wallet';
+                    connectedWallet = window.starknet.name || 'Ready Wallet';
                     connectedAddress = window.starknet.selectedAddress;
                     updateWalletUI();
                     return;
@@ -1337,6 +1337,392 @@
         
         // Initialize the dashboard
         init();
+
+        // Initialize frontend integration for real contract interactions
+        window.VernWalletIntegration = new VernWalletFrontendIntegration({
+            apiUrl: 'http://localhost:3001',
+            websocketUrl: 'ws://localhost:3001/ws',
+            autoConnect: true,
+            enableRealTimeUpdates: true
+        });
+
+        // Set up real-time swap integration
+        window.VernWalletIntegration.on('swapConnected', () => {
+            console.log('🔗 Connected to VernWallet Swap API');
+            showNotification('Connected to swap backend successfully');
+        });
+
+        window.VernWalletIntegration.on('swapError', (error) => {
+            console.error('Swap API Error:', error);
+            showNotification(`Swap error: ${error.message}`, true);
+        });
+
+        window.VernWalletIntegration.on('priceUpdate', (data) => {
+            console.log('Price update:', data);
+            // Update exchange rates with real data
+            if (data.rates) {
+                Object.keys(data.rates).forEach(key => {
+                    exchangeRates[key] = data.rates[key];
+                });
+                updateQuote();
+            }
+        });
+
+        // Enhanced swap execution with real contract integration
+        async function executeRealSwap() {
+            const fromToken = fromTokenSelect.querySelector('.token-symbol').textContent;
+            const toToken = toTokenSelect.querySelector('.token-symbol').textContent;
+            const amount = parseFloat(fromAmount.value) || 0;
+
+            if (amount <= 0) {
+                showNotification('Please enter a valid amount', true);
+                return;
+            }
+
+            if (!connectedAddress) {
+                showNotification('Please connect your wallet first', true);
+                return;
+            }
+
+            try {
+                swapButton.disabled = true;
+                swapButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Swapping...';
+
+                const result = await window.VernWalletIntegration.executeSwap({
+                    fromToken: fromToken,
+                    toToken: toToken,
+                    amount: amount,
+                    fromAddress: connectedAddress,
+                    slippageTolerance: 0.5
+                });
+
+                if (result.success) {
+                    showNotification(`Swap executed successfully! ${result.toAmount} ${toToken} received. Transaction: ${result.transactionHash?.substring(0, 10)}...`);
+
+                    // Reset form
+                    fromAmount.value = '';
+                    toAmount.value = '';
+                    swapButton.disabled = true;
+                } else {
+                    throw new Error(result.error || 'Swap failed');
+                }
+
+            } catch (error) {
+                console.error('Real swap error:', error);
+                showNotification(`Swap failed: ${error.message}`, true);
+            } finally {
+                swapButton.disabled = false;
+                swapButton.innerHTML = 'Swap';
+            }
+        }
+
+        // Override the original swap execution
+        swapButton.removeEventListener('click', executeSwap);
+        swapButton.addEventListener('click', executeRealSwap);
+
+        // Enhanced wallet connection with real contract integration
+        function connectWalletWithIntegration() {
+            if (connectedWallet) {
+                showNotification('Wallet already connected. Please disconnect first.', true);
+                return;
+            }
+            openWalletModal();
+        }
+
+        // Override wallet connection
+        connectWalletBtn.removeEventListener('click', connectWallet);
+        connectWalletBtn.addEventListener('click', connectWalletWithIntegration);
+
+        // Enhanced wallet connection handler
+        async function connectToRealWalletWithIntegration(wallet) {
+            try {
+                closeWalletModal();
+                showNotification(`Connecting to ${wallet.name}...`);
+
+                const result = await wallet.connect();
+
+                if (!result || !result.address) {
+                    throw new Error('No address returned from wallet');
+                }
+
+                connectedWallet = result.name;
+                connectedAddress = result.address;
+
+                updateWalletUI();
+
+                // Initialize real contract integration
+                await window.VernWalletIntegration.connectWallet({
+                    type: wallet.type.toLowerCase(),
+                    address: connectedAddress,
+                    name: connectedWallet
+                });
+
+                showNotification(`Successfully connected to ${connectedWallet}!`);
+
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                showNotification(`Failed to connect to ${wallet.name}: ${error.message}`, true);
+            }
+        }
+
+        // Override wallet connection in modal
+        const realWallets = [
+            {
+                id: 'metamask',
+                name: 'MetaMask',
+                type: 'Ethereum',
+                icon: 'fab fa-ethereum',
+                isAvailable: () => window.ethereum && !window.ethereum.isCoinbaseWallet && !window.ethereum.isTrust,
+                connect: async () => {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    return { address: accounts[0], name: 'MetaMask' };
+                }
+            },
+            {
+                id: 'phantom',
+                name: 'Phantom',
+                type: 'Solana',
+                icon: 'fas fa-ghost',
+                isAvailable: () => window.solana && window.solana.isPhantom,
+                connect: async () => {
+                    const response = await window.solana.connect();
+                    return { address: response.publicKey.toString(), name: 'Phantom' };
+                }
+            },
+            {
+                id: 'coinbase',
+                name: 'Coinbase Wallet',
+                type: 'Ethereum',
+                icon: 'fab fa-bitcoin',
+                isAvailable: () => window.ethereum && window.ethereum.isCoinbaseWallet,
+                connect: async () => {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    return { address: accounts[0], name: 'Coinbase Wallet' };
+                }
+            },
+            {
+                id: 'solflare',
+                name: 'Solflare',
+                type: 'Solana',
+                icon: 'fas fa-sun',
+                isAvailable: () => window.solflare && window.solflare.isSolflare,
+                connect: async () => {
+                    const response = await window.solflare.connect();
+                    return { address: response.publicKey.toString(), name: 'Solflare' };
+                }
+            },
+            {
+                id: 'trustwallet',
+                name: 'Trust Wallet',
+                type: 'Ethereum',
+                icon: 'fas fa-shield-alt',
+                isAvailable: () => window.ethereum && window.ethereum.isTrust,
+                connect: async () => {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    return { address: accounts[0], name: 'Trust Wallet' };
+                }
+            },
+            {
+                id: 'starknet',
+                name: 'Ready Wallet',
+                type: 'StarkNet',
+                icon: 'fas fa-link',
+                isAvailable: () => window.starknet,
+                connect: async () => {
+                    await window.starknet.enable();
+                    return { address: window.starknet.selectedAddress, name: window.starknet.name || 'Ready Wallet' };
+                }
+            }
+        ];
+
+        // Override wallet connection for each wallet
+        realWallets.forEach(wallet => {
+            if (wallet.isAvailable()) {
+                // Store original connect function
+                const originalConnect = wallet.connect;
+                // Override with enhanced version
+                wallet.connect = async () => {
+                    const result = await originalConnect();
+                    await window.VernWalletIntegration.connectWallet({
+                        type: wallet.type.toLowerCase(),
+                        address: result.address,
+                        name: result.name
+                    });
+                    return result;
+                };
+            }
+        });
+
+        // Enhanced token selection with real-time price updates
+        function selectTokenWithIntegration(tokenSymbol, isFrom) {
+            if (isFrom) {
+                fromTokenSelect.querySelector('.token-symbol').textContent = tokenSymbol;
+                // Update token icon based on symbol
+                const iconMap = {
+                    'BTC': 'fab fa-bitcoin',
+                    'STRK': 'fas fa-link',
+                    'ETH': 'fab fa-ethereum',
+                    'USDC': 'fas fa-dollar-sign'
+                };
+                const iconClass = iconMap[tokenSymbol] || 'fas fa-coins';
+                fromTokenSelect.querySelector('.token-icon').innerHTML = `<i class="${iconClass}"></i>`;
+            } else {
+                toTokenSelect.querySelector('.token-symbol').textContent = tokenSymbol;
+                // Update token icon based on symbol
+                const iconMap = {
+                    'BTC': 'fab fa-bitcoin',
+                    'STRK': 'fas fa-link',
+                    'ETH': 'fab fa-ethereum',
+                    'USDC': 'fas fa-dollar-sign'
+                };
+                const iconClass = iconMap[tokenSymbol] || 'fas fa-coins';
+                toTokenSelect.querySelector('.token-icon').innerHTML = `<i class="${iconClass}"></i>`;
+            }
+
+            tokenModal.style.display = 'none';
+            updateQuoteWithIntegration();
+        }
+
+        // Enhanced quote update with real-time prices
+        async function updateQuoteWithIntegration() {
+            const fromToken = fromTokenSelect.querySelector('.token-symbol').textContent;
+            const toToken = toTokenSelect.querySelector('.token-symbol').textContent;
+            const amount = parseFloat(fromAmount.value) || 0;
+
+            if (fromToken === toToken) {
+                toAmount.value = amount;
+                return;
+            }
+
+            if (amount > 0) {
+                try {
+                    // Get real-time quote from backend
+                    const quoteResult = await window.VernWalletIntegration.getSwapQuote({
+                        fromToken: fromToken,
+                        toToken: toToken,
+                        amount: amount
+                    });
+
+                    if (quoteResult.success) {
+                        toAmount.value = quoteResult.toAmount;
+                        // Update exchange rate display
+                        const rateElement = document.querySelector('.detail-value');
+                        if (rateElement) {
+                            rateElement.textContent = `1 ${fromToken} = ${quoteResult.exchangeRate} ${toToken}`;
+                        }
+                    } else {
+                        // Fallback to static rates
+                        const rateKey = `${fromToken}-${toToken}`;
+                        if (exchangeRates[rateKey]) {
+                            const result = amount * exchangeRates[rateKey];
+                            toAmount.value = result.toFixed(2);
+                        } else {
+                            toAmount.value = '0.0';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Quote update error:', error);
+                    // Fallback to static rates
+                    const rateKey = `${fromToken}-${toToken}`;
+                    if (exchangeRates[rateKey]) {
+                        const result = amount * exchangeRates[rateKey];
+                        toAmount.value = result.toFixed(2);
+                    } else {
+                        toAmount.value = '0.0';
+                    }
+                }
+            } else {
+                toAmount.value = '0.0';
+            }
+
+            // Enable/disable swap button based on input
+            swapButton.disabled = amount <= 0;
+        }
+
+        // Override token selection event listeners
+        fromTokenSelect.removeEventListener('click', fromTokenSelect.onclick);
+        fromTokenSelect.addEventListener('click', () => {
+            currentSelection = 'from';
+            tokenModal.style.display = 'flex';
+        });
+
+        toTokenSelect.removeEventListener('click', toTokenSelect.onclick);
+        toTokenSelect.addEventListener('click', () => {
+            currentSelection = 'to';
+            tokenModal.style.display = 'flex';
+        });
+
+        // Override amount input listener
+        fromAmount.removeEventListener('input', updateQuote);
+        fromAmount.addEventListener('input', updateQuoteWithIntegration);
+
+        // Override token selection from modal
+        const tokenItems = document.querySelectorAll('.token-item');
+        tokenItems.forEach(item => {
+            item.removeEventListener('click', item.onclick);
+            item.addEventListener('click', function() {
+                const tokenSymbol = this.querySelector('.token-name').textContent;
+                selectTokenWithIntegration(tokenSymbol, currentSelection === 'from');
+            });
+        });
+
+        // Enhanced token switch with integration
+        function switchTokensWithIntegration() {
+            const fromToken = fromTokenSelect.querySelector('.token-symbol').textContent;
+            const toToken = toTokenSelect.querySelector('.token-symbol').textContent;
+
+            // Swap tokens
+            fromTokenSelect.querySelector('.token-symbol').textContent = toToken;
+            toTokenSelect.querySelector('.token-symbol').textContent = fromToken;
+
+            // Swap icons
+            const fromIcon = fromTokenSelect.querySelector('.token-icon').cloneNode(true);
+            const toIcon = toTokenSelect.querySelector('.token-icon').cloneNode(true);
+
+            fromTokenSelect.querySelector('.token-icon').replaceWith(toIcon);
+            toTokenSelect.querySelector('.token-icon').replaceWith(fromIcon);
+
+            // Update quote with new token pair
+            updateQuoteWithIntegration();
+        }
+
+        // Override switch tokens
+        switchTokens.removeEventListener('click', switchTokens.onclick);
+        switchTokens.addEventListener('click', switchTokensWithIntegration);
+
+        // Enhanced liquidity pool display with real data
+        async function loadLiquidityPools() {
+            try {
+                const poolsResult = await window.VernWalletIntegration.getLiquidityPools();
+
+                if (poolsResult.success && poolsResult.pools) {
+                    // Update pool information with real data
+                    const poolItems = document.querySelectorAll('.pool-item');
+                    poolsResult.pools.forEach((pool, index) => {
+                        if (poolItems[index]) {
+                            const valueElement = poolItems[index].querySelector('.pool-value');
+                            const aprElement = poolItems[index].querySelector('.pool-apr');
+
+                            if (valueElement) {
+                                valueElement.textContent = `$${pool.totalValueLocked}`;
+                            }
+                            if (aprElement) {
+                                aprElement.textContent = `${pool.apr}% APR`;
+                            }
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading liquidity pools:', error);
+            }
+        }
+
+        // Load liquidity pools on initialization
+        if (window.VernWalletIntegration) {
+            loadLiquidityPools();
+        }
+
+        console.log('🔗 VernWallet Swap integration initialized successfully');
     </script>
 </body>
 </html>

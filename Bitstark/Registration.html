@@ -26,6 +26,7 @@
             --transition: all 0.3s ease;
             --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --gradient-dark: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
         }
         
         * {
@@ -45,6 +46,8 @@
             background-image: 
                 radial-gradient(circle at 15% 50%, rgba(124, 58, 237, 0.1) 0%, transparent 25%),
                 radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.1) 0%, transparent 25%);
+            position: relative;
+            overflow-x: hidden;
         }
         
         .container {
@@ -52,6 +55,42 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
+        }
+        
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+        }
+        
+        /* Glow effects */
+        .glow {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(var(--primary), transparent 70%);
+            opacity: 0.05;
+            filter: blur(40px);
+            z-index: -1;
+        }
+        
+        .glow-1 {
+            top: 10%;
+            right: 10%;
+        }
+        
+        .glow-2 {
+            bottom: 10%;
+            left: 10%;
         }
         
         /* Header */
@@ -79,6 +118,9 @@
             font-size: 1.5rem;
             color: white;
             text-decoration: none;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
         .logo-icon {
@@ -86,17 +128,34 @@
             font-size: 1.8rem;
         }
         
+        .login-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .login-link:hover {
+            color: var(--primary-light);
+        }
+        
         /* Main Content */
         main {
             flex: 1;
             padding: 40px 0;
+            display: flex;
+            align-items: center;
+            min-height: calc(100vh - 140px);
         }
         
         .dashboard {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 40px;
-            margin-top: 30px;
+            width: 100%;
         }
         
         @media (max-width: 968px) {
@@ -107,7 +166,7 @@
         
         .registration-card {
             background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
             border-radius: 20px;
             padding: 40px;
             box-shadow: var(--card-shadow);
@@ -181,6 +240,11 @@
             top: 42px;
             color: var(--gray);
             cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .password-toggle:hover {
+            color: var(--primary);
         }
         
         .form-row {
@@ -237,6 +301,12 @@
         .terms a {
             color: var(--primary);
             text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .terms a:hover {
+            color: var(--primary-light);
+            text-decoration: underline;
         }
         
         .divider {
@@ -281,6 +351,7 @@
         .wallet-btn:hover {
             background: rgba(124, 58, 237, 0.1);
             border-color: var(--primary);
+            transform: translateY(-1px);
         }
 
         .google-btn {
@@ -306,12 +377,24 @@
         /* Dashboard Info */
         .dashboard-info {
             background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
             border-radius: 20px;
             padding: 40px;
             box-shadow: var(--card-shadow);
             border: 1px solid rgba(255, 255, 255, 0.05);
             height: fit-content;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dashboard-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient);
         }
         
         .info-header {
@@ -339,6 +422,14 @@
             align-items: center;
             gap: 15px;
             margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+        
+        .benefit-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
         }
         
         .benefit-icon {
@@ -351,6 +442,13 @@
             justify-content: center;
             color: var(--primary);
             font-size: 1.2rem;
+            transition: var(--transition);
+        }
+        
+        .benefit-item:hover .benefit-icon {
+            background: var(--gradient);
+            color: white;
+            transform: rotateY(180deg);
         }
         
         .benefit-content h3 {
@@ -369,6 +467,7 @@
             border-radius: 15px;
             padding: 25px;
             margin-top: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
         
         .stats h3 {
@@ -386,6 +485,13 @@
         
         .stat-item {
             text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        
+        .stat-item:hover {
+            background: rgba(255, 255, 255, 0.05);
         }
         
         .stat-value {
@@ -448,6 +554,7 @@
         
         .social-links a:hover {
             color: var(--primary);
+            transform: translateY(-2px);
         }
         
         .footer-links h3 {
@@ -484,6 +591,7 @@
         
         .footer-links a:hover {
             color: white;
+            padding-left: 5px;
         }
         
         .copyright {
@@ -519,6 +627,7 @@
             box-shadow: var(--card-shadow);
             border: 1px solid rgba(124, 58, 237, 0.2);
             animation: modalFadeIn 0.3s ease;
+            position: relative;
         }
         
         @keyframes modalFadeIn {
@@ -573,42 +682,6 @@
             background: rgba(255, 255, 255, 0.1);
             color: white;
         }
-
-        .email-radio {
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--gray);
-            border-radius: 50%;
-            position: relative;
-            transition: var(--transition);
-        }
-
-        .email-radio.selected::after {
-            content: '';
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 8px;
-            height: 8px;
-            background: var(--primary);
-            border-radius: 50%;
-        }
-
-        .different-email {
-            border: 2px dashed rgba(124, 58, 237, 0.3);
-            background: rgba(124, 58, 237, 0.05);
-        }
-
-        .different-email:hover {
-            border-color: var(--primary);
-            background: rgba(124, 58, 237, 0.1);
-        }
-
-        .different-email .email-avatar {
-            background: transparent;
-            color: var(--primary);
-        }
-
         
         /* Password strength indicator */
         .password-strength {
@@ -661,17 +734,92 @@
             .modal-content {
                 padding: 30px 20px;
             }
+            
+            main {
+                padding: 20px 0;
+            }
+        }
+
+        /* New Enhanced Elements */
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+        
+        .live-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        
+        .live-status::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--info);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-100vh) rotate(360deg); }
         }
     </style>
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    
+    <!-- Particles Background -->
+    <div class="particles" id="particles"></div>
+
     <!-- Header -->
     <header>
         <div class="container">
             <nav>
-                <a href="#" class="logo">
+                <a href="../Bitstark/Landingpage.html" class="logo">
                     <i class="fas fa-bridge logo-icon"></i>
                     BTC→STARK
+                </a>
+                <a href="../Bitstark/Login.html" class="login-link">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Already have an account? Sign in
                 </a>
             </nav>
         </div>
@@ -686,6 +834,11 @@
                     <div class="card-header">
                         <h2>Create Account</h2>
                         <p>Register to start using the Bitcoin-StarkNet Bridge</p>
+                    </div>
+                    
+                    <div class="security-badge">
+                        <i class="fas fa-shield-alt"></i>
+                        Secure & Encrypted Registration
                     </div>
                     
                     <form id="registrationForm">
@@ -738,9 +891,7 @@
                         <div class="wallet-options">
                             <button type="button" class="wallet-btn google-btn" id="googleBtn">
                                 <i class="fab fa-google wallet-icon"></i>
-                                <span>Sign in with Google</span>
-                            </button>
-                            
+                                <span>Sign up with Google</span>
                             </button>
                         </div>
                     </form>
@@ -841,7 +992,7 @@
                 <div class="footer-links">
                     <h3>Product</h3>
                     <ul>
-                        <li><a href="#">Bridge</a></li>
+                        <li><a href="../Bitstark/Landingpage.html">Bridge</a></li>
                         <li><a href="#">Fees</a></li>
                         <li><a href="#">Security</a></li>
                         <li><a href="#">Status</a></li>
@@ -850,7 +1001,7 @@
                 <div class="footer-links">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="#">Documentation</a></li>
+                        <li><a href="../Bitstark/Documentation.html">Documentation</a></li>
                         <li><a href="#">Tutorials</a></li>
                         <li><a href="#">API</a></li>
                         <li><a href="#">Support</a></li>
@@ -872,8 +1023,6 @@
         </div>
     </footer>
 
-
-
     <!-- Success Modal -->
     <div class="modal" id="successModal">
         <div class="modal-content">
@@ -888,6 +1037,32 @@
     </div>
 
     <script>
+        // Create particles background
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size and position
+                const size = Math.random() * 5 + 1;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // Random color
+                const colors = ['#7c3aed', '#10b981', '#f7931a', '#3b82f6'];
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Random animation duration
+                particle.style.animationDuration = `${Math.random() * 20 + 10}s`;
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
         // Google Sign-In Configuration
         // For local development, you can use a demo/test client ID
         // Replace with your actual Google OAuth 2.0 Client ID from Google Cloud Console for production
@@ -957,11 +1132,60 @@
             return JSON.parse(jsonPayload);
         }
 
+        // Check if user has an account
+        function checkUserAccount() {
+            const userData = localStorage.getItem('userData');
+            console.log('Checking user account - userData:', userData);
+            return userData !== null;
+        }
+
+        // Update login link based on account status
+        function updateLoginLink() {
+            const loginLink = document.querySelector('.login-link');
+            const hasAccount = checkUserAccount();
+            console.log('Updating login link - hasAccount:', hasAccount);
+
+            if (hasAccount) {
+                // User has an account, make link functional
+                loginLink.href = '../Bitstark/Login.html';
+                loginLink.style.opacity = '1';
+                loginLink.style.pointerEvents = 'auto';
+                loginLink.style.cursor = 'pointer';
+                loginLink.title = 'Sign in to your account';
+                console.log('Login link enabled');
+            } else {
+                // User doesn't have an account, disable link
+                loginLink.href = '#';
+                loginLink.style.opacity = '0.5';
+                loginLink.style.pointerEvents = 'none';
+                loginLink.style.cursor = 'not-allowed';
+                loginLink.title = 'Please register first to access login';
+                console.log('Login link disabled');
+            }
+        }
+
+        // Handle login link click
+        function handleLoginClick(event) {
+            const hasAccount = checkUserAccount();
+            if (!hasAccount) {
+                event.preventDefault();
+                alert('Please register first before signing in.');
+                return false;
+            }
+            return true;
+        }
+
         // Initialize when Google script loads
         window.onload = function() {
+            createParticles();
             if (typeof google !== 'undefined') {
                 initializeGoogleSignIn();
             }
+            updateLoginLink();
+
+            // Add click handler to login link
+            const loginLink = document.querySelector('.login-link');
+            loginLink.addEventListener('click', handleLoginClick);
         };
 
         // Password visibility toggle
@@ -1013,6 +1237,7 @@
                 passwordStrengthBar.className = 'password-strength-bar';
                 passwordStrengthBar.style.width = '0';
                 passwordStrengthText.textContent = 'Password strength';
+                passwordStrengthText.style.color = 'var(--gray)';
             } else if (strength <= 2) {
                 passwordStrengthBar.className = 'password-strength-bar strength-weak';
                 passwordStrengthText.textContent = 'Weak password';
@@ -1036,9 +1261,21 @@
             const confirmPassword = document.getElementById('confirmPassword').value;
             const firstName = document.getElementById('firstName').value;
             const lastName = document.getElementById('lastName').value;
+            const terms = document.getElementById('terms').checked;
+            
+            // Validation
+            if (!terms) {
+                alert('Please agree to the Terms of Service and Privacy Policy');
+                return;
+            }
             
             if (password !== confirmPassword) {
                 alert('Passwords do not match!');
+                return;
+            }
+            
+            if (password.length < 8) {
+                alert('Password must be at least 8 characters long');
                 return;
             }
             
@@ -1048,7 +1285,8 @@
                 lastName: lastName,
                 email: document.getElementById('email').value,
                 name: `${firstName} ${lastName}`,
-                avatar: null
+                avatar: null,
+                registrationDate: new Date().toISOString()
             };
             
             localStorage.setItem('userData', JSON.stringify(userData));
@@ -1071,47 +1309,12 @@
             }
         });
 
-        document.getElementById('metamaskBtn').addEventListener('click', function() {
-            simulateWalletRegistration('MetaMask');
-        });
-
-        document.getElementById('argentBtn').addEventListener('click', function() {
-            simulateWalletRegistration('Argent X');
-        });
-
-        document.getElementById('braavosBtn').addEventListener('click', function() {
-            simulateWalletRegistration('Braavos');
-        });
-        
-
-
-
-
-
-        function simulateWalletRegistration(walletName) {
-            // For demo purposes, simulate wallet registration
-            const userData = {
-                name: "Wallet User",
-                email: "user@wallet.com",
-                avatar: null,
-                wallet: walletName
-            };
-
-            localStorage.setItem('userData', JSON.stringify(userData));
-
-            // Show success modal
-            document.getElementById('successModal').style.display = 'flex';
-        }
-        
-
         // Close modal when clicking outside
         window.addEventListener('click', function(event) {
             if (event.target.classList.contains('modal')) {
-                const modalId = event.target.id;
-                closeModal(modalId);
+                event.target.style.display = 'none';
             }
         });
     </script>
 </body>
 </html>
-

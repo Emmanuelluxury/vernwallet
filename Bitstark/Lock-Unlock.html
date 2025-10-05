@@ -140,9 +140,104 @@
         }
 
         .connect-wallet.connected:hover {
-            transform: none;
-            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.25);
-        }
+             transform: none;
+             box-shadow: 0 4px 6px rgba(16, 185, 129, 0.25);
+         }
+
+         /* Enhanced Wallet Connection Styles */
+         .wallet-connection-status {
+             display: flex;
+             align-items: center;
+             gap: 8px;
+             padding: 8px 12px;
+             background: rgba(16, 185, 129, 0.1);
+             border-radius: 20px;
+             border: 1px solid rgba(16, 185, 129, 0.3);
+             font-size: 0.85rem;
+             color: var(--secondary);
+         }
+
+         .wallet-disconnect-btn {
+             background: none;
+             border: none;
+             color: var(--danger);
+             cursor: pointer;
+             padding: 4px;
+             border-radius: 50%;
+             transition: all 0.3s;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+         }
+
+         .wallet-disconnect-btn:hover {
+             background: rgba(239, 68, 68, 0.1);
+             transform: scale(1.1);
+         }
+
+         .wallet-info-display {
+             display: flex;
+             flex-direction: column;
+             gap: 4px;
+         }
+
+         .wallet-name-display {
+             font-weight: 600;
+             color: white;
+             font-size: 0.9rem;
+         }
+
+         .wallet-address-display {
+             font-family: 'JetBrains Mono', monospace;
+             font-size: 0.75rem;
+             color: var(--gray);
+         }
+
+         .connection-indicator {
+             display: flex;
+             align-items: center;
+             gap: 6px;
+             font-size: 0.8rem;
+         }
+
+         .connection-dot {
+             width: 8px;
+             height: 8px;
+             border-radius: 50%;
+             background: var(--secondary);
+             animation: connectionPulse 2s infinite;
+         }
+
+         @keyframes connectionPulse {
+             0% { opacity: 1; }
+             50% { opacity: 0.5; }
+             100% { opacity: 1; }
+         }
+
+         .wallet-balance-display {
+             background: rgba(124, 58, 237, 0.1);
+             border-radius: 8px;
+             padding: 8px 12px;
+             margin-top: 8px;
+             border: 1px solid rgba(124, 58, 237, 0.2);
+         }
+
+         .balance-item {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             font-size: 0.8rem;
+         }
+
+         .balance-amount {
+             font-family: 'JetBrains Mono', monospace;
+             font-weight: 600;
+             color: var(--primary);
+         }
+
+         .balance-label {
+             color: var(--gray);
+         }
 
         /* Wallet Modal */
         .modal {
@@ -160,16 +255,29 @@
         }
 
         .modal-content {
-            background: var(--dark);
-            border-radius: 16px;
-            padding: 30px;
+            background: linear-gradient(135deg, var(--dark) 0%, rgba(15, 23, 42, 0.9) 100%);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
             width: 100%;
-            max-width: 500px;
-            max-height: 80vh;
+            max-width: 600px;
+            max-height: 85vh;
             overflow-y: auto;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             position: relative;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .modal-header {
@@ -425,6 +533,97 @@
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+        }
+
+        /* Address Input Enhancement */
+        .address-input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .address-input-container:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+        }
+
+        .address-input {
+            flex: 1;
+            padding: 14px 16px;
+            border: none;
+            background: transparent;
+            color: white;
+            font-size: 1rem;
+            border-radius: 10px;
+        }
+
+        .address-input:focus {
+            outline: none;
+        }
+
+        .address-actions {
+            display: flex;
+            gap: 8px;
+            padding: 0 8px;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .address-action-btn {
+            background: none;
+            border: none;
+            color: var(--gray);
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .address-action-btn:hover {
+            background: rgba(124, 58, 237, 0.1);
+            color: var(--primary);
+        }
+
+        .address-feedback {
+            margin-top: 8px;
+            min-height: 20px;
+        }
+
+        .address-status {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .address-status.valid {
+            color: var(--secondary);
+        }
+
+        .address-status.invalid {
+            color: var(--danger);
+        }
+
+        .address-status i {
+            font-size: 0.8rem;
+        }
+
+        /* Responsive adjustments for address input */
+        @media (max-width: 768px) {
+            .address-actions {
+                gap: 4px;
+                padding: 0 4px;
+            }
+
+            .address-action-btn {
+                padding: 6px;
+            }
         }
         
         .amount-input {
@@ -877,15 +1076,38 @@
                 <form class="action-form" id="lockForm">
                     <div class="form-group">
                         <label for="fromAddress">From Bitcoin Address</label>
-                        <select id="fromAddress">
-                            <option value="bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq">bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq (1.2543 BTC)</option>
-                            <option value="bc1q9z4m9s5vner4nj24cnv3xdrp5p6c0v0y3j5g4z">bc1q9z4m9s5vner4nj24cnv3xdrp5p6c0v0y3j5g4z (0.8421 BTC)</option>
-                        </select>
+                        <div class="address-input-container">
+                            <input type="text" id="fromAddress" placeholder="Enter Bitcoin address or use connected wallet" class="address-input" required>
+                            <div class="address-actions">
+                                <button type="button" class="address-action-btn" id="useConnectedBtn" title="Use Connected Wallet">
+                                    <i class="fas fa-wallet"></i>
+                                </button>
+                                <button type="button" class="address-action-btn" id="pasteBtn" title="Paste from Clipboard">
+                                    <i class="fas fa-paste"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="address-feedback">
+                            <span class="address-status" id="addressStatus"></span>
+                        </div>
                     </div>
                     
                     <div class="form-group">
                         <label for="toAddress">StarkNet Address</label>
-                        <input type="text" id="toAddress" placeholder="Enter your StarkNet address" required>
+                        <div class="address-input-container">
+                            <input type="text" id="toAddress" placeholder="Enter StarkNet address or use connected wallet" class="address-input" required>
+                            <div class="address-actions">
+                                <button type="button" class="address-action-btn" id="starknetUseConnectedBtn" title="Use Connected Wallet">
+                                    <i class="fas fa-wallet"></i>
+                                </button>
+                                <button type="button" class="address-action-btn" id="starknetPasteBtn" title="Paste from Clipboard">
+                                    <i class="fas fa-paste"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="address-feedback">
+                            <span class="address-status" id="starknetAddressStatus"></span>
+                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -973,15 +1195,38 @@
                 <form class="action-form" id="unlockForm">
                     <div class="form-group">
                         <label for="unlockFromAddress">From StarkNet Address</label>
-                        <select id="unlockFromAddress">
-                            <option value="0x072D4D4F4Ca56e4f1B515E214c23399B7cA312a9aA4F02679871d5bdafa7c7c1">0x072D...c7c1 (42.5 sBTC)</option>
-                            <option value="0x05b6b3f8b518b4696b24d6b0e729b66e4d9c3d3a7d87c6f3c6f3d3a7d87c6f3c">0x05b6...6f3c (18.3 sBTC)</option>
-                        </select>
+                        <div class="address-input-container">
+                            <input type="text" id="unlockFromAddress" placeholder="Enter StarkNet address or use connected wallet" class="address-input" required>
+                            <div class="address-actions">
+                                <button type="button" class="address-action-btn" id="unlockUseConnectedBtn" title="Use Connected Wallet">
+                                    <i class="fas fa-wallet"></i>
+                                </button>
+                                <button type="button" class="address-action-btn" id="unlockPasteBtn" title="Paste from Clipboard">
+                                    <i class="fas fa-paste"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="address-feedback">
+                            <span class="address-status" id="unlockAddressStatus"></span>
+                        </div>
                     </div>
                     
                     <div class="form-group">
                         <label for="unlockToAddress">Bitcoin Address</label>
-                        <input type="text" id="unlockToAddress" placeholder="Enter your Bitcoin address" required>
+                        <div class="address-input-container">
+                            <input type="text" id="unlockToAddress" placeholder="Enter Bitcoin address or use connected wallet" class="address-input" required>
+                            <div class="address-actions">
+                                <button type="button" class="address-action-btn" id="unlockBitcoinUseConnectedBtn" title="Use Connected Wallet">
+                                    <i class="fas fa-wallet"></i>
+                                </button>
+                                <button type="button" class="address-action-btn" id="unlockBitcoinPasteBtn" title="Paste from Clipboard">
+                                    <i class="fas fa-paste"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="address-feedback">
+                            <span class="address-status" id="unlockBitcoinAddressStatus"></span>
+                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -1188,13 +1433,13 @@
         const availableWallets = [
             {
                 id: 'starknet',
-                name: 'StarkNet Wallet',
+                name: 'Ready Wallet',
                 type: 'StarkNet',
                 icon: 'fas fa-link',
                 isAvailable: () => window.starknet,
                 connect: async () => {
                     await window.starknet.enable();
-                    return { address: window.starknet.selectedAddress, name: window.starknet.name || 'StarkNet Wallet' };
+                    return { address: window.starknet.selectedAddress, name: window.starknet.name || 'Ready Wallet' };
                 }
             },
             {
@@ -1396,11 +1641,159 @@
             }, 3000);
         }
 
+        // Address input enhancement functionality
+        function initializeAddressInput() {
+            const fromAddressInput = document.getElementById('fromAddress');
+            const useConnectedBtn = document.getElementById('useConnectedBtn');
+            const pasteBtn = document.getElementById('pasteBtn');
+            const addressStatus = document.getElementById('addressStatus');
+
+            // Bitcoin address validation regex patterns
+            const bitcoinPatterns = [
+                /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/, // Legacy (P2PKH)
+                /^[bc1][a-z0-9]{39,59}$/, // SegWit (Bech32)
+                /^[3][a-km-zA-HJ-NP-Z1-9]{25,34}$/ // P2SH
+            ];
+
+            // Validate Bitcoin address
+            function isValidBitcoinAddress(address) {
+                return bitcoinPatterns.some(pattern => pattern.test(address));
+            }
+
+            // Update address status
+            function updateAddressStatus(isValid, message = '') {
+                if (isValid) {
+                    addressStatus.innerHTML = '<i class="fas fa-check-circle"></i> Valid Bitcoin address';
+                    addressStatus.className = 'address-status valid';
+                } else {
+                    addressStatus.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message || 'Invalid Bitcoin address'}`;
+                    addressStatus.className = 'address-status invalid';
+                }
+            }
+
+            // Real-time validation
+            fromAddressInput.addEventListener('input', function() {
+                const address = this.value.trim();
+                if (address) {
+                    const isValid = isValidBitcoinAddress(address);
+                    updateAddressStatus(isValid);
+                } else {
+                    addressStatus.innerHTML = '';
+                    addressStatus.className = 'address-status';
+                }
+            });
+
+            // Use connected wallet address
+            useConnectedBtn.addEventListener('click', function() {
+                if (connectedAddress) {
+                    fromAddressInput.value = connectedAddress;
+                    updateAddressStatus(isValidBitcoinAddress(connectedAddress), 'Using connected wallet address');
+                } else {
+                    showNotification('No wallet connected. Please connect a wallet first.', true);
+                }
+            });
+
+            // Paste from clipboard
+            pasteBtn.addEventListener('click', async function() {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    if (text) {
+                        fromAddressInput.value = text.trim();
+                        const isValid = isValidBitcoinAddress(text.trim());
+                        updateAddressStatus(isValid, isValid ? 'Address pasted from clipboard' : 'Invalid Bitcoin address format');
+                        showNotification('Address pasted from clipboard');
+                    }
+                } catch (error) {
+                    console.error('Failed to read clipboard:', error);
+                    showNotification('Failed to access clipboard. Please paste manually.', true);
+                }
+            });
+
+            // Initial validation if address exists
+            const initialAddress = fromAddressInput.value.trim();
+            if (initialAddress) {
+                updateAddressStatus(isValidBitcoinAddress(initialAddress));
+            }
+        }
+
+        // Unlock address input enhancement functionality
+        function initializeUnlockAddressInput() {
+            const unlockFromAddressInput = document.getElementById('unlockFromAddress');
+            const unlockUseConnectedBtn = document.getElementById('unlockUseConnectedBtn');
+            const unlockPasteBtn = document.getElementById('unlockPasteBtn');
+            const unlockAddressStatus = document.getElementById('unlockAddressStatus');
+
+            // StarkNet address validation regex pattern (0x + 64 hex characters)
+            const starknetPattern = /^0x[a-fA-F0-9]{64}$/;
+
+            // Validate StarkNet address
+            function isValidStarknetAddress(address) {
+                return starknetPattern.test(address);
+            }
+
+            // Update unlock address status
+            function updateUnlockAddressStatus(isValid, message = '') {
+                if (isValid) {
+                    unlockAddressStatus.innerHTML = '<i class="fas fa-check-circle"></i> Valid StarkNet address';
+                    unlockAddressStatus.className = 'address-status valid';
+                } else {
+                    unlockAddressStatus.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message || 'Invalid StarkNet address'}`;
+                    unlockAddressStatus.className = 'address-status invalid';
+                }
+            }
+
+            // Real-time validation for unlock
+            unlockFromAddressInput.addEventListener('input', function() {
+                const address = this.value.trim();
+                if (address) {
+                    const isValid = isValidStarknetAddress(address);
+                    updateUnlockAddressStatus(isValid);
+                } else {
+                    unlockAddressStatus.innerHTML = '';
+                    unlockAddressStatus.className = 'address-status';
+                }
+            });
+
+            // Use connected wallet address for unlock
+            unlockUseConnectedBtn.addEventListener('click', function() {
+                if (connectedAddress) {
+                    unlockFromAddressInput.value = connectedAddress;
+                    updateUnlockAddressStatus(isValidStarknetAddress(connectedAddress), 'Using connected wallet address');
+                } else {
+                    showNotification('No wallet connected. Please connect a wallet first.', true);
+                }
+            });
+
+            // Paste from clipboard for unlock
+            unlockPasteBtn.addEventListener('click', async function() {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    if (text) {
+                        unlockFromAddressInput.value = text.trim();
+                        const isValid = isValidStarknetAddress(text.trim());
+                        updateUnlockAddressStatus(isValid, isValid ? 'Address pasted from clipboard' : 'Invalid StarkNet address format');
+                        showNotification('Address pasted from clipboard');
+                    }
+                } catch (error) {
+                    console.error('Failed to read clipboard:', error);
+                    showNotification('Failed to access clipboard. Please paste manually.', true);
+                }
+            });
+
+            // Initial validation if address exists
+            const initialAddress = unlockFromAddressInput.value.trim();
+            if (initialAddress) {
+                updateUnlockAddressStatus(isValidStarknetAddress(initialAddress));
+            }
+        }
+
         // Initialize the interface
         function init() {
             setupEventListeners();
             simulateLockProgress();
             checkExistingWalletConnection();
+            initializeAddressInput(); // Initialize lock address input enhancement
+            initializeUnlockAddressInput(); // Initialize unlock address input enhancement
         }
 
         // Set up event listeners
@@ -1531,9 +1924,9 @@
         // Check for existing wallet connection on page load
         async function checkExistingWalletConnection() {
             try {
-                // Check StarkNet wallets first
+                // Check Ready wallets first
                 if (window.starknet && window.starknet.isConnected) {
-                    connectedWallet = window.starknet.name || 'StarkNet Wallet';
+                    connectedWallet = window.starknet.name || 'Ready Wallet';
                     connectedAddress = window.starknet.selectedAddress;
                     updateWalletUI();
                     return;
@@ -1605,6 +1998,649 @@
 
         // Initialize the interface
         init();
+
+        // Initialize frontend integration for real contract interactions
+        window.VernWalletIntegration = new VernWalletFrontendIntegration({
+            apiUrl: 'http://localhost:3001',
+            websocketUrl: 'ws://localhost:3001/ws',
+            autoConnect: true,
+            enableRealTimeUpdates: true
+        });
+
+        // Set up real-time lock/unlock integration
+        window.VernWalletIntegration.on('lockUnlockConnected', () => {
+            console.log('🔗 Connected to VernWallet Lock/Unlock API');
+            showNotification('Connected to lock/unlock backend successfully');
+        });
+
+        window.VernWalletIntegration.on('lockUnlockError', (error) => {
+            console.error('Lock/Unlock API Error:', error);
+            showNotification(`Lock/Unlock error: ${error.message}`, true);
+        });
+
+        window.VernWalletIntegration.on('lockUpdate', (data) => {
+            console.log('Lock update:', data);
+            if (data.status === 'completed') {
+                showNotification('Lock process completed! Funds are now available on StarkNet.');
+                // Update UI with real transaction data
+                updateLockStatus(data);
+            }
+        });
+
+        window.VernWalletIntegration.on('unlockUpdate', (data) => {
+            console.log('Unlock update:', data);
+            if (data.status === 'completed') {
+                showNotification('Unlock process completed! Funds have been returned to Bitcoin network.');
+                // Update UI with real transaction data
+                updateUnlockStatus(data);
+            }
+        });
+
+        // Enhanced lock process with real contract integration
+        async function initiateRealLockProcess() {
+            const amount = parseFloat(document.getElementById('lockAmount').value);
+            const toAddress = document.getElementById('toAddress').value;
+            const fromAddress = document.getElementById('fromAddress').value.trim();
+
+            if (amount <= 0 || !toAddress) {
+                showNotification('Please enter a valid amount and destination address', true);
+                return;
+            }
+
+            if (!fromAddress) {
+                showNotification('Please enter a source Bitcoin address', true);
+                return;
+            }
+
+            // Validate Bitcoin address
+            const bitcoinPatterns = [
+                /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/, // Legacy (P2PKH)
+                /^[bc1][a-z0-9]{39,59}$/, // SegWit (Bech32)
+                /^[3][a-km-zA-HJ-NP-Z1-9]{25,34}$/ // P2SH
+            ];
+
+            if (!bitcoinPatterns.some(pattern => pattern.test(fromAddress))) {
+                showNotification('Please enter a valid Bitcoin address', true);
+                return;
+            }
+
+            if (!connectedAddress) {
+                showNotification('Please connect your wallet first', true);
+                return;
+            }
+
+            try {
+                lockButton.disabled = true;
+                lockButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Locking...';
+
+                const result = await window.VernWalletIntegration.lockBitcoin({
+                    fromAddress: fromAddress,
+                    toAddress: toAddress,
+                    amount: amount,
+                    confirmations: 6
+                });
+
+                if (result.success) {
+                    showNotification(`Lock process initiated! ${amount} BTC is being locked. Transaction: ${result.transactionHash?.substring(0, 10)}...`);
+
+                    // Reset form
+                    lockForm.reset();
+                    lockButton.disabled = true;
+
+                    // Update progress
+                    lockProgressFill.style.width = '10%';
+                    lockProgressValue.textContent = '10%';
+                } else {
+                    throw new Error(result.error || 'Lock process failed');
+                }
+
+            } catch (error) {
+                console.error('Real lock error:', error);
+                showNotification(`Lock process failed: ${error.message}`, true);
+            } finally {
+                lockButton.disabled = false;
+                lockButton.innerHTML = '<i class="fas fa-lock"></i> Lock Bitcoin';
+            }
+        }
+
+        // Enhanced unlock process with real contract integration
+        async function initiateRealUnlockProcess() {
+            const amount = parseFloat(document.getElementById('unlockAmount').value);
+            const toAddress = document.getElementById('unlockToAddress').value;
+            const fromAddress = document.getElementById('unlockFromAddress').value.trim();
+
+            if (amount <= 0 || !toAddress) {
+                showNotification('Please enter a valid amount and destination address', true);
+                return;
+            }
+
+            if (!fromAddress) {
+                showNotification('Please enter a source StarkNet address', true);
+                return;
+            }
+
+            // Validate StarkNet address
+            const starknetPattern = /^0x[a-fA-F0-9]{64}$/;
+            if (!starknetPattern.test(fromAddress)) {
+                showNotification('Please enter a valid StarkNet address (0x followed by 64 hex characters)', true);
+                return;
+            }
+
+            if (!connectedAddress) {
+                showNotification('Please connect your wallet first', true);
+                return;
+            }
+
+            try {
+                unlockButton.disabled = true;
+                unlockButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Unlocking...';
+
+                const result = await window.VernWalletIntegration.unlockBitcoin({
+                    fromAddress: fromAddress,
+                    toAddress: toAddress,
+                    amount: amount
+                });
+
+                if (result.success) {
+                    showNotification(`Unlock process initiated! ${amount} sBTC is being unlocked. Transaction: ${result.transactionHash?.substring(0, 10)}...`);
+
+                    // Reset form
+                    unlockForm.reset();
+                    unlockButton.disabled = true;
+
+                    // Update progress
+                    unlockProgressFill.style.width = '10%';
+                    unlockProgressValue.textContent = '10%';
+
+                    // Update status indicator
+                    document.querySelector('#unlockInterface .status-dot').className = 'status-dot status-processing';
+                    document.querySelector('#unlockInterface .status-indicator span').textContent = 'Processing';
+                } else {
+                    throw new Error(result.error || 'Unlock process failed');
+                }
+
+            } catch (error) {
+                console.error('Real unlock error:', error);
+                showNotification(`Unlock process failed: ${error.message}`, true);
+            } finally {
+                unlockButton.disabled = false;
+                unlockButton.innerHTML = '<i class="fas fa-unlock"></i> Unlock Bitcoin';
+            }
+        }
+
+        // Override the original form submissions
+        lockForm.removeEventListener('submit', initiateLockProcess);
+        lockForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            initiateRealLockProcess();
+        });
+
+        unlockForm.removeEventListener('submit', initiateUnlockProcess);
+        unlockForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            initiateRealUnlockProcess();
+        });
+
+        // Enhanced wallet connection with real contract integration
+        function connectWalletWithIntegration() {
+            if (connectedWallet) {
+                showNotification('Wallet already connected. Please disconnect first.', true);
+                return;
+            }
+            openWalletModal();
+        }
+
+        // Override wallet connection
+        connectWalletBtn.removeEventListener('click', connectWallet);
+        connectWalletBtn.addEventListener('click', connectWalletWithIntegration);
+
+        // Enhanced wallet connection handler
+        async function connectToRealWalletWithIntegration(wallet) {
+            try {
+                closeWalletModal();
+                showNotification(`Connecting to ${wallet.name}...`);
+
+                const result = await wallet.connect();
+
+                if (!result || !result.address) {
+                    throw new Error('No address returned from wallet');
+                }
+
+                connectedWallet = result.name;
+                connectedAddress = result.address;
+
+                updateWalletUI();
+
+                // Initialize real contract integration
+                await window.VernWalletIntegration.connectWallet({
+                    type: wallet.type.toLowerCase(),
+                    address: connectedAddress,
+                    name: connectedWallet
+                });
+
+                showNotification(`Successfully connected to ${connectedWallet}!`);
+
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                showNotification(`Failed to connect to ${wallet.name}: ${error.message}`, true);
+            }
+        }
+
+        // Override wallet connection in modal
+        availableWallets.forEach(wallet => {
+            if (wallet.isAvailable()) {
+                // Store original connect function
+                const originalConnect = wallet.connect;
+                // Override with enhanced version
+                wallet.connect = async () => {
+                    const result = await originalConnect();
+                    await window.VernWalletIntegration.connectWallet({
+                        type: wallet.type.toLowerCase(),
+                        address: result.address,
+                        name: result.name
+                    });
+                    return result;
+                };
+            }
+        });
+
+        // Enhanced address input with real-time validation
+        function enhanceAddressInputWithIntegration() {
+            const fromAddressInput = document.getElementById('fromAddress');
+            const useConnectedBtn = document.getElementById('useConnectedBtn');
+            const pasteBtn = document.getElementById('pasteBtn');
+            const addressStatus = document.getElementById('addressStatus');
+
+            // Bitcoin address validation regex patterns
+            const bitcoinPatterns = [
+                /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/, // Legacy (P2PKH)
+                /^[bc1][a-z0-9]{39,59}$/, // SegWit (Bech32)
+                /^[3][a-km-zA-HJ-NP-Z1-9]{25,34}$/ // P2SH
+            ];
+
+            // Validate Bitcoin address
+            function isValidBitcoinAddress(address) {
+                return bitcoinPatterns.some(pattern => pattern.test(address));
+            }
+
+            // Update address status with enhanced feedback
+            function updateAddressStatus(isValid, message = '') {
+                if (isValid) {
+                    addressStatus.innerHTML = '<i class="fas fa-check-circle"></i> Valid Bitcoin address';
+                    addressStatus.className = 'address-status valid';
+                } else {
+                    addressStatus.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message || 'Invalid Bitcoin address'}`;
+                    addressStatus.className = 'address-status invalid';
+                }
+            }
+
+            // Real-time validation with integration
+            fromAddressInput.addEventListener('input', async function() {
+                const address = this.value.trim();
+                if (address) {
+                    const isValid = isValidBitcoinAddress(address);
+
+                    if (isValid) {
+                        // Check if address has sufficient balance
+                        try {
+                            const balanceResult = await window.VernWalletIntegration.getBitcoinBalance(address);
+                            if (balanceResult.success) {
+                                updateAddressStatus(true, `Balance: ${balanceResult.balance} BTC`);
+                            } else {
+                                updateAddressStatus(true, 'Valid Bitcoin address');
+                            }
+                        } catch (error) {
+                            updateAddressStatus(true, 'Valid Bitcoin address');
+                        }
+                    } else {
+                        updateAddressStatus(false, 'Invalid Bitcoin address format');
+                    }
+                } else {
+                    addressStatus.innerHTML = '';
+                    addressStatus.className = 'address-status';
+                }
+            });
+
+            // Use connected wallet address with integration
+            useConnectedBtn.addEventListener('click', function() {
+                if (connectedAddress) {
+                    fromAddressInput.value = connectedAddress;
+                    updateAddressStatus(isValidBitcoinAddress(connectedAddress), 'Using connected wallet address');
+                } else {
+                    showNotification('No wallet connected. Please connect a wallet first.', true);
+                }
+            });
+
+            // Paste from clipboard with integration
+            pasteBtn.addEventListener('click', async function() {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    if (text) {
+                        fromAddressInput.value = text.trim();
+                        const isValid = isValidBitcoinAddress(text.trim());
+                        updateAddressStatus(isValid, isValid ? 'Address pasted from clipboard' : 'Invalid Bitcoin address format');
+                        showNotification('Address pasted from clipboard');
+                    }
+                } catch (error) {
+                    console.error('Failed to read clipboard:', error);
+                    showNotification('Failed to access clipboard. Please paste manually.', true);
+                }
+            });
+        }
+
+        // Enhanced unlock address input with integration
+        function enhanceUnlockAddressInputWithIntegration() {
+            const unlockFromAddressInput = document.getElementById('unlockFromAddress');
+            const unlockUseConnectedBtn = document.getElementById('unlockUseConnectedBtn');
+            const unlockPasteBtn = document.getElementById('unlockPasteBtn');
+            const unlockAddressStatus = document.getElementById('unlockAddressStatus');
+
+            // StarkNet address validation regex pattern (0x + 64 hex characters)
+            const starknetPattern = /^0x[a-fA-F0-9]{64}$/;
+
+            // Validate StarkNet address
+            function isValidStarknetAddress(address) {
+                return starknetPattern.test(address);
+            }
+
+            // Update unlock address status with enhanced feedback
+            function updateUnlockAddressStatus(isValid, message = '') {
+                if (isValid) {
+                    unlockAddressStatus.innerHTML = '<i class="fas fa-check-circle"></i> Valid StarkNet address';
+                    unlockAddressStatus.className = 'address-status valid';
+                } else {
+                    unlockAddressStatus.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message || 'Invalid StarkNet address'}`;
+                    unlockAddressStatus.className = 'address-status invalid';
+                }
+            }
+
+            // Real-time validation for unlock with integration
+            unlockFromAddressInput.addEventListener('input', async function() {
+                const address = this.value.trim();
+                if (address) {
+                    const isValid = isValidStarknetAddress(address);
+
+                    if (isValid) {
+                        // Check if address has sufficient sBTC balance
+                        try {
+                            const balanceResult = await window.VernWalletIntegration.getStarknetBalance(address);
+                            if (balanceResult.success) {
+                                updateUnlockAddressStatus(true, `Balance: ${balanceResult.balance} sBTC`);
+                            } else {
+                                updateUnlockAddressStatus(true, 'Valid StarkNet address');
+                            }
+                        } catch (error) {
+                            updateUnlockAddressStatus(true, 'Valid StarkNet address');
+                        }
+                    } else {
+                        updateUnlockAddressStatus(false, 'Invalid StarkNet address format (must be 0x + 64 hex characters)');
+                    }
+                } else {
+                    unlockAddressStatus.innerHTML = '';
+                    unlockAddressStatus.className = 'address-status';
+                }
+            });
+
+            // Use connected wallet address for unlock with integration
+            unlockUseConnectedBtn.addEventListener('click', function() {
+                if (connectedAddress) {
+                    unlockFromAddressInput.value = connectedAddress;
+                    updateUnlockAddressStatus(isValidStarknetAddress(connectedAddress), 'Using connected wallet address');
+                } else {
+                    showNotification('No wallet connected. Please connect a wallet first.', true);
+                }
+            });
+
+            // Paste from clipboard for unlock with integration
+            unlockPasteBtn.addEventListener('click', async function() {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    if (text) {
+                        unlockFromAddressInput.value = text.trim();
+                        const isValid = isValidStarknetAddress(text.trim());
+                        updateUnlockAddressStatus(isValid, isValid ? 'Address pasted from clipboard' : 'Invalid StarkNet address format');
+                        showNotification('Address pasted from clipboard');
+                    }
+                } catch (error) {
+                    console.error('Failed to read clipboard:', error);
+                    showNotification('Failed to access clipboard. Please paste manually.', true);
+                }
+            });
+        }
+
+        // Initialize enhanced address inputs
+        enhanceAddressInputWithIntegration();
+        enhanceUnlockAddressInputWithIntegration();
+
+        // Enhanced StarkNet address input functionality
+        function initializeStarknetAddressInput() {
+            const toAddressInput = document.getElementById('toAddress');
+            const starknetUseConnectedBtn = document.getElementById('starknetUseConnectedBtn');
+            const starknetPasteBtn = document.getElementById('starknetPasteBtn');
+            const starknetAddressStatus = document.getElementById('starknetAddressStatus');
+
+            // StarkNet address validation regex pattern (0x + 64 hex characters)
+            const starknetPattern = /^0x[a-fA-F0-9]{64}$/;
+
+            // Validate StarkNet address
+            function isValidStarknetAddress(address) {
+                return starknetPattern.test(address);
+            }
+
+            // Update StarkNet address status
+            function updateStarknetAddressStatus(isValid, message = '') {
+                if (isValid) {
+                    starknetAddressStatus.innerHTML = '<i class="fas fa-check-circle"></i> Valid StarkNet address';
+                    starknetAddressStatus.className = 'address-status valid';
+                } else {
+                    starknetAddressStatus.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message || 'Invalid StarkNet address'}`;
+                    starknetAddressStatus.className = 'address-status invalid';
+                }
+            }
+
+            // Real-time validation
+            toAddressInput.addEventListener('input', function() {
+                const address = this.value.trim();
+                if (address) {
+                    const isValid = isValidStarknetAddress(address);
+                    updateStarknetAddressStatus(isValid);
+                } else {
+                    starknetAddressStatus.innerHTML = '';
+                    starknetAddressStatus.className = 'address-status';
+                }
+            });
+
+            // Use connected wallet address
+            starknetUseConnectedBtn.addEventListener('click', function() {
+                if (connectedAddress) {
+                    toAddressInput.value = connectedAddress;
+                    updateStarknetAddressStatus(isValidStarknetAddress(connectedAddress), 'Using connected wallet address');
+                } else {
+                    showNotification('No wallet connected. Please connect a wallet first.', true);
+                }
+            });
+
+            // Paste from clipboard
+            starknetPasteBtn.addEventListener('click', async function() {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    if (text) {
+                        toAddressInput.value = text.trim();
+                        const isValid = isValidStarknetAddress(text.trim());
+                        updateStarknetAddressStatus(isValid, isValid ? 'Address pasted from clipboard' : 'Invalid StarkNet address format');
+                        showNotification('Address pasted from clipboard');
+                    }
+                } catch (error) {
+                    console.error('Failed to read clipboard:', error);
+                    showNotification('Failed to access clipboard. Please paste manually.', true);
+                }
+            });
+
+            // Initial validation if address exists
+            const initialAddress = toAddressInput.value.trim();
+            if (initialAddress) {
+                updateStarknetAddressStatus(isValidStarknetAddress(initialAddress));
+            }
+        }
+
+        // Initialize StarkNet address input enhancement
+        initializeStarknetAddressInput();
+
+        // Enhanced Bitcoin address input functionality for unlock section
+        function initializeUnlockBitcoinAddressInput() {
+            const unlockToAddressInput = document.getElementById('unlockToAddress');
+            const unlockBitcoinUseConnectedBtn = document.getElementById('unlockBitcoinUseConnectedBtn');
+            const unlockBitcoinPasteBtn = document.getElementById('unlockBitcoinPasteBtn');
+            const unlockBitcoinAddressStatus = document.getElementById('unlockBitcoinAddressStatus');
+
+            // Bitcoin address validation regex patterns
+            const bitcoinPatterns = [
+                /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/, // Legacy (P2PKH)
+                /^[bc1][a-z0-9]{39,59}$/, // SegWit (Bech32)
+                /^[3][a-km-zA-HJ-NP-Z1-9]{25,34}$/ // P2SH
+            ];
+
+            // Validate Bitcoin address
+            function isValidBitcoinAddress(address) {
+                return bitcoinPatterns.some(pattern => pattern.test(address));
+            }
+
+            // Update Bitcoin address status for unlock
+            function updateUnlockBitcoinAddressStatus(isValid, message = '') {
+                if (isValid) {
+                    unlockBitcoinAddressStatus.innerHTML = '<i class="fas fa-check-circle"></i> Valid Bitcoin address';
+                    unlockBitcoinAddressStatus.className = 'address-status valid';
+                } else {
+                    unlockBitcoinAddressStatus.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message || 'Invalid Bitcoin address'}`;
+                    unlockBitcoinAddressStatus.className = 'address-status invalid';
+                }
+            }
+
+            // Real-time validation for unlock Bitcoin address
+            unlockToAddressInput.addEventListener('input', function() {
+                const address = this.value.trim();
+                if (address) {
+                    const isValid = isValidBitcoinAddress(address);
+                    updateUnlockBitcoinAddressStatus(isValid);
+                } else {
+                    unlockBitcoinAddressStatus.innerHTML = '';
+                    unlockBitcoinAddressStatus.className = 'address-status';
+                }
+            });
+
+            // Use connected wallet address for unlock Bitcoin
+            unlockBitcoinUseConnectedBtn.addEventListener('click', function() {
+                if (connectedAddress) {
+                    unlockToAddressInput.value = connectedAddress;
+                    updateUnlockBitcoinAddressStatus(isValidBitcoinAddress(connectedAddress), 'Using connected wallet address');
+                } else {
+                    showNotification('No wallet connected. Please connect a wallet first.', true);
+                }
+            });
+
+            // Paste from clipboard for unlock Bitcoin
+            unlockBitcoinPasteBtn.addEventListener('click', async function() {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    if (text) {
+                        unlockToAddressInput.value = text.trim();
+                        const isValid = isValidBitcoinAddress(text.trim());
+                        updateUnlockBitcoinAddressStatus(isValid, isValid ? 'Address pasted from clipboard' : 'Invalid Bitcoin address format');
+                        showNotification('Address pasted from clipboard');
+                    }
+                } catch (error) {
+                    console.error('Failed to read clipboard:', error);
+                    showNotification('Failed to access clipboard. Please paste manually.', true);
+                }
+            });
+
+            // Initial validation if address exists
+            const initialAddress = unlockToAddressInput.value.trim();
+            if (initialAddress) {
+                updateUnlockBitcoinAddressStatus(isValidBitcoinAddress(initialAddress));
+            }
+        }
+
+        // Initialize unlock Bitcoin address input enhancement
+        initializeUnlockBitcoinAddressInput();
+
+        // Enhanced max amount calculation with real balances
+        function setMaxAmountWithIntegration() {
+            const form = this.closest('form');
+            const amountInput = form.querySelector('input[type="number"]');
+
+            if (form.id === 'lockForm') {
+                // Get real Bitcoin balance
+                window.VernWalletIntegration.getBitcoinBalance(document.getElementById('fromAddress').value)
+                    .then(result => {
+                        if (result.success) {
+                            const maxAmount = result.balance * 0.99; // Leave buffer for fees
+                            amountInput.value = maxAmount.toFixed(6);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error getting Bitcoin balance:', error);
+                        // Fallback to static calculation
+                        const balanceText = this.parentElement.querySelector('span').textContent;
+                        const balance = parseFloat(balanceText.match(/(\d+\.\d+)/)[0]);
+                        amountInput.value = (balance * 0.99).toFixed(6);
+                    });
+            } else {
+                // Get real StarkNet balance
+                window.VernWalletIntegration.getStarknetBalance(document.getElementById('unlockFromAddress').value)
+                    .then(result => {
+                        if (result.success) {
+                            const maxAmount = result.balance * 0.99; // Leave buffer for fees
+                            amountInput.value = maxAmount.toFixed(6);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error getting StarkNet balance:', error);
+                        // Fallback to static calculation
+                        const balanceText = this.parentElement.querySelector('span').textContent;
+                        const balance = parseFloat(balanceText.match(/(\d+\.\d+)/)[0]);
+                        amountInput.value = (balance * 0.99).toFixed(6);
+                    });
+            }
+        }
+
+        // Override max button functionality
+        maxButtons.forEach(button => {
+            button.removeEventListener('click', setMaxAmount);
+            button.addEventListener('click', setMaxAmountWithIntegration);
+        });
+
+        // Update lock status with real data
+        function updateLockStatus(data) {
+            // Update status indicator
+            document.querySelector('#lockInterface .status-dot').className = 'status-dot status-confirmed';
+            document.querySelector('#lockInterface .status-indicator span').textContent = 'Completed';
+
+            // Update transaction hash if available
+            if (data.transactionHash) {
+                const txElement = document.querySelector('#lockInterface .fee-item span[style*="monospace"]');
+                if (txElement) {
+                    txElement.textContent = data.transactionHash;
+                }
+            }
+        }
+
+        // Update unlock status with real data
+        function updateUnlockStatus(data) {
+            // Update status indicator
+            document.querySelector('#unlockInterface .status-dot').className = 'status-dot status-confirmed';
+            document.querySelector('#unlockInterface .status-indicator span').textContent = 'Completed';
+
+            // Update transaction hash if available
+            if (data.transactionHash) {
+                const txElement = document.querySelector('#unlockInterface .fee-item span[style*="monospace"]');
+                if (txElement) {
+                    txElement.textContent = data.transactionHash;
+                }
+            }
+        }
+
+        console.log('🔗 VernWallet Lock/Unlock integration initialized successfully');
     </script>
 </body>
 </html>

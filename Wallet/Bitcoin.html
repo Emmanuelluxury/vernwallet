@@ -483,29 +483,32 @@
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        /* Wallet Modal Styles */
+        /* Wallet Modal */
         .modal {
             display: none;
             position: fixed;
-            z-index: 1000;
-            left: 0;
             top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(5px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
         }
 
         .modal-content {
-            background: rgba(255, 255, 255, 0.05);
-            margin: 10% auto;
+            background: linear-gradient(135deg, #1a2a32, #2c3e50);
+            border-radius: 16px;
             padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            width: 90%;
-            max-width: 500px;
-            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 450px;
+            max-height: 80vh;
+            overflow-y: auto;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
         }
 
         .modal-header {
@@ -515,9 +518,10 @@
             margin-bottom: 20px;
         }
 
-        .modal-header h3 {
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
             color: #f2a900;
-            margin: 0;
         }
 
         .close-modal {
@@ -542,25 +546,29 @@
         .wallet-option {
             display: flex;
             align-items: center;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+            gap: 15px;
+            padding: 16px;
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
             cursor: pointer;
-            transition: background 0.3s;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .wallet-option:hover {
-            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
         }
 
         .wallet-option.available {
-            cursor: pointer;
+            border-color: #f2a900;
+            background: rgba(242, 169, 0, 0.05);
         }
 
         .wallet-option.unavailable {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+
+        .wallet-option:hover {
+            background: rgba(242, 169, 0, 0.1);
+            border-color: #f2a900;
+            transform: translateY(-1px);
         }
 
         .wallet-icon {
@@ -571,7 +579,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 15px;
             color: #f2a900;
         }
 
@@ -581,21 +588,19 @@
 
         .wallet-name {
             font-weight: 600;
-            color: #fff;
+            color: white;
+            margin-bottom: 2px;
         }
 
         .wallet-type {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: rgba(255, 255, 255, 0.7);
         }
 
         .wallet-status {
-            font-size: 0.9rem;
-            color: #4caf50;
-        }
-
-        .wallet-option.unavailable .wallet-status {
-            color: #f44336;
+            font-size: 0.8rem;
+            color: #f2a900;
+            font-weight: 500;
         }
 
         @media (max-width: 768px) {
@@ -1253,46 +1258,156 @@
             }
         }
 
-        // Wallet Connection Functionality
+        // DOM Elements
+        const connectWalletBtn = document.getElementById('connectWallet');
+        const walletModal = document.getElementById('walletModal');
+        const closeModalBtn = document.getElementById('closeModal');
+        const walletOptionsContainer = document.getElementById('walletOptions');
+        const copyButton = document.querySelector('.icon-btn');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+
+        // Wallet connection state
         let connectedWallet = null;
+        let connectedAddress = null;
 
-        // Connect Wallet Button Event Listener
-        document.getElementById('connectWallet').addEventListener('click', function() {
-            showWalletModal();
-        });
-
-        // Close Modal Event Listener
-        document.getElementById('closeModal').addEventListener('click', function() {
-            hideWalletModal();
-        });
-
-        // Close modal when clicking outside
-        document.getElementById('walletModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                hideWalletModal();
+        // Available wallets configuration
+        const availableWallets = [
+            {
+                id: 'starknet',
+                name: 'Ready Wallet',
+                type: 'StarkNet',
+                icon: 'fas fa-link',
+                isAvailable: () => window.starknet,
+                connect: async () => {
+                    await window.starknet.enable();
+                    return { address: window.starknet.selectedAddress, name: window.starknet.name || 'Ready Wallet' };
+                }
+            },
+            {
+                id: 'metamask',
+                name: 'MetaMask',
+                type: 'Ethereum',
+                icon: 'fab fa-ethereum',
+                isAvailable: () => window.ethereum && !window.ethereum.isCoinbaseWallet && !window.ethereum.isTrust,
+                connect: async () => {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    return { address: accounts[0], name: 'MetaMask' };
+                }
+            },
+            {
+                id: 'coinbase',
+                name: 'Coinbase Wallet',
+                type: 'Ethereum',
+                icon: 'fab fa-bitcoin',
+                isAvailable: () => window.ethereum && window.ethereum.isCoinbaseWallet,
+                connect: async () => {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    return { address: accounts[0], name: 'Coinbase Wallet' };
+                }
+            },
+            {
+                id: 'trustwallet',
+                name: 'Trust Wallet',
+                type: 'Ethereum',
+                icon: 'fas fa-shield-alt',
+                isAvailable: () => window.ethereum && window.ethereum.isTrust,
+                connect: async () => {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    return { address: accounts[0], name: 'Trust Wallet' };
+                }
+            },
+            {
+                id: 'phantom',
+                name: 'Phantom',
+                type: 'Solana',
+                icon: 'fas fa-ghost',
+                isAvailable: () => window.solana && window.solana.isPhantom,
+                connect: async () => {
+                    const response = await window.solana.connect();
+                    return { address: response.publicKey.toString(), name: 'Phantom' };
+                }
+            },
+            {
+                id: 'solflare',
+                name: 'Solflare',
+                type: 'Solana',
+                icon: 'fas fa-sun',
+                isAvailable: () => window.solflare && window.solflare.isSolflare,
+                connect: async () => {
+                    const response = await window.solflare.connect();
+                    return { address: response.publicKey.toString(), name: 'Solflare' };
+                }
+            },
+            {
+                id: 'brave',
+                name: 'Brave Wallet',
+                type: 'Ethereum',
+                icon: 'fab fa-ethereum',
+                isAvailable: () => window.ethereum && window.ethereum.isBraveWallet,
+                connect: async () => {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    return { address: accounts[0], name: 'Brave Wallet' };
+                }
+            },
+            {
+                id: 'opera',
+                name: 'Opera Wallet',
+                type: 'Ethereum',
+                icon: 'fab fa-ethereum',
+                isAvailable: () => window.ethereum && window.ethereum.isOpera,
+                connect: async () => {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    return { address: accounts[0], name: 'Opera Wallet' };
+                }
+            },
+            {
+                id: 'frame',
+                name: 'Frame',
+                type: 'Ethereum',
+                icon: 'fas fa-wallet',
+                isAvailable: () => window.ethereum && window.ethereum.isFrame,
+                connect: async () => {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    return { address: accounts[0], name: 'Frame' };
+                }
+            },
+            {
+                id: 'status',
+                name: 'Status',
+                type: 'Ethereum',
+                icon: 'fas fa-mobile-alt',
+                isAvailable: () => window.ethereum && window.ethereum.isStatus,
+                connect: async () => {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    return { address: accounts[0], name: 'Status' };
+                }
             }
-        });
+        ];
 
-        // Show wallet modal and populate options
-        function showWalletModal() {
-            const modal = document.getElementById('walletModal');
-            const walletOptions = document.getElementById('walletOptions');
+        // Modal functions
+        function openWalletModal() {
+            populateWalletOptions();
+            walletModal.style.display = 'flex';
+        }
 
-            // Define available wallets
-            const wallets = [
-                { name: 'MetaMask', type: 'Browser Extension', icon: 'fab fa-ethereum', available: true },
-                { name: 'Phantom', type: 'Browser Extension', icon: 'fas fa-ghost', available: true },
-                { name: 'Trust Wallet', type: 'Mobile App', icon: 'fas fa-mobile-alt', available: true },
-                { name: 'Ledger', type: 'Hardware Wallet', icon: 'fas fa-usb', available: true },
-                { name: 'Trezor', type: 'Hardware Wallet', icon: 'fas fa-shield-alt', available: true },
-                { name: 'Exodus', type: 'Desktop Wallet', icon: 'fas fa-desktop', available: false },
-                { name: 'Electrum', type: 'Desktop Wallet', icon: 'fas fa-wallet', available: false }
-            ];
+        function closeWalletModal() {
+            walletModal.style.display = 'none';
+        }
 
-            // Populate wallet options
-            walletOptions.innerHTML = wallets.map(wallet => `
-                <div class="wallet-option ${wallet.available ? 'available' : 'unavailable'}"
-                     onclick="${wallet.available ? `connectWallet('${wallet.name}')` : ''}">
+        // Populate wallet options with real available wallets
+        function populateWalletOptions() {
+            walletOptionsContainer.innerHTML = '';
+
+            availableWallets.forEach(wallet => {
+                const isAvailable = wallet.isAvailable();
+                const optionElement = document.createElement('div');
+                optionElement.className = `wallet-option ${isAvailable ? 'available' : 'unavailable'}`;
+                if (isAvailable) {
+                    optionElement.onclick = () => connectToRealWallet(wallet);
+                }
+
+                optionElement.innerHTML = `
                     <div class="wallet-icon">
                         <i class="${wallet.icon}"></i>
                     </div>
@@ -1301,236 +1416,193 @@
                         <div class="wallet-type">${wallet.type}</div>
                     </div>
                     <div class="wallet-status">
-                        ${wallet.available ? 'Available' : 'Not Available'}
+                        ${isAvailable ? 'Available' : 'Not Installed'}
                     </div>
-                </div>
-            `).join('');
+                `;
 
-            modal.style.display = 'block';
+                walletOptionsContainer.appendChild(optionElement);
+            });
         }
 
-        // Hide wallet modal
-        function hideWalletModal() {
-            document.getElementById('walletModal').style.display = 'none';
-        }
-
-        // Connect to selected wallet
-        async function connectWallet(walletName) {
+        // Connect to real wallet
+        async function connectToRealWallet(wallet) {
             try {
-                showNotification(`Connecting to ${walletName}...`, 'info');
+                closeWalletModal();
+                showNotification(`Connecting to ${wallet.name}...`);
 
-                let connectionResult;
+                const result = await wallet.connect();
 
-                switch(walletName) {
-                    case 'MetaMask':
-                        connectionResult = await connectMetaMask();
-                        break;
-                    case 'Phantom':
-                        connectionResult = await connectPhantom();
-                        break;
-                    case 'Trust Wallet':
-                        connectionResult = await connectTrustWallet();
-                        break;
-                    case 'Ledger':
-                        connectionResult = await connectLedger();
-                        break;
-                    case 'Trezor':
-                        connectionResult = await connectTrezor();
-                        break;
-                    default:
-                        throw new Error(`${walletName} connection not implemented yet`);
-                }
+                connectedWallet = result.name;
+                connectedAddress = result.address;
 
-                if (connectionResult.success) {
-                    connectedWallet = walletName;
-                    updateConnectButton(true);
-                    hideWalletModal();
-                    showNotification(`Successfully connected to ${walletName}!`, 'success');
-
-                    // Update wallet information
-                    updateWalletInfo(connectionResult.address, connectionResult.balance);
-                } else {
-                    throw new Error(connectionResult.error || 'Connection failed');
-                }
+                updateWalletUI();
+                showNotification(`Successfully connected to ${connectedWallet}!`);
 
             } catch (error) {
                 console.error('Wallet connection error:', error);
-                showNotification(`Failed to connect to ${walletName}: ${error.message}`, 'error');
+                showNotification(`Failed to connect to ${wallet.name}: ${error.message}`, true);
             }
         }
 
-        // Connect to MetaMask
-        async function connectMetaMask() {
-            if (typeof window.ethereum === 'undefined') {
-                throw new Error('MetaMask is not installed. Please install MetaMask extension.');
-            }
+        // Connect wallet - show modal with all available real wallets
+        function connectWallet() {
+            openWalletModal();
+        }
 
-            try {
-                // Request account access
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                const address = accounts[0];
-
-                // Get balance (this is ETH balance, but we'll simulate BTC for demo)
-                const balance = await window.ethereum.request({
-                    method: 'eth_getBalance',
-                    params: [address, 'latest']
-                });
-
-                return {
-                    success: true,
-                    address: address,
-                    balance: '0.000000' // Simulate BTC balance
-                };
-            } catch (error) {
-                return {
-                    success: false,
-                    error: error.message
-                };
+        // Update wallet UI
+        function updateWalletUI() {
+            if (connectedWallet && connectedAddress) {
+                connectWalletBtn.innerHTML = `<i class="fas fa-wallet"></i> ${connectedAddress.substring(0, 6)}...${connectedAddress.substring(connectedAddress.length - 4)}`;
+                connectWalletBtn.classList.add('connected');
             }
         }
 
-        // Connect to Phantom
-        async function connectPhantom() {
-            if (typeof window.solana === 'undefined' || !window.solana.isPhantom) {
-                throw new Error('Phantom is not installed. Please install Phantom extension.');
-            }
-
+        // Check for existing wallet connection on page load
+        async function checkExistingWalletConnection() {
             try {
-                const response = await window.solana.connect();
-                const address = response.publicKey.toString();
-
-                return {
-                    success: true,
-                    address: address,
-                    balance: '0.000000' // Simulate BTC balance
-                };
-            } catch (error) {
-                return {
-                    success: false,
-                    error: error.message
-                };
-            }
-        }
-
-        // Connect to Trust Wallet
-        async function connectTrustWallet() {
-            // Trust Wallet uses WalletConnect for web connections
-            if (typeof window.ethereum === 'undefined') {
-                throw new Error('Trust Wallet is not available. Please use Trust Wallet mobile app with WalletConnect.');
-            }
-
-            try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                const address = accounts[0];
-
-                return {
-                    success: true,
-                    address: address,
-                    balance: '0.000000' // Simulate BTC balance
-                };
-            } catch (error) {
-                return {
-                    success: false,
-                    error: error.message
-                };
-            }
-        }
-
-        // Connect to Ledger
-        async function connectLedger() {
-            // For hardware wallets, we need WebUSB permission
-            if (!navigator.usb) {
-                throw new Error('WebUSB is not supported in this browser. Please use a compatible browser.');
-            }
-
-            try {
-                // Request USB device access
-                const device = await navigator.usb.requestDevice({
-                    filters: [{ vendorId: 0x2c97 }] // Ledger vendor ID
-                });
-
-                // Open device and get address (simplified)
-                await device.open();
-                await device.selectConfiguration(1);
-                await device.claimInterface(0);
-
-                // This is a simplified version - real implementation would use ledger libraries
-                return {
-                    success: true,
-                    address: 'bc1qledger' + Math.random().toString(36).substring(2, 10),
-                    balance: '0.000000'
-                };
-            } catch (error) {
-                if (error.name === 'NotFoundError') {
-                    throw new Error('No Ledger device found. Please connect your Ledger and try again.');
+                // Check StarkNet wallets first
+                if (window.starknet && window.starknet.isConnected) {
+                    connectedWallet = window.starknet.name || 'Ready Wallet';
+                    connectedAddress = window.starknet.selectedAddress;
+                    updateWalletUI();
+                    return;
                 }
-                return {
-                    success: false,
-                    error: error.message
-                };
-            }
-        }
 
-        // Connect to Trezor
-        async function connectTrezor() {
-            // Trezor connection would require Trezor Connect library
-            throw new Error('Trezor connection requires additional setup. Please use Trezor Suite for desktop connection.');
-        }
-
-        // Update connect button state
-        function updateConnectButton(isConnected) {
-            const button = document.getElementById('connectWallet');
-            if (isConnected) {
-                button.innerHTML = '<i class="fas fa-check"></i> Connected';
-                button.classList.add('connected');
-            } else {
-                button.innerHTML = '<i class="fas fa-wallet"></i> Connect Wallet';
-                button.classList.remove('connected');
-            }
-        }
-
-        // Update wallet information display
-        function updateWalletInfo(address, balance = null) {
-            // Update address display
-            const addressElement = document.querySelector('.address-value');
-            if (addressElement && address) {
-                // Format address for display (show first and last few characters)
-                const formattedAddress = address.length > 20
-                    ? `${address.substring(0, 10)}...${address.substring(address.length - 8)}`
-                    : address;
-                addressElement.textContent = formattedAddress;
-            }
-
-            // Update balance display if provided
-            if (balance !== null) {
-                const balanceElement = document.querySelector('.balance');
-                if (balanceElement) {
-                    balanceElement.innerHTML = `${balance} <span class="currency">BTC</span>`;
+                // Check Ethereum wallets
+                if (window.ethereum) {
+                    try {
+                        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                        if (accounts.length > 0) {
+                            connectedAddress = accounts[0];
+                            connectedWallet = getEthereumWalletName();
+                            updateWalletUI();
+                            return;
+                        }
+                    } catch (error) {
+                        // Continue if request fails
+                    }
                 }
+
+                // Check Phantom (Solana)
+                if (window.solana && window.solana.isPhantom) {
+                    try {
+                        const response = await window.solana.connect({ onlyIfTrusted: true });
+                        connectedWallet = 'Phantom';
+                        connectedAddress = response.publicKey.toString();
+                        updateWalletUI();
+                        return;
+                    } catch (error) {
+                        // User hasn't connected before
+                    }
+                }
+
+                // Check Solflare (Solana)
+                if (window.solflare && window.solflare.isSolflare) {
+                    try {
+                        const response = await window.solflare.connect({ onlyIfTrusted: true });
+                        connectedWallet = 'Solflare';
+                        connectedAddress = response.publicKey.toString();
+                        updateWalletUI();
+                        return;
+                    } catch (error) {
+                        // User hasn't connected before
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking existing wallet connection:', error);
+            }
+        }
+
+        // Get Ethereum wallet name
+        function getEthereumWalletName() {
+            if (window.ethereum.isMetaMask) return 'MetaMask';
+            if (window.ethereum.isCoinbaseWallet) return 'Coinbase Wallet';
+            if (window.ethereum.isTrust) return 'Trust Wallet';
+            if (window.ethereum.isExodus) return 'Exodus';
+            if (window.ethereum.isLedger) return 'Ledger';
+            if (window.ethereum.isTrezor) return 'Trezor';
+            return 'Ethereum Wallet';
+        }
+
+        // Initialize the dashboard
+        async function init() {
+            setupEventListeners();
+            await checkExistingWalletConnection();
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Wallet connection events
+            connectWalletBtn.addEventListener('click', connectWallet);
+            closeModalBtn.addEventListener('click', closeWalletModal);
+
+            // Close modal when clicking outside
+            walletModal.addEventListener('click', (e) => {
+                if (e.target === walletModal) {
+                    closeWalletModal();
+                }
+            });
+
+            // Copy address button
+            copyButton.addEventListener('click', copyAddressToClipboard);
+
+            // Bridge action buttons
+            const actionButtons = document.querySelectorAll('.btn');
+            actionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.textContent.trim();
+                    handleAction(action);
+                });
+            });
+        }
+
+        // Copy address to clipboard
+        function copyAddressToClipboard() {
+            const address = document.querySelector('.address-value').textContent;
+            navigator.clipboard.writeText(address)
+                .then(() => {
+                    showNotification('Bitcoin address copied to clipboard!');
+                })
+                .catch(err => {
+                    showNotification('Failed to copy address', true);
+                    console.error('Failed to copy: ', err);
+                });
+        }
+
+        // Handle action button clicks
+        function handleAction(action) {
+            if (action.includes('Bridge to Starknet')) {
+                showNotification('Preparing to bridge BTC to Starknet...');
+            } else if (action.includes('Swap Bitcoin')) {
+                showNotification('Opening swap interface...');
+            } else if (action.includes('Save QR Code')) {
+                showNotification('QR code saved to your downloads folder!');
+            } else if (action.includes('Generate New Address')) {
+                showNotification('New Bitcoin address generated!');
+            } else if (action.includes('View All')) {
+                showNotification('Loading all transactions...');
             }
         }
 
         // Show notification
-        function showNotification(message, type = 'info') {
-            const notification = document.getElementById('notification');
-            const notificationText = document.getElementById('notificationText');
-
+        function showNotification(message, isError = false) {
             notificationText.textContent = message;
-            notification.style.borderLeftColor = type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#f2a900';
+
+            if (isError) {
+                notification.style.borderLeftColor = '#f44336';
+            } else {
+                notification.style.borderLeftColor = '#f2a900';
+            }
+
             notification.style.display = 'block';
 
-            // Auto-hide after 3 seconds
             setTimeout(() => {
                 notification.style.display = 'none';
             }, 3000);
         }
 
-        // Disconnect wallet (optional feature)
-        function disconnectWallet() {
-            connectedWallet = null;
-            updateConnectButton(false);
-            showNotification('Wallet disconnected', 'info');
-        }
+        // Initialize the dashboard
+        init();
     </script>
 </body>
 </html>

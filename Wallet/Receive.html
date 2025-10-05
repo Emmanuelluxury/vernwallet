@@ -872,6 +872,9 @@
     <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
     <script src="https://unpkg.com/@coinbase/wallet-sdk@3.7.1/dist/index.js"></script>
 
+    <!-- Integration Script -->
+    <script src="../frontend-integration.js"></script>
+
     <script>
         // DOM Elements
         const connectWalletBtn = document.getElementById('connectWallet');
@@ -889,6 +892,7 @@
         // Wallet connection state
         let connectedWallet = null;
         let connectedAddress = null;
+        let walletIntegration = null;
 
         // Addresses for different networks
         const addresses = {
@@ -915,6 +919,25 @@
 
         function closeWalletModal() {
             walletModal.style.display = 'none';
+        }
+
+        // Initialize wallet integration
+        async function initializeWalletIntegration() {
+            try {
+                walletIntegration = new WalletIntegrationService();
+                await walletIntegration.initialize();
+
+                // Check for existing wallet connection
+                const existingConnection = walletIntegration.getConnectedWallet();
+                if (existingConnection) {
+                    connectedWallet = existingConnection.name;
+                    connectedAddress = existingConnection.address;
+                    updateWalletUI();
+                    updateAddressDisplay();
+                }
+            } catch (error) {
+                console.error('Failed to initialize wallet integration:', error);
+            }
         }
 
         // Populate wallet options with real available wallets
@@ -979,13 +1002,13 @@
                 },
                 {
                     id: 'starknet',
-                    name: 'StarkNet Wallet',
+                    name: 'Ready Wallet',
                     type: 'StarkNet',
                     icon: 'fas fa-link',
                     isAvailable: () => window.starknet,
                     connect: async () => {
                         await window.starknet.enable();
-                        return { address: window.starknet.selectedAddress, name: window.starknet.name || 'StarkNet Wallet' };
+                        return { address: window.starknet.selectedAddress, name: window.starknet.name || 'Ready Wallet' };
                     }
                 }
             ];
@@ -1021,12 +1044,13 @@
                 closeWalletModal();
                 showNotification(`Connecting to ${wallet.name}...`);
 
-                const result = await wallet.connect();
+                const result = await walletIntegration.connectWallet(wallet.id);
 
                 connectedWallet = result.name;
                 connectedAddress = result.address;
 
                 updateWalletUI();
+                updateAddressDisplay();
                 showNotification(`Successfully connected to ${connectedWallet}!`);
 
             } catch (error) {
@@ -1036,17 +1060,27 @@
         }
 
         // Connect wallet - opens modal with real wallets
-        function connectWallet() {
-            openWalletModal();
+        async function connectWallet() {
+            try {
+                const result = await walletIntegration.connectWallet();
+                connectedWallet = result.name;
+                connectedAddress = result.address;
+                updateWalletUI();
+                updateAddressDisplay();
+                showNotification(`Successfully connected to ${connectedWallet}!`);
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                showNotification(`Failed to connect wallet: ${error.message}`, true);
+            }
         }
 
 
         // Check for existing wallet connection on page load
         async function checkExistingWalletConnection() {
             try {
-                // Check StarkNet wallets first
+                // Check Ready wallets first
                 if (window.starknet && window.starknet.isConnected) {
-                    connectedWallet = window.starknet.name || 'StarkNet Wallet';
+                    connectedWallet = window.starknet.name || 'Ready Wallet';
                     connectedAddress = window.starknet.selectedAddress;
                     updateWalletUI();
                     return;
@@ -1117,10 +1151,10 @@
         }
 
         // Initialize the dashboard
-        function init() {
+        async function init() {
+            await initializeWalletIntegration();
             setupEventListeners();
             updateAddressDisplay();
-            checkExistingWalletConnection();
         }
         
         // Set up event listeners
@@ -1166,9 +1200,22 @@
         }
         
         // Update address display based on current network
-        function updateAddressDisplay() {
-            addressValue.textContent = addresses[currentNetwork][currentAddressIndex];
-            // In a real application, this would also update the QR code
+        async function updateAddressDisplay() {
+            try {
+                if (connectedAddress) {
+                    // Use connected wallet address
+                    addressValue.textContent = connectedAddress;
+                } else {
+                    // Generate new address using wallet integration
+                    const newAddress = await walletIntegration.generateReceiveAddress(currentNetwork);
+                    addressValue.textContent = newAddress;
+                }
+                // In a real application, this would also update the QR code
+            } catch (error) {
+                console.error('Error updating address display:', error);
+                // Fallback to static addresses if integration fails
+                addressValue.textContent = addresses[currentNetwork][currentAddressIndex];
+            }
         }
         
         // Copy address to clipboard
@@ -1190,10 +1237,19 @@
         }
         
         // Generate new address
-        function generateNewAddress() {
-            currentAddressIndex = (currentAddressIndex + 1) % addresses[currentNetwork].length;
-            updateAddressDisplay();
-            showNotification('New address generated successfully!');
+        async function generateNewAddress() {
+            try {
+                showNotification('Generating new address...');
+                const newAddress = await walletIntegration.generateReceiveAddress(currentNetwork);
+                addressValue.textContent = newAddress;
+                showNotification('New address generated successfully!');
+            } catch (error) {
+                console.error('Error generating new address:', error);
+                // Fallback to static addresses if integration fails
+                currentAddressIndex = (currentAddressIndex + 1) % addresses[currentNetwork].length;
+                updateAddressDisplay();
+                showNotification('New address generated successfully!');
+            }
         }
         
         // Share address via different platforms

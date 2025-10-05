@@ -1,0 +1,523 @@
+[
+  {
+    "type": "enum",
+    "name": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::BitcoinNetwork",
+    "variants": [
+      {
+        "name": "Mainnet",
+        "type": "()"
+      },
+      {
+        "name": "Testnet",
+        "type": "()"
+      },
+      {
+        "name": "Regtest",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "constructor",
+    "name": "constructor",
+    "inputs": [
+      {
+        "name": "admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "network",
+        "type": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::BitcoinNetwork"
+      },
+      {
+        "name": "rpc_host",
+        "type": "core::felt252"
+      },
+      {
+        "name": "rpc_port",
+        "type": "core::integer::u16"
+      },
+      {
+        "name": "rpc_username",
+        "type": "core::felt252"
+      },
+      {
+        "name": "rpc_password",
+        "type": "core::felt252"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "connect_bitcoin_node",
+    "inputs": [],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "get_block_height",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::integer::u32"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_best_block_hash",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::BitcoinTxIn",
+    "members": [
+      {
+        "name": "txid",
+        "type": "core::felt252"
+      },
+      {
+        "name": "vout",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "script_sig",
+        "type": "core::array::Array::<core::integer::u8>"
+      },
+      {
+        "name": "sequence",
+        "type": "core::integer::u32"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::BitcoinTxOut",
+    "members": [
+      {
+        "name": "value",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "script_pubkey",
+        "type": "core::array::Array::<core::integer::u8>"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::BitcoinTransaction",
+    "members": [
+      {
+        "name": "version",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "inputs",
+        "type": "core::array::Array::<starknet_bridge::contracts::BitcoinClient::BitcoinClient::BitcoinTxIn>"
+      },
+      {
+        "name": "outputs",
+        "type": "core::array::Array::<starknet_bridge::contracts::BitcoinClient::BitcoinClient::BitcoinTxOut>"
+      },
+      {
+        "name": "locktime",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "txid",
+        "type": "core::felt252"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "get_transaction",
+    "inputs": [
+      {
+        "name": "txid",
+        "type": "core::felt252"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::BitcoinTransaction"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "submit_transaction",
+    "inputs": [
+      {
+        "name": "tx",
+        "type": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::BitcoinTransaction"
+      },
+      {
+        "name": "block_height",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "confirmations",
+        "type": "core::integer::u32"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::BitcoinHeader",
+    "members": [
+      {
+        "name": "version",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "previous_block_hash",
+        "type": "core::felt252"
+      },
+      {
+        "name": "merkle_root",
+        "type": "core::felt252"
+      },
+      {
+        "name": "timestamp",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "bits",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "nonce",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "hash",
+        "type": "core::felt252"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "get_block_header",
+    "inputs": [
+      {
+        "name": "block_height",
+        "type": "core::integer::u32"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::BitcoinHeader"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "submit_block_header",
+    "inputs": [
+      {
+        "name": "header",
+        "type": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::BitcoinHeader"
+      },
+      {
+        "name": "height",
+        "type": "core::integer::u32"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "broadcast_transaction",
+    "inputs": [
+      {
+        "name": "raw_tx",
+        "type": "core::array::Array::<core::integer::u8>"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "get_address_balance",
+    "inputs": [
+      {
+        "name": "address",
+        "type": "core::felt252"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::integer::u64"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_utxos_for_address",
+    "inputs": [
+      {
+        "name": "address",
+        "type": "core::felt252"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::array::Array::<starknet_bridge::contracts::BitcoinClient::BitcoinClient::BitcoinTxOut>"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "submit_utxo_batch",
+    "inputs": [
+      {
+        "name": "address",
+        "type": "core::felt252"
+      },
+      {
+        "name": "utxos",
+        "type": "core::array::Array::<starknet_bridge::contracts::BitcoinClient::BitcoinClient::BitcoinTxOut>"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "enum",
+    "name": "core::bool",
+    "variants": [
+      {
+        "name": "False",
+        "type": "()"
+      },
+      {
+        "name": "True",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "is_transaction_confirmed",
+    "inputs": [
+      {
+        "name": "txid",
+        "type": "core::felt252"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::bool"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "update_block_height",
+    "inputs": [],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "set_admin",
+    "inputs": [
+      {
+        "name": "new_admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "get_admin",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "set_rpc_config",
+    "inputs": [
+      {
+        "name": "host",
+        "type": "core::felt252"
+      },
+      {
+        "name": "port",
+        "type": "core::integer::u16"
+      },
+      {
+        "name": "username",
+        "type": "core::felt252"
+      },
+      {
+        "name": "password",
+        "type": "core::felt252"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "get_network",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::BitcoinNetwork"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "is_connected",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::bool"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::BitcoinNodeConnected",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "node_type",
+        "type": "core::felt252",
+        "kind": "key"
+      },
+      {
+        "name": "network",
+        "type": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::BitcoinNetwork",
+        "kind": "data"
+      },
+      {
+        "name": "height",
+        "type": "core::integer::u32",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::NewBlockDetected",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "block_height",
+        "type": "core::integer::u32",
+        "kind": "key"
+      },
+      {
+        "name": "block_hash",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "tx_count",
+        "type": "core::integer::u32",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::TransactionConfirmed",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "txid",
+        "type": "core::felt252",
+        "kind": "key"
+      },
+      {
+        "name": "block_height",
+        "type": "core::integer::u32",
+        "kind": "data"
+      },
+      {
+        "name": "confirmations",
+        "type": "core::integer::u32",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::RPCError",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "error_code",
+        "type": "core::felt252",
+        "kind": "key"
+      },
+      {
+        "name": "message",
+        "type": "core::felt252",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::Event",
+    "kind": "enum",
+    "variants": [
+      {
+        "name": "BitcoinNodeConnected",
+        "type": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::BitcoinNodeConnected",
+        "kind": "nested"
+      },
+      {
+        "name": "NewBlockDetected",
+        "type": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::NewBlockDetected",
+        "kind": "nested"
+      },
+      {
+        "name": "TransactionConfirmed",
+        "type": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::TransactionConfirmed",
+        "kind": "nested"
+      },
+      {
+        "name": "RPCError",
+        "type": "starknet_bridge::contracts::BitcoinClient::BitcoinClient::RPCError",
+        "kind": "nested"
+      }
+    ]
+  }
+]

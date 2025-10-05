@@ -1,0 +1,259 @@
+[
+  {
+    "type": "constructor",
+    "name": "constructor",
+    "inputs": [
+      {
+        "name": "admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "sha256",
+    "inputs": [
+      {
+        "name": "data",
+        "type": "core::array::Array::<core::integer::u8>"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "double_sha256",
+    "inputs": [
+      {
+        "name": "data",
+        "type": "core::array::Array::<core::integer::u8>"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "hash256",
+    "inputs": [
+      {
+        "name": "data",
+        "type": "core::array::Array::<core::integer::u8>"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "compute_txid",
+    "inputs": [
+      {
+        "name": "tx_data",
+        "type": "core::array::Array::<core::integer::u8>"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "compute_block_hash",
+    "inputs": [
+      {
+        "name": "header_data",
+        "type": "core::array::Array::<core::integer::u8>"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "compute_merkle_root",
+    "inputs": [
+      {
+        "name": "txids",
+        "type": "core::array::Array::<core::felt252>"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "enum",
+    "name": "core::bool",
+    "variants": [
+      {
+        "name": "False",
+        "type": "()"
+      },
+      {
+        "name": "True",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "verify_merkle_proof",
+    "inputs": [
+      {
+        "name": "txid",
+        "type": "core::felt252"
+      },
+      {
+        "name": "merkle_root",
+        "type": "core::felt252"
+      },
+      {
+        "name": "merkle_branch",
+        "type": "core::array::Array::<core::felt252>"
+      },
+      {
+        "name": "position",
+        "type": "core::integer::u32"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::bool"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "validate_bitcoin_address",
+    "inputs": [
+      {
+        "name": "address",
+        "type": "core::felt252"
+      },
+      {
+        "name": "network",
+        "type": "core::felt252"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::bool"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "satoshis_to_btc",
+    "inputs": [
+      {
+        "name": "satoshis",
+        "type": "core::integer::u64"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "btc_to_satoshis",
+    "inputs": [
+      {
+        "name": "btc_amount",
+        "type": "core::felt252"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::integer::u64"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "set_admin",
+    "inputs": [
+      {
+        "name": "new_admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "get_admin",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::CryptoUtils::CryptoUtils::HashComputed",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "hash_type",
+        "type": "core::felt252",
+        "kind": "key"
+      },
+      {
+        "name": "input_length",
+        "type": "core::integer::u32",
+        "kind": "data"
+      },
+      {
+        "name": "result",
+        "type": "core::felt252",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::CryptoUtils::CryptoUtils::Event",
+    "kind": "enum",
+    "variants": [
+      {
+        "name": "HashComputed",
+        "type": "starknet_bridge::contracts::CryptoUtils::CryptoUtils::HashComputed",
+        "kind": "nested"
+      }
+    ]
+  }
+]

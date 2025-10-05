@@ -25,6 +25,7 @@
             --transition: all 0.3s ease;
             --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --gradient-dark: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
         }
         
         * {
@@ -42,6 +43,9 @@
             padding: 0;
             margin: 0;
             overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(124, 58, 237, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 20%);
         }
         
         .container {
@@ -82,6 +86,9 @@
             font-size: 1.5rem;
             color: white;
             text-decoration: none;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
         .logo-icon {
@@ -179,32 +186,6 @@
             overflow: hidden;
         }
         
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -100px;
-            right: -100px;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(var(--primary-light), transparent 70%);
-            opacity: 0.2;
-            border-radius: 50%;
-            z-index: -1;
-        }
-        
-        .hero::after {
-            content: '';
-            position: absolute;
-            bottom: -100px;
-            left: -100px;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(var(--secondary), transparent 70%);
-            opacity: 0.15;
-            border-radius: 50%;
-            z-index: -1;
-        }
-        
         .hero-content {
             display: flex;
             align-items: center;
@@ -231,7 +212,7 @@
         }
 
         .hero-title span {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: var(--gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -1105,9 +1086,186 @@
         .notification.error {
             background: var(--danger);
         }
+
+        /* New Enhanced Elements */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-100vh) rotate(360deg); }
+        }
+        
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+        
+        .live-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        
+        .live-status::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--info);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .testimonials {
+            padding: 100px 0;
+            background: rgba(15, 23, 42, 0.3);
+        }
+        
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .testimonial-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+        
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 20px;
+            color: var(--gray-light);
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .author-info h4 {
+            color: white;
+            margin-bottom: 5px;
+        }
+        
+        .author-info p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .faq {
+            padding: 100px 0;
+            background: rgba(15, 23, 42, 0.5);
+        }
+        
+        .faq-grid {
+            max-width: 800px;
+            margin: 50px auto 0;
+        }
+        
+        .faq-item {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .faq-question {
+            padding: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            transition: var(--transition);
+        }
+        
+        .faq-question:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: var(--transition);
+            color: var(--gray);
+        }
+        
+        .faq-item.active .faq-answer {
+            padding: 0 20px 20px;
+            max-height: 200px;
+        }
+        
+        .faq-item.active .faq-question {
+            background: rgba(124, 58, 237, 0.1);
+        }
+        
+        .faq-toggle {
+            transition: var(--transition);
+        }
+        
+        .faq-item.active .faq-toggle {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 <body>
+    <!-- Particles Background -->
+    <div class="particles" id="particles"></div>
+    
     <!-- Header -->
     <header>
         <div class="container">
@@ -1121,15 +1279,20 @@
                     <li><a href="#how-it-works">How It Works</a></li>
                     <li><a href="#bridge">Bridge</a></li>
                     <li><a href="#stats">Stats</a></li>
+                    <li><a href="#testimonials">Testimonials</a></li>
+                    <li><a href="#faq">FAQ</a></li>
                 </ul>
-                <button class="connect-wallet" id="connectWallet">
-                    <i class="fas fa-wallet"></i>
-                    Connect Wallet
-                </button>
-                <button class="disconnect-wallet" id="disconnectWallet" style="display: none;">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Disconnect
-                </button>
+                <div>
+                    <span class="live-status">Live</span>
+                    <button class="connect-wallet" id="connectWallet">
+                        <i class="fas fa-wallet"></i>
+                        Connect Wallet
+                    </button>
+                    <button class="disconnect-wallet" id="disconnectWallet" style="display: none;">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Disconnect
+                    </button>
+                </div>
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
                     <i class="fas fa-bars"></i>
                 </button>
@@ -1147,6 +1310,8 @@
             <li><a href="#how-it-works">How It Works</a></li>
             <li><a href="#bridge">Bridge</a></li>
             <li><a href="#stats">Stats</a></li>
+            <li><a href="#testimonials">Testimonials</a></li>
+            <li><a href="#faq">FAQ</a></li>
             <li><a href="#" id="mobileConnect">Connect Wallet</a></li>
         </ul>
     </div>
@@ -1156,6 +1321,10 @@
         <div class="container">
             <div class="hero-content">
                 <div class="hero-text">
+                    <div class="security-badge">
+                        <i class="fas fa-shield-alt"></i>
+                        Non-Custodial & Secure
+                    </div>
                     <h1 class="hero-title">Seamlessly Bridge <span>Bitcoin</span> to <span>Starknet</span></h1>
                     <p class="hero-subtitle">The most secure, fast, and cost-effective way to transfer your Bitcoin assets to Starknet and unlock the potential of Layer 2 scalability.</p>
                     
@@ -1236,6 +1405,13 @@
                     <h3 class="feature-title">Low Fees</h3>
                     <p class="feature-description">Save on gas costs with our efficient bridging mechanism that reduces transaction fees significantly.</p>
                 </div>
+                <!-- <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="feature-title">Scalable</h3>
+                    <p class="feature-description">Leverage StarkNet's Layer 2 scalability for faster and cheaper transactions.</p>
+                </div> -->
             </div>
         </div>
     </section>
@@ -1336,6 +1512,96 @@
         </div>
     </section>
 
+    <!-- Testimonials Section -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">What Our Users Say</h2>
+                <p class="section-subtitle">Trusted by thousands of users across the globe</p>
+            </div>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"The Bitcoin-StarkNet bridge has revolutionized how I interact with DeFi. The process is seamless and the fees are significantly lower than other solutions."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">JD</div>
+                        <div class="author-info">
+                            <h4>John Doe</h4>
+                            <p>DeFi Enthusiast</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"As a developer, I appreciate the robust API and documentation. Integrating the bridge into our dApp was straightforward and our users love the experience."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">SJ</div>
+                        <div class="author-info">
+                            <h4>Sarah Johnson</h4>
+                            <p>Blockchain Developer</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"The security features give me peace of mind when moving large amounts. The non-custodial approach means I always maintain control of my assets."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">MW</div>
+                        <div class="author-info">
+                            <h4>Michael Wang</h4>
+                            <p>Crypto Investor</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq" id="faq">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <p class="section-subtitle">Find answers to common questions about our bridge</p>
+            </div>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        How long does a transfer take?
+                        <i class="fas fa-chevron-down faq-toggle"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Transfers typically take between 10-30 minutes depending on network congestion. Bitcoin confirmations usually take the longest, while the StarkNet portion is almost instant.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        What are the fees for using the bridge?
+                        <i class="fas fa-chevron-down faq-toggle"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Our bridge charges a 0.1% fee on transfers, plus network gas fees. This is significantly lower than most cross-chain bridges on the market.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        Is my funds safe during the bridging process?
+                        <i class="fas fa-chevron-down faq-toggle"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Yes! Our bridge is non-custodial, meaning you maintain control of your assets throughout the entire process. The smart contracts have been audited by leading security firms.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        What wallets are supported?
+                        <i class="fas fa-chevron-down faq-toggle"></i>
+                    </div>
+                    <div class="faq-answer">
+                        We support all major Bitcoin wallets (like Ledger, Trezor, Electrum) and StarkNet wallets (Argent X, Braavos). You can see the full list in our documentation.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer>
         <div class="container">
@@ -1407,7 +1673,7 @@
                     <div class="wallet-icon">
                         <i class="fas fa-wallet"></i>
                     </div>
-                    <div class="wallet-name">Argent X</div>
+                    <div class="wallet-name">Ready Wallet</div>
                 </div>
                 <div class="wallet-option" data-wallet="braavos">
                     <div class="wallet-icon">
@@ -1458,10 +1724,45 @@
         const bridgeButton = document.getElementById('bridgeButton');
         const notification = document.getElementById('notification');
         const notificationText = document.getElementById('notificationText');
+        const faqItems = document.querySelectorAll('.faq-item');
+        const particlesContainer = document.getElementById('particles');
 
         // Wallet connection state
         let connectedWallet = null;
         let connectedAddress = null;
+        
+        // Create particles background
+        function createParticles() {
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size and position
+                const size = Math.random() * 5 + 1;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // Random color
+                const colors = ['#7c3aed', '#10b981', '#f7931a', '#3b82f6'];
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Random animation duration
+                particle.style.animationDuration = `${Math.random() * 20 + 10}s`;
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // FAQ functionality
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question');
+            question.addEventListener('click', () => {
+                item.classList.toggle('active');
+            });
+        });
         
         // Header scroll effect
         window.addEventListener('scroll', () => {
@@ -1792,6 +2093,9 @@
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            // Create particles background
+            createParticles();
+            
             // Check if wallet is already connected
             checkExistingWalletConnection();
 

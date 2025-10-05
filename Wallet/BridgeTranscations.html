@@ -668,6 +668,115 @@
         .processing {
             animation: pulse 2s infinite;
         }
+
+        /* Transaction Hash Copy Styles */
+        .hash-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .transaction-hash {
+            flex: 1;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            font-family: monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+        }
+
+        .transaction-hash:hover {
+            background: rgba(124, 58, 237, 0.1);
+            color: var(--primary);
+        }
+
+        .copy-hash-btn {
+            background: rgba(124, 58, 237, 0.2);
+            border: none;
+            color: var(--primary);
+            padding: 6px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.8rem;
+            min-width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-hash-btn:hover {
+            background: rgba(124, 58, 237, 0.3);
+            transform: scale(1.05);
+        }
+
+        .copy-hash-btn.copied {
+            background: var(--success);
+            color: white;
+        }
+
+        .copy-hash-btn.copied i::before {
+            content: "\f00c"; /* Check mark icon */
+        }
+
+        /* Transaction ID Copy Styles in Table */
+        .tx-id-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .tx-id {
+            flex: 1;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 2px 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        .tx-id:hover {
+            background: rgba(124, 58, 237, 0.1);
+            color: var(--primary);
+        }
+
+        .copy-tx-btn {
+            background: rgba(124, 58, 237, 0.2);
+            border: none;
+            color: var(--primary);
+            padding: 4px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.7rem;
+            min-width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-tx-btn:hover {
+            background: rgba(124, 58, 237, 0.3);
+            transform: scale(1.05);
+        }
+
+        .copy-tx-btn.copied {
+            background: var(--success);
+            color: white;
+        }
+
+        .copy-tx-btn.copied i::before {
+            content: "\f00c"; /* Check mark icon */
+        }
     </style>
 </head>
 <body>
@@ -873,7 +982,14 @@
                     </thead>
                     <tbody>
                         <tr data-txid="txn_8f7e6d5c4b3a">
-                            <td>txn_8f7e6d5c4b3a</td>
+                            <td>
+                                <div class="tx-id-container">
+                                    <span class="tx-id" onclick="copyTransactionHash(this)">txn_8f7e6d5c4b3a</span>
+                                    <button class="copy-tx-btn" onclick="copyTransactionHash(this.previousElementSibling)" title="Copy transaction ID">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </td>
                             <td><span class="direction-indicator direction-to-starknet"><i class="fab fa-bitcoin"></i> → <i class="fas fa-layer-group"></i></span></td>
                             <td>1.25 BTC</td>
                             <td><span class="status-badge status-completed">Completed</span></td>
@@ -995,12 +1111,22 @@
                     
                     <div class="detail-group">
                         <div class="detail-label">Bitcoin TX Hash</div>
-                        <div class="detail-value" id="detail-btc-hash">a1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d</div>
+                        <div class="detail-value hash-container">
+                            <span class="transaction-hash" id="detail-btc-hash" onclick="copyTransactionHash(this)">a1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d</span>
+                            <button class="copy-hash-btn" onclick="copyTransactionHash(this.previousElementSibling)" title="Copy Bitcoin transaction hash">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
                     </div>
-                    
+
                     <div class="detail-group">
                         <div class="detail-label">Starknet TX Hash</div>
-                        <div class="detail-value" id="detail-stark-hash">0x023f5d7c8b1a4e6f3c9a2b8e7d6c5a4f3b2e1d0c9a8b7c6d5e4f3a2b1c0d9e8f7</div>
+                        <div class="detail-value hash-container">
+                            <span class="transaction-hash" id="detail-stark-hash" onclick="copyTransactionHash(this)">0x023f5d7c8b1a4e6f3c9a2b8e7d6c5a4f3b2e1d0c9a8b7c6d5e4f3a2b1c0d9e8f7</span>
+                            <button class="copy-hash-btn" onclick="copyTransactionHash(this.previousElementSibling)" title="Copy Starknet transaction hash">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="detail-group">
@@ -1027,6 +1153,90 @@
     </div>
 
     <script>
+        // Copy transaction hash to clipboard
+        async function copyTransactionHash(element) {
+            const hashText = element.textContent.trim();
+
+            try {
+                // Use modern clipboard API if available
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(hashText);
+                } else {
+                    // Fallback for older browsers or non-HTTPS
+                    const textArea = document.createElement('textarea');
+                    textArea.value = hashText;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-999999px';
+                    textArea.style.top = '-999999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+
+                    try {
+                        document.execCommand('copy');
+                    } catch (err) {
+                        console.error('Fallback: Unable to copy', err);
+                        throw new Error('Copy failed');
+                    }
+
+                    textArea.remove();
+                }
+
+                // Visual feedback
+                const copyBtn = element.nextElementSibling;
+                if (copyBtn && copyBtn.classList.contains('copy-hash-btn')) {
+                    copyBtn.classList.add('copied');
+
+                    setTimeout(() => {
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                }
+
+                // Show notification (you can customize this)
+                showCopyNotification(`Transaction hash copied to clipboard!`);
+
+            } catch (error) {
+                console.error('Failed to copy transaction hash:', error);
+                showCopyNotification('Failed to copy transaction hash. Please copy manually.', true);
+            }
+        }
+
+        // Show copy notification
+        function showCopyNotification(message, isError = false) {
+            // Create notification element if it doesn't exist
+            let notification = document.getElementById('copy-notification');
+            if (!notification) {
+                notification = document.createElement('div');
+                notification.id = 'copy-notification';
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 12px 20px;
+                    background: rgba(15, 23, 42, 0.9);
+                    backdrop-filter: blur(10px);
+                    border-left: 4px solid ${isError ? '#ef4444' : '#00d2ff'};
+                    border-radius: 8px;
+                    color: white;
+                    font-size: 0.9rem;
+                    z-index: 2000;
+                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                    max-width: 300px;
+                    animation: slideIn 0.3s forwards;
+                `;
+                document.body.appendChild(notification);
+            }
+
+            notification.textContent = message;
+            notification.style.borderLeftColor = isError ? '#ef4444' : '#00d2ff';
+
+            setTimeout(() => {
+                if (notification) {
+                    notification.style.display = 'none';
+                }
+            }, 3000);
+        }
+
         // Bridge Transactions Dashboard - Functionality
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize data
@@ -1102,7 +1312,14 @@
 
             tbody.innerHTML = transactions.map(tx => `
                 <tr data-txid="${tx.id}">
-                    <td>${tx.id}</td>
+                    <td>
+                        <div class="tx-id-container">
+                            <span class="tx-id" onclick="copyTransactionHash(this)">${tx.id}</span>
+                            <button class="copy-tx-btn" onclick="copyTransactionHash(this.previousElementSibling)" title="Copy transaction ID">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </td>
                     <td><span class="direction-indicator ${tx.directionClass}"><i class="fab fa-bitcoin"></i> → <i class="fas fa-layer-group"></i></span></td>
                     <td>${tx.amount}</td>
                     <td><span class="status-badge ${tx.statusClass}">${tx.status}</span></td>
@@ -1130,13 +1347,11 @@
                 { text: 'Pending', class: 'status-pending' },
                 { text: 'Failed', class: 'status-failed' }
             ];
-            const timeOptions = ['2 min ago', '5 min ago', '12 min ago', '23 min ago', '38 min ago', '1 hr ago', '2 hrs ago', '3 hrs ago', '5 hrs ago', '8 hrs ago', '12 hrs ago', '1 day ago'];
 
             const transactions = [];
             for (let i = 0; i < count; i++) {
                 const direction = directions[Math.floor(Math.random() * directions.length)];
                 const status = statuses[Math.floor(Math.random() * statuses.length)];
-                const time = timeOptions[Math.floor(Math.random() * timeOptions.length)];
 
                 let amount;
                 if (direction.text === 'BTC → STRK') {
@@ -1145,6 +1360,9 @@
                     amount = `${Math.floor(1000 + Math.random() * 20000).toLocaleString()} STRK`;
                 }
 
+                // Generate realistic timestamp
+                const time = generateRealisticTimestamp(i);
+
                 transactions.push({
                     id: `txn_${Math.random().toString(36).substring(2, 15)}`,
                     direction: direction.text,
@@ -1152,11 +1370,33 @@
                     amount: amount,
                     status: status.text,
                     statusClass: status.class,
-                    time: time
+                    time: time,
+                    timestamp: Date.now() - (i * Math.random() * 86400000) // Spread over last 24 hours
                 });
             }
 
             return transactions;
+        }
+
+        // Generate realistic timestamp
+        function generateRealisticTimestamp(index) {
+            const now = new Date();
+            const randomMinutes = Math.floor(Math.random() * 1440); // Random minutes in 24 hours
+            const txTime = new Date(now.getTime() - (randomMinutes * 60000));
+
+            const diffMinutes = Math.floor((now - txTime) / 60000);
+
+            if (diffMinutes < 1) {
+                return 'Just now';
+            } else if (diffMinutes < 60) {
+                return `${diffMinutes} min ago`;
+            } else if (diffMinutes < 1440) {
+                const hours = Math.floor(diffMinutes / 60);
+                return `${hours} hr${hours > 1 ? 's' : ''} ago`;
+            } else {
+                const days = Math.floor(diffMinutes / 1440);
+                return `${days} day${days > 1 ? 's' : ''} ago`;
+            }
         }
 
         // Update transaction stats
@@ -1309,9 +1549,12 @@
                     (parseFloat(amount) * 0.001).toFixed(6) + ' BTC' :
                     (parseFloat(amount.replace(/,/g, '')) * 0.0015).toFixed(3) + ' STRK';
 
-                const initiated = new Date(Date.now() - Math.random() * 86400000).toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+                // Generate realistic timestamps
+                const baseTime = new Date(Date.now() - Math.random() * 86400000); // Random time in last 24 hours
+                const initiated = baseTime.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+
                 const completed = statusText === 'Completed' ?
-                    new Date(Date.now() - Math.random() * 3600000).toISOString().replace('T', ' ').substring(0, 19) + ' UTC' :
+                    new Date(baseTime.getTime() + Math.random() * 3600000).toISOString().replace('T', ' ').substring(0, 19) + ' UTC' :
                     'Pending';
 
                 const btcHash = isBtcToStrk || statusText === 'Completed' ?
@@ -1378,11 +1621,18 @@
             const row = document.createElement('tr');
             row.setAttribute('data-txid', newTx.id);
             row.innerHTML = `
-                <td>${newTx.id}</td>
+                <td>
+                    <div class="tx-id-container">
+                        <span class="tx-id" onclick="copyTransactionHash(this)">${newTx.id}</span>
+                        <button class="copy-tx-btn" onclick="copyTransactionHash(this.previousElementSibling)" title="Copy transaction ID">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </td>
                 <td><span class="direction-indicator ${newTx.directionClass}"><i class="fab fa-bitcoin"></i> → <i class="fas fa-layer-group"></i></span></td>
                 <td>${newTx.amount}</td>
                 <td><span class="status-badge ${newTx.statusClass}">${newTx.status}</span></td>
-                <td>Just now</td>
+                <td>${newTx.time}</td>
                 <td><button class="btn btn-sm" onclick="showTransactionDetails('${newTx.id}')">View</button></td>
             `;
 

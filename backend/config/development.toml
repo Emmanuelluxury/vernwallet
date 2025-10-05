@@ -1,0 +1,54 @@
+[bitcoin]
+rpcUrl = "http://localhost:18332"
+rpcUser = "testnet_user"
+rpcPassword = "testnet_password"
+genesisHash = "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943"
+networkMagic = "0b110907"
+network = "testnet"
+
+[starknet]
+rpcUrl = "https://starknet-sepolia.public.blastapi.io/rpc/v0.7"
+accountAddress = "0x1234567890abcdef1234567890abcdef12345678"
+privateKey = "0x1234567890abcdef1234567890abcdef12345678"
+emergencyAdminAddress = "0x1234567890abcdef1234567890abcdef12345678"
+network = "sepolia"
+chainId = "SN_SEPOLIA"
+enableFallbackMode = true
+maxContractRetries = 3
+contractTimeout = 10000
+retryDelay = 2000
+
+[api]
+port = 3001
+host = "localhost"
+corsOrigins = ["http://127.0.0.1:5501", "http://localhost:3000", "http://localhost:3001"]
+
+[database]
+host = "localhost"
+port = 5432
+name = "vernwallet_bridge_dev"
+username = "bridge_dev"
+password = "bridge_dev_password"
+
+[logging]
+level = "debug"
+maxSize = "20m"
+maxFiles = "14d"
+
+[bridge]
+confirmationsRequired = 3
+maxDepositAmount = "100000000000000000000000000000000"
+minDepositAmount = "100000000"
+depositTimeout = 86400
+withdrawalTimeout = 259200
+dailyLimit = "1000000000000000000000000000000000"
+minOperatorBond = "1000000000000000000000"
+stakingEnabled = true
+rewardRate = "1000000000000000000"
+stakingRewardsEnabled = true
+emergencyPauseEnabled = true
+rateLimitPerMinute = 10
+depositFee = "10000"
+withdrawalFee = "20000"
+stakingFee = "5000"
+network = "testnet"

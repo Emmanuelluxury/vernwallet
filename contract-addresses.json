@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "generated": "2025-10-02T15:04:00.389Z",
+    "network": "mainnet",
+    "description": "VernWallet Bridge Contract Addresses"
+  },
+  "contracts": {
+    "bitcoinUtils": "0x03661680d36818231f7144274dcbd673d787bddea40ac11d81299da81ec824cf",
+    "cryptoUtils": "0x015d202687c81a2c138f3b764ead3f396c361e049119287738b223fdff7d7f77",
+    "spvVerifier": "0x05bf5f33d548b49b8a2f2d94f2da78ea358f6e0d4eb2a9fe741d9be4db801fe4",
+    "bitcoinClient": "0x048a96be5ca623256df3a0eea2f903103f9859844f2163b827fbc12b017b0299",
+    "bitcoinHeaders": "0x05062ab53aea2baa96b31fe73a40e2cabc6871449a5666f949c3c92a51d6b833",
+    "btcDepositManager": "0x01cb8f799219ff2aa63dc6b06e35a944fdb347993c102b3e7a83d8c6373f39c9",
+    "btcPegOut": "0x06592114e225312fbd2c8068baeb2e65b743516ef5c0829ddc45766040658e2c",
+    "bridge": "0x012402f9a1612d3d48bfc7beb93f756e9848f67e3a0a8c1a23d48f03a25acc9e",
+    "escapeHatch": "0x07e01eec5443158d9ae9c36c5df009b8b2c5e20dab34489a79a25718a409a187",
+    "sbtc": "0x029a051888fb8d645e4f0279393e18f95b1eacdf47b87829dd997b6264588b2c",
+    "operatorRegistry": "0x077d8d9f403eb1c8384acc3e7e7983d50ae9ffb64b7934d682cb2a6f83a94f13"
+  }
+}

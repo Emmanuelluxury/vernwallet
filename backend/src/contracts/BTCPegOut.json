@@ -1,0 +1,515 @@
+[
+  {
+    "type": "struct",
+    "name": "core::integer::u256",
+    "members": [
+      {
+        "name": "low",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "high",
+        "type": "core::integer::u128"
+      }
+    ]
+  },
+  {
+    "type": "constructor",
+    "name": "constructor",
+    "inputs": [
+      {
+        "name": "admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "sbtc_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "operator_registry_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "timelock_duration",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "withdrawal_fee_bps",
+        "type": "core::integer::u16"
+      },
+      {
+        "name": "min_withdrawal_amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "max_withdrawal_amount",
+        "type": "core::integer::u256"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "request_withdrawal",
+    "inputs": [
+      {
+        "name": "amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "btc_address",
+        "type": "core::felt252"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::integer::u256"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "sign_withdrawal",
+    "inputs": [
+      {
+        "name": "withdrawal_id",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "signature",
+        "type": "core::felt252"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "broadcast_bitcoin_tx",
+    "inputs": [
+      {
+        "name": "withdrawal_id",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "bitcoin_tx_hash",
+        "type": "core::felt252"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "complete_withdrawal",
+    "inputs": [
+      {
+        "name": "withdrawal_id",
+        "type": "core::integer::u256"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "emergency_unlock",
+    "inputs": [
+      {
+        "name": "withdrawal_id",
+        "type": "core::integer::u256"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "enum",
+    "name": "starknet_bridge::contracts::BTCPegOut::BTCPegOut::WithdrawalStatus",
+    "variants": [
+      {
+        "name": "Pending",
+        "type": "()"
+      },
+      {
+        "name": "OperatorsSigning",
+        "type": "()"
+      },
+      {
+        "name": "QuorumReached",
+        "type": "()"
+      },
+      {
+        "name": "BitcoinBroadcast",
+        "type": "()"
+      },
+      {
+        "name": "Completed",
+        "type": "()"
+      },
+      {
+        "name": "Failed",
+        "type": "()"
+      },
+      {
+        "name": "EmergencyUnlocked",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::BTCPegOut::BTCPegOut::WithdrawalRequest",
+    "members": [
+      {
+        "name": "user",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "btc_address",
+        "type": "core::felt252"
+      },
+      {
+        "name": "fee_amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "timelock_deadline",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "status",
+        "type": "starknet_bridge::contracts::BTCPegOut::BTCPegOut::WithdrawalStatus"
+      },
+      {
+        "name": "created_at",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "finalized_at",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "bitcoin_tx_hash",
+        "type": "core::felt252"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "get_withdrawal",
+    "inputs": [
+      {
+        "name": "withdrawal_id",
+        "type": "core::integer::u256"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "starknet_bridge::contracts::BTCPegOut::BTCPegOut::WithdrawalRequest"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_withdrawal_status",
+    "inputs": [
+      {
+        "name": "withdrawal_id",
+        "type": "core::integer::u256"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "starknet_bridge::contracts::BTCPegOut::BTCPegOut::WithdrawalStatus"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "set_timelock_duration",
+    "inputs": [
+      {
+        "name": "duration",
+        "type": "core::integer::u64"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "set_withdrawal_fee",
+    "inputs": [
+      {
+        "name": "fee_bps",
+        "type": "core::integer::u16"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "set_min_withdrawal_amount",
+    "inputs": [
+      {
+        "name": "amount",
+        "type": "core::integer::u256"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "set_max_withdrawal_amount",
+    "inputs": [
+      {
+        "name": "amount",
+        "type": "core::integer::u256"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "enum",
+    "name": "core::bool",
+    "variants": [
+      {
+        "name": "False",
+        "type": "()"
+      },
+      {
+        "name": "True",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "set_emergency_mode",
+    "inputs": [
+      {
+        "name": "enabled",
+        "type": "core::bool"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "set_admin",
+    "inputs": [
+      {
+        "name": "new_admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "get_admin",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::BTCPegOut::BTCPegOut::WithdrawalRequested",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "withdrawal_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "user",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "btc_address",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "fee_amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "timelock_deadline",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::BTCPegOut::BTCPegOut::WithdrawalSigned",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "withdrawal_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "operator",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "signature",
+        "type": "core::felt252",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::BTCPegOut::BTCPegOut::QuorumReached",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "withdrawal_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "signatures_count",
+        "type": "core::integer::u32",
+        "kind": "data"
+      },
+      {
+        "name": "required_signatures",
+        "type": "core::integer::u32",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::BTCPegOut::BTCPegOut::BitcoinTxBroadcast",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "withdrawal_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "bitcoin_tx_hash",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "broadcast_at",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::BTCPegOut::BTCPegOut::WithdrawalCompleted",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "withdrawal_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "user",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "amount_burned",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::BTCPegOut::BTCPegOut::EmergencyUnlocked",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "withdrawal_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "user",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "unlocked_at",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::BTCPegOut::BTCPegOut::Event",
+    "kind": "enum",
+    "variants": [
+      {
+        "name": "WithdrawalRequested",
+        "type": "starknet_bridge::contracts::BTCPegOut::BTCPegOut::WithdrawalRequested",
+        "kind": "nested"
+      },
+      {
+        "name": "WithdrawalSigned",
+        "type": "starknet_bridge::contracts::BTCPegOut::BTCPegOut::WithdrawalSigned",
+        "kind": "nested"
+      },
+      {
+        "name": "QuorumReached",
+        "type": "starknet_bridge::contracts::BTCPegOut::BTCPegOut::QuorumReached",
+        "kind": "nested"
+      },
+      {
+        "name": "BitcoinTxBroadcast",
+        "type": "starknet_bridge::contracts::BTCPegOut::BTCPegOut::BitcoinTxBroadcast",
+        "kind": "nested"
+      },
+      {
+        "name": "WithdrawalCompleted",
+        "type": "starknet_bridge::contracts::BTCPegOut::BTCPegOut::WithdrawalCompleted",
+        "kind": "nested"
+      },
+      {
+        "name": "EmergencyUnlocked",
+        "type": "starknet_bridge::contracts::BTCPegOut::BTCPegOut::EmergencyUnlocked",
+        "kind": "nested"
+      }
+    ]
+  }
+]

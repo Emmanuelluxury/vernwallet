@@ -1,0 +1,223 @@
+[
+  {
+    "type": "constructor",
+    "name": "constructor",
+    "inputs": [
+      {
+        "name": "admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "genesis_hash",
+        "type": "core::felt252"
+      },
+      {
+        "name": "max_reorg_depth",
+        "type": "core::integer::u32"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::BitcoinHeaders::BitcoinHeaders::BitcoinHeader",
+    "members": [
+      {
+        "name": "hash",
+        "type": "core::felt252"
+      },
+      {
+        "name": "previous_block_hash",
+        "type": "core::felt252"
+      },
+      {
+        "name": "merkle_root",
+        "type": "core::felt252"
+      },
+      {
+        "name": "timestamp",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "bits",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "nonce",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "height",
+        "type": "core::integer::u32"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "submit_header",
+    "inputs": [
+      {
+        "name": "header",
+        "type": "starknet_bridge::contracts::BitcoinHeaders::BitcoinHeaders::BitcoinHeader"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "get_header",
+    "inputs": [
+      {
+        "name": "height",
+        "type": "core::integer::u32"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "starknet_bridge::contracts::BitcoinHeaders::BitcoinHeaders::BitcoinHeader"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_header_hash",
+    "inputs": [
+      {
+        "name": "height",
+        "type": "core::integer::u32"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_best_height",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::integer::u32"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_merkle_root",
+    "inputs": [
+      {
+        "name": "height",
+        "type": "core::integer::u32"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "set_admin",
+    "inputs": [
+      {
+        "name": "new_admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "get_admin",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::BitcoinHeaders::BitcoinHeaders::HeaderSubmitted",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "header_hash",
+        "type": "core::felt252",
+        "kind": "key"
+      },
+      {
+        "name": "height",
+        "type": "core::integer::u32",
+        "kind": "key"
+      },
+      {
+        "name": "previous_block_hash",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "timestamp",
+        "type": "core::integer::u32",
+        "kind": "data"
+      },
+      {
+        "name": "bits",
+        "type": "core::integer::u32",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::BitcoinHeaders::BitcoinHeaders::ChainReorg",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "from_height",
+        "type": "core::integer::u32",
+        "kind": "key"
+      },
+      {
+        "name": "to_height",
+        "type": "core::integer::u32",
+        "kind": "key"
+      },
+      {
+        "name": "new_best_hash",
+        "type": "core::felt252",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::BitcoinHeaders::BitcoinHeaders::Event",
+    "kind": "enum",
+    "variants": [
+      {
+        "name": "HeaderSubmitted",
+        "type": "starknet_bridge::contracts::BitcoinHeaders::BitcoinHeaders::HeaderSubmitted",
+        "kind": "nested"
+      },
+      {
+        "name": "ChainReorg",
+        "type": "starknet_bridge::contracts::BitcoinHeaders::BitcoinHeaders::ChainReorg",
+        "kind": "nested"
+      }
+    ]
+  }
+]

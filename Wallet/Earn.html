@@ -942,6 +942,9 @@
     <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
     <script src="https://unpkg.com/@coinbase/wallet-sdk@3.7.1/dist/index.js"></script>
 
+    <!-- Integration Script -->
+    <script src="../frontend-integration.js"></script>
+
     <script>
         // DOM Elements
         const connectWalletBtn = document.getElementById('connectWallet');
@@ -955,6 +958,7 @@
         // Wallet connection state
         let connectedWallet = null;
         let connectedAddress = null;
+        let walletIntegration = null;
 
         // Modal functions
         function openWalletModal() {
@@ -964,6 +968,24 @@
 
         function closeWalletModal() {
             walletModal.style.display = 'none';
+        }
+
+        // Initialize wallet integration
+        async function initializeWalletIntegration() {
+            try {
+                walletIntegration = new WalletIntegrationService();
+                await walletIntegration.initialize();
+
+                // Check for existing wallet connection
+                const existingConnection = walletIntegration.getConnectedWallet();
+                if (existingConnection) {
+                    connectedWallet = existingConnection.name;
+                    connectedAddress = existingConnection.address;
+                    updateWalletUI();
+                }
+            } catch (error) {
+                console.error('Failed to initialize wallet integration:', error);
+            }
         }
 
         // Populate wallet options with real available wallets
@@ -1028,13 +1050,13 @@
                 },
                 {
                     id: 'starknet',
-                    name: 'StarkNet Wallet',
+                    name: 'Ready Wallet',
                     type: 'StarkNet',
                     icon: 'fas fa-link',
                     isAvailable: () => window.starknet,
                     connect: async () => {
                         await window.starknet.enable();
-                        return { address: window.starknet.selectedAddress, name: window.starknet.name || 'StarkNet Wallet' };
+                        return { address: window.starknet.selectedAddress, name: window.starknet.name || 'Ready Wallet' };
                     }
                 }
             ];
@@ -1070,7 +1092,7 @@
                 closeWalletModal();
                 showNotification(`Connecting to ${wallet.name}...`);
 
-                const result = await wallet.connect();
+                const result = await walletIntegration.connectWallet(wallet.id);
 
                 connectedWallet = result.name;
                 connectedAddress = result.address;
@@ -1085,17 +1107,26 @@
         }
 
         // Connect wallet - opens modal with real wallets
-        function connectWallet() {
-            openWalletModal();
+        async function connectWallet() {
+            try {
+                const result = await walletIntegration.connectWallet();
+                connectedWallet = result.name;
+                connectedAddress = result.address;
+                updateWalletUI();
+                showNotification(`Successfully connected to ${connectedWallet}!`);
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                showNotification(`Failed to connect wallet: ${error.message}`, true);
+            }
         }
 
 
         // Check for existing wallet connection on page load
         async function checkExistingWalletConnection() {
             try {
-                // Check StarkNet wallets first
+                // Check Ready wallets first
                 if (window.starknet && window.starknet.isConnected) {
-                    connectedWallet = window.starknet.name || 'StarkNet Wallet';
+                    connectedWallet = window.starknet.name || 'Ready Wallet';
                     connectedAddress = window.starknet.selectedAddress;
                     updateWalletUI();
                     return;
@@ -1166,9 +1197,9 @@
         }
 
         // Initialize the dashboard
-        function init() {
+        async function init() {
+            await initializeWalletIntegration();
             setupEventListeners();
-            checkExistingWalletConnection();
         }
         
         // Set up event listeners
@@ -1196,18 +1227,23 @@
             // Investment buttons
             const investmentButtons = document.querySelectorAll('.btn-primary, .action-btn');
             investmentButtons.forEach(button => {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', async function() {
                     const action = this.querySelector('i').className;
                     const card = this.closest('.opportunity-card') || this.closest('tr');
                     const title = card.querySelector('.opportunity-title')?.textContent ||
                                  card.querySelector('.investment-asset span')?.textContent;
 
-                    if (action.includes('fa-plus')) {
-                        showNotification(`Adding funds to ${title}...`);
-                    } else if (action.includes('fa-minus')) {
-                        showNotification(`Removing funds from ${title}...`);
-                    } else if (action.includes('fa-download')) {
-                        showNotification('Claiming all rewards...');
+                    try {
+                        if (action.includes('fa-plus')) {
+                            await handleStake(title);
+                        } else if (action.includes('fa-minus')) {
+                            await handleUnstake(title);
+                        } else if (action.includes('fa-download')) {
+                            await handleClaimRewards();
+                        }
+                    } catch (error) {
+                        console.error('Investment action error:', error);
+                        showNotification(`Action failed: ${error.message}`, true);
                     }
                 });
             });
@@ -1217,6 +1253,63 @@
         function filterOpportunities(filter) {
             console.log(`Filtering opportunities by: ${filter}`);
             // In a real application, this would filter the displayed opportunities
+        }
+
+        // Handle staking action
+        async function handleStake(opportunityTitle) {
+            try {
+                showNotification(`Staking in ${opportunityTitle}...`);
+
+                let stakeData;
+                if (opportunityTitle.includes('BTC')) {
+                    stakeData = { asset: 'BTC', amount: 1.25 };
+                } else if (opportunityTitle.includes('STRK')) {
+                    stakeData = { asset: 'STRK', amount: 1240 };
+                } else if (opportunityTitle.includes('LP')) {
+                    stakeData = { asset: 'BTC-STRK LP', amount: 12450 };
+                }
+
+                const result = await walletIntegration.stake(stakeData);
+
+                showNotification(`Successfully staked in ${opportunityTitle}! TX: ${result.transactionHash?.substring(0, 10)}...`);
+            } catch (error) {
+                throw new Error(`Staking failed: ${error.message}`);
+            }
+        }
+
+        // Handle unstaking action
+        async function handleUnstake(opportunityTitle) {
+            try {
+                showNotification(`Unstaking from ${opportunityTitle}...`);
+
+                let unstakeData;
+                if (opportunityTitle.includes('BTC')) {
+                    unstakeData = { asset: 'BTC', amount: 0.5 };
+                } else if (opportunityTitle.includes('STRK')) {
+                    unstakeData = { asset: 'STRK', amount: 500 };
+                } else if (opportunityTitle.includes('LP')) {
+                    unstakeData = { asset: 'BTC-STRK LP', amount: 5000 };
+                }
+
+                const result = await walletIntegration.unstake(unstakeData);
+
+                showNotification(`Successfully unstaked from ${opportunityTitle}! TX: ${result.transactionHash?.substring(0, 10)}...`);
+            } catch (error) {
+                throw new Error(`Unstaking failed: ${error.message}`);
+            }
+        }
+
+        // Handle claim rewards action
+        async function handleClaimRewards() {
+            try {
+                showNotification('Claiming all rewards...');
+
+                const result = await walletIntegration.claimRewards();
+
+                showNotification(`Successfully claimed rewards! TX: ${result.transactionHash?.substring(0, 10)}...`);
+            } catch (error) {
+                throw new Error(`Claim rewards failed: ${error.message}`);
+            }
         }
         
         // Show notification

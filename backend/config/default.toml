@@ -1,0 +1,59 @@
+[bridge]
+network = "bitcoin-starknet"
+
+[bitcoin]
+network = "mainnet"
+
+[starknet]
+network = "mainnet"
+
+[contracts]
+# BitcoinUtils contract
+bitcoinUtils = "0x03661680d36818231f7144274dcbd673d787bddea40ac11d81299da81ec824cf"
+
+# CryptoUtils contract
+cryptoUtils = "0x015d202687c81a2c138f3b764ead3f396c361e049119287738b223fdff7d7f77"
+
+# SPVVerifier contract
+spvVerifier = "0x05bf5f33d548b49b8a2f2d94f2da78ea358f6e0d4eb2a9fe741d9be4db801fe4"
+
+# BitcoinClient contract
+bitcoinClient = "0x048a96be5ca623256df3a0eea2f903103f9859844f2163b827fbc12b017b0299"
+
+# BitcoinHeaders contract
+bitcoinHeaders = "0x05062ab53aea2baa96b31fe73a40e2cabc6871449a5666f949c3c92a51d6b833"
+
+# BTCDepositManager contract
+btcDepositManager = "0x01cb8f799219ff2aa63dc6b06e35a944fdb347993c102b3e7a83d8c6373f39c9"
+
+# BTCPegOut contract
+btcPegOut = "0x06592114e225312fbd2c8068baeb2e65b743516ef5c0829ddc45766040658e2c"
+
+# Bridge contract
+bridge = "0x012402f9a1612d3d48bfc7beb93f756e9848f67e3a0a8c1a23d48f03a25acc9e"
+
+# EscapeHatch contract
+escapeHatch = "0x07e01eec5443158d9ae9c36c5df009b8b2c5e20dab34489a79a25718a409a187"
+
+# SBTC contract
+sbtc = "0x029a051888fb8d645e4f0279393e18f95b1eacdf47b87829dd997b6264588b2c"
+
+# OperatorRegistry contract
+operatorRegistry = "0x077d8d9f403eb1c8384acc3e7e7983d50ae9ffb64b7934d682cb2a6f83a94f13"
+
+[api]
+port = 3001
+host = "localhost"
+corsOrigins = ["http://localhost:3000"]
+
+[database]
+host = "localhost"
+port = 5432
+name = "vernwallet_bridge"
+username = "bridge_user"
+password = "bridge_password"
+
+[logging]
+level = "info"
+maxSize = "20m"
+maxFiles = "14d"

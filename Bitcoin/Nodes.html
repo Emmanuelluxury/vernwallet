@@ -6,22 +6,28 @@
     <title>Nodes Dashboard - Bitcoin-Starknet Bridge</title>
     <link rel="icon" href="../images/image.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #10b981; /* Green for nodes */
             --primary-dark: #0d966c;
+            --primary-light: rgba(16, 185, 129, 0.15);
             --secondary: #1f2937;
             --dark: #0f172a;
+            --darker: #0d141f;
             --light: #f9fafb;
+            --lighter: #ffffff;
             --gray: #9ca3af;
-            --dark-gray: #4b5563;
-            --light-gray: #f3f4f6;
+            --gray-light: rgba(156, 163, 175, 0.2);
             --danger: #ef4444;
             --warning: #f59e0b;
             --success: #10b981;
             --info: #3b82f6;
             --bitcoin: #f7931a;
             --starknet: #7c3aed;
+            --border-radius: 16px;
+            --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            --transition: all 0.3s ease;
         }
         
         * {
@@ -32,10 +38,16 @@
         }
         
         body {
-            background-color: #0f172a;
+            background: var(--darker);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(31, 41, 55, 0.3) 0%, transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(31, 41, 55, 0.2) 0%, transparent 25%);
             color: var(--light);
             line-height: 1.6;
             min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
         }
         
         .app-container {
@@ -46,9 +58,9 @@
         /* Sidebar Navigation */
         .sidebar {
             width: 280px;
-            background: rgba(31, 41, 55, 0.8);
+            background: rgba(31, 41, 55, 0.85);
             backdrop-filter: blur(15px);
-            border-right: 1px solid rgba(16, 185, 129, 0.2);
+            border-right: 1px solid rgba(16, 185, 129, 0.15);
             padding: 24px 0;
             display: flex;
             flex-direction: column;
@@ -61,7 +73,7 @@
         
         .sidebar-header {
             padding: 0 24px 24px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             margin-bottom: 16px;
             display: flex;
             align-items: center;
@@ -109,8 +121,8 @@
         }
         
         .nav-item:hover, .nav-item.active {
-            background: rgba(16, 185, 129, 0.1);
-            color: white;
+            background: var(--primary-light);
+            color: var(--lighter);
             border-left-color: var(--primary);
         }
         
@@ -175,9 +187,9 @@
         }
         
         .stat-card {
-            background: rgba(31, 41, 55, 0.6);
+            background: rgba(31, 41, 55, 0.5);
             backdrop-filter: blur(10px);
-            border-radius: 1rem;
+            border-radius: var(--border-radius);
             padding: 24px;
             box-shadow: var(--card-shadow);
             border: 1px solid rgba(16, 185, 129, 0.1);
@@ -198,7 +210,8 @@
 
         .stat-card:hover {
             transform: translateY(-5px);
-            border-color: #0d966c;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(16, 185, 129, 0.3);
         }
         
         .stat-header {
@@ -224,7 +237,7 @@
             align-items: center;
             justify-content: center;
             font-size: 1.4rem;
-            background: rgba(16, 185, 129, 0.2);
+            background: var(--primary-light);
             color: var(--primary);
         }
         
@@ -234,6 +247,7 @@
             margin-bottom: 8px;
             background: linear-gradient(90deg, var(--lighter) 0%, var(--gray) 100%);
             -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
         .stat-change {
@@ -254,30 +268,46 @@
         
         /* Cards */
         .card {
-            background: rgba(31, 41, 55, 0.6);
+            background: rgba(31, 41, 55, 0.5);
             backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--card-shadow);
             border: 1px solid rgba(16, 185, 129, 0.1);
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            border-color: rgba(16, 185, 129, 0.2);
         }
         
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
         
         .card-title {
-            font-size: 1.2rem;
-            font-weight: 600;
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .card-title i {
             color: var(--primary);
-            margin-right: 10px;
+            background: var(--primary-light);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .card-actions {
@@ -322,7 +352,7 @@
         .btn:hover {
             background: var(--primary-dark);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px #0d966c;
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
         }
 
         .btn:active {
@@ -335,11 +365,11 @@
         }
         
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
         }
         
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
         }
         
         .btn-warning {
@@ -359,13 +389,14 @@
         
         .table th {
             text-align: left;
-            padding: 12px 15px;
-            font-size: 0.9rem;
+            padding: 16px;
+            font-size: 0.95rem;
             color: var(--gray);
             font-weight: 600;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
-
+        
         .table th:first-child {
             border-top-left-radius: 8px;
         }
@@ -375,37 +406,42 @@
         }
         
         .table td {
-            padding: 12px 15px;
+            padding: 16px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
         }
         
         .table tr:last-child td {
             border-bottom: none;
         }
         
+        .table tr:hover td {
+            background: rgba(16, 185, 129, 0.05);
+        }
+        
         /* Status badges */
         .status-badge {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            padding: 5px 10px;
+            gap: 6px;
+            padding: 6px 12px;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 500;
         }
         
         .status-online {
-            background: rgba(16, 185, 129, 0.2);
+            background: rgba(16, 185, 129, 0.15);
             color: var(--success);
         }
         
         .status-offline {
-            background: rgba(239, 68, 68, 0.2);
+            background: rgba(239, 68, 68, 0.15);
             color: var(--danger);
         }
         
         .status-syncing {
-            background: rgba(245, 158, 11, 0.2);
+            background: rgba(245, 158, 11, 0.15);
             color: var(--warning);
         }
         
@@ -413,40 +449,68 @@
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 24px;
         }
         
         /* Progress bars */
         .progress-container {
-            margin: 15px 0;
+            margin: 20px 0;
         }
         
         .progress-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
         
         .progress-label {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            font-weight: 500;
         }
         
         .progress-value {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 600;
         }
         
         .progress-bar {
-            height: 8px;
+            height: 10px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
+            border-radius: 5px;
             overflow: hidden;
+            position: relative;
         }
         
         .progress-fill {
             height: 100%;
-            border-radius: 4px;
-            background: var(--primary);
+            border-radius: 5px;
+            background: linear-gradient(90deg, var(--primary), #0d966c);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background-image: linear-gradient(
+                -45deg, 
+                rgba(255, 255, 255, 0.2) 25%, 
+                transparent 25%, 
+                transparent 50%, 
+                rgba(255, 255, 255, 0.2) 50%, 
+                rgba(255, 255, 255, 0.2) 75%, 
+                transparent 75%, 
+                transparent
+            );
+            z-index: 1;
+            background-size: 20px 20px;
+            animation: move 1s linear infinite;
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
         }
         
         /* Node list */
@@ -457,9 +521,16 @@
         .node-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px 0;
+            gap: 14px;
+            padding: 16px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+            border-radius: 8px;
+        }
+
+        .node-item:hover {
+            background: rgba(16, 185, 129, 0.08);
+            transform: translateX(5px);
         }
         
         .node-item:last-child {
@@ -467,14 +538,15 @@
         }
         
         .node-avatar {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            background: rgba(16, 185, 129, 0.2);
+            background: var(--primary-light);
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--primary);
+            font-size: 1.2rem;
         }
         
         .node-details {
@@ -483,22 +555,24 @@
         
         .node-name {
             font-weight: 600;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
         }
         
         .node-meta {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--gray);
         }
         
         .node-status {
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
         }
         
         .status-connected {
             background: var(--success);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
         }
         
         .status-disconnected {
@@ -507,6 +581,7 @@
         
         .status-syncing {
             background: var(--warning);
+            animation: pulse 2s infinite;
         }
         
         /* Node visualization */
@@ -530,7 +605,7 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: rgba(16, 185, 129, 0.2);
+            background: var(--primary-light);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -539,6 +614,11 @@
             margin-bottom: 10px;
             position: relative;
             z-index: 2;
+            transition: var(--transition);
+        }
+        
+        .node-vis-icon:hover {
+            transform: scale(1.1);
         }
         
         .node-vis-icon.bitcoin {
@@ -578,26 +658,37 @@
         
         /* Alerts */
         .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            padding: 18px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
             display: flex;
-            align-items: center;
-            gap: 12px;
+            align-items: flex-start;
+            gap: 14px;
+            background: rgba(31, 41, 55, 0.6);
+            border-left: 4px solid;
         }
         
         .alert-info {
-            background: rgba(59, 130, 246, 0.2);
-            border-left: 4px solid var(--info);
+            border-left-color: var(--info);
+            background: rgba(59, 130, 246, 0.1);
         }
         
         .alert-warning {
-            background: rgba(245, 158, 11, 0.2);
-            border-left: 4px solid var(--warning);
+            border-left-color: var(--warning);
+            background: rgba(245, 158, 11, 0.1);
         }
         
         .alert-icon {
-            font-size: 1.2rem;
+            font-size: 1.4rem;
+            margin-top: 2px;
+        }
+        
+        .alert-info .alert-icon {
+            color: var(--info);
+        }
+        
+        .alert-warning .alert-icon {
+            color: var(--warning);
         }
         
         .alert-content {
@@ -606,24 +697,26 @@
         
         .alert-title {
             font-weight: 600;
-            margin-bottom: 3px;
+            margin-bottom: 5px;
+            font-size: 1.05rem;
         }
         
         .alert-description {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--gray);
+            line-height: 1.5;
         }
         
         /* Filters */
         .filter-bar {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
         
         .filter-select {
-            padding: 8px 12px;
+            padding: 10px 12px;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
@@ -639,20 +732,21 @@
 
         .search-icon {
             position: absolute;
-            left: 10px;
+            left: 12px;
             color: var(--gray);
             font-size: 0.9rem;
             z-index: 1;
         }
 
         .search-input {
-            padding: 8px 12px 8px 35px;
+            padding: 10px 12px 10px 40px;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             color: white;
             font-size: 0.9rem;
             width: 200px;
+            transition: var(--transition);
         }
 
         .search-input:focus {
@@ -663,6 +757,492 @@
 
         .search-input::placeholder {
             color: var(--gray);
+        }
+        
+        /* New styles for enhanced design */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .metric-card {
+            background: rgba(31, 41, 55, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(16, 185, 129, 0.1);
+            transition: var(--transition);
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        /* Interactive Metric Cards */
+        .metric-card {
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .metric-card:hover::before {
+            opacity: 1;
+        }
+
+        .metric-card.clicked {
+            animation: cardClick 0.2s ease;
+        }
+
+        @keyframes cardClick {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.98); }
+            100% { transform: scale(1); }
+        }
+
+        .metric-card .tooltip {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(31, 41, 55, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .metric-card .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: rgba(31, 41, 55, 0.95);
+        }
+
+        .metric-card:hover .tooltip {
+            opacity: 1;
+        }
+
+        .metric-card .metric-sparkline {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 60px;
+            height: 30px;
+            opacity: 0.6;
+        }
+
+        .metric-card .trend-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .metric-card .trend-up {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .metric-card .trend-down {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .metric-card .trend-stable {
+            background: rgba(156, 163, 175, 0.2);
+            color: var(--gray);
+        }
+
+        .metric-card.loading {
+            position: relative;
+        }
+
+        .metric-card.loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(31, 41, 55, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .metric-card.loading::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-top: 2px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            transform: translate(-50%, -50%);
+            z-index: 11;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Chart animations */
+        .chart-line {
+            stroke-dasharray: 300;
+            stroke-dashoffset: 300;
+            animation: drawLine 2s ease-in-out;
+        }
+
+        .chart-area {
+            opacity: 0;
+            animation: fadeInArea 2s ease-in-out 0.5s forwards;
+        }
+
+        @keyframes drawLine {
+            0% { stroke-dashoffset: 300; }
+            100% { stroke-dashoffset: 0; }
+        }
+
+        @keyframes fadeInArea {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* Detailed view modal */
+        .metric-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .metric-modal-content {
+            background: rgba(31, 41, 55, 0.95);
+            backdrop-filter: blur(10px);
+            margin: 3% auto;
+            padding: 0;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .metric-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric-modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .metric-modal-title i {
+            color: var(--primary);
+            background: var(--primary-light);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .metric-modal-close {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .metric-modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .metric-modal-body {
+            padding: 24px;
+        }
+
+        .metric-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .metric-detail-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric-detail-title {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-detail-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .metric-detail-change {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .metric-chart-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric-chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metric-chart-title i {
+            color: var(--primary);
+        }
+
+        .export-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+        }
+
+        .export-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        /* Historical data table */
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .history-table th {
+            background: rgba(255, 255, 255, 0.05);
+            font-weight: 600;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .history-table td {
+            color: white;
+        }
+
+        .history-table tr:hover td {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .metric-title {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--lighter);
+        }
+        
+        .metric-change {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .chart-container {
+            height: 120px;
+            margin-top: 15px;
+            position: relative;
+        }
+        
+        .chart {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .chart-line {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        
+        .chart-area {
+            fill: url(#areaGradient);
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 10px;
+            color: var(--light);
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+        
+        .quick-action-btn:hover {
+            background: rgba(16, 185, 129, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .quick-action-btn i {
+            color: var(--primary);
+        }
+        
+        /* Node performance chart */
+        .performance-chart {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .chart-header h4 {
+            margin: 0;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        .chart-legend {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
         }
         
         /* Responsive adjustments */
@@ -710,8 +1290,90 @@
             .main-content {
                 padding: 16px;
             }
+            
+            .filter-bar {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                width: 100%;
+            }
+        }
+        
+        /* Animation for status updates */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
         }
 
+        @keyframes move {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 0; }
+        }
+
+        /* Notification animations */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* Fade in animation for updates */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Glow effects */
+        .glow {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(var(--primary), transparent 70%);
+            opacity: 0.05;
+            filter: blur(40px);
+            z-index: -1;
+        }
+        
+        .glow-1 {
+            top: 10%;
+            right: 10%;
+        }
+        
+        .glow-2 {
+            bottom: 10%;
+            left: 10%;
+        }
+        
         /* Modal Styles */
         .modal {
             display: none;
@@ -764,7 +1426,7 @@
             cursor: pointer;
             padding: 5px;
             border-radius: 50%;
-            transition: all 0.3s;
+            transition: var(--transition);
         }
 
         .modal-close:hover {
@@ -848,134 +1510,12 @@
             background: rgba(239, 68, 68, 0.9);
             border-color: rgba(239, 68, 68, 0.3);
         }
-
-        /* Hover Effects */
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .node-item:hover {
-            background: rgba(16, 185, 129, 0.05);
-            transform: translateX(5px);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-        }
-
-        .node-avatar:hover {
-            transform: scale(1.1);
-            transition: transform 0.3s ease;
-        }
-
-        .progress-bar:hover .progress-fill {
-            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-        }
-
-        /* Tooltips */
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-
-        .tooltip .tooltip-text {
-            visibility: hidden;
-            width: 200px;
-            background-color: rgba(31, 41, 55, 0.9);
-            color: white;
-            text-align: center;
-            border-radius: 6px;
-            padding: 8px 12px;
-            position: absolute;
-            z-index: 1000;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -100px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.8rem;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .tooltip:hover .tooltip-text {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .tooltip .tooltip-text::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: rgba(31, 41, 55, 0.9) transparent transparent transparent;
-        }
-
-        /* Performance Chart */
-        .performance-chart {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .chart-header h4 {
-            margin: 0;
-            color: white;
-            font-size: 0.9rem;
-        }
-
-        .chart-legend {
-            display: flex;
-            gap: 15px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.8rem;
-            color: var(--gray);
-        }
-
-        .legend-color {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 100px;
-        }
-
-        #responseTimeChart {
-            width: 100% !important;
-            height: 100px !important;
-        }
     </style>
 </head>
 <body>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    
     <div class="app-container">
         <!-- Sidebar Navigation -->
         <div class="sidebar">
@@ -1029,17 +1569,35 @@
             <div class="header">
                 <h1 class="header-title"><i class="fas fa-server"></i> Nodes Dashboard</h1>
                 <div class="header-actions">
-                    <button class="btn btn-secondary tooltip" title="Refresh all node statuses">
+                    <button class="btn btn-secondary" id="refreshBtn">
                         <i class="fas fa-sync-alt"></i>
-                        Refresh
-                        <span class="tooltip-text">Update all node information and statuses</span>
+                        Refresh Data
                     </button>
-                    <button class="btn tooltip" title="Add a new node to the network">
+                    <button class="btn" id="addNodeBtn">
                         <i class="fas fa-plus"></i>
                         Add Node
-                        <span class="tooltip-text">Configure and deploy a new blockchain node</span>
                     </button>
                 </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <a href="#" class="quick-action-btn">
+                    <i class="fas fa-download"></i>
+                    Export Data
+                </a>
+                <a href="#" class="quick-action-btn">
+                    <i class="fas fa-chart-bar"></i>
+                    View Analytics
+                </a>
+                <a href="#" class="quick-action-btn">
+                    <i class="fas fa-history"></i>
+                    View Logs
+                </a>
+                <a href="#" class="quick-action-btn">
+                    <i class="fas fa-network-wired"></i>
+                    Add Peer
+                </a>
             </div>
             
             <!-- Stats Grid -->
@@ -1097,6 +1655,84 @@
                     <div class="stat-change positive">
                         <i class="fas fa-arrow-down"></i>
                         -12 ms
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Metric Cards -->
+            <div class="card-grid">
+                <div class="metric-card" data-metric="network-health" data-type="percentage" data-current="94" data-previous="91" data-unit="%" data-status="good">
+                    <div class="tooltip">Network Health: Overall system performance and connectivity status</div>
+                    <div class="trend-indicator trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div class="metric-title">Network Health</div>
+                    <div class="metric-value">94%</div>
+                    <div class="metric-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +3% from last week
+                    </div>
+                    <div class="chart-container">
+                        <svg class="chart" viewBox="0 0 300 100" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="var(--primary)" stop-opacity="0.3"/>
+                                    <stop offset="100%" stop-color="var(--primary)" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                            <path class="chart-area" d="M0,100 L50,70 L100,80 L150,60 L200,40 L250,30 L300,50 L300,100 Z"></path>
+                            <path class="chart-line" d="M0,100 L50,70 L100,80 L150,60 L200,40 L250,30 L300,50"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="metric-card" data-metric="data-throughput" data-type="throughput" data-current="45" data-previous="37" data-unit="MB/s" data-status="good">
+                    <div class="tooltip">Data Throughput: Rate of data transfer across the network</div>
+                    <div class="trend-indicator trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div class="metric-title">Data Throughput</div>
+                    <div class="metric-value">45 MB/s</div>
+                    <div class="metric-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +8 MB/s from yesterday
+                    </div>
+                    <div class="chart-container">
+                        <svg class="chart" viewBox="0 0 300 100" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="areaGradient2" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="var(--success)" stop-opacity="0.3"/>
+                                    <stop offset="100%" stop-color="var(--success)" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                            <path class="chart-area" d="M0,100 L50,80 L100,60 L150,40 L200,50 L250,70 L300,30 L300,100 Z" style="fill: url(#areaGradient2)"></path>
+                            <path class="chart-line" d="M0,100 L50,80 L100,60 L150,40 L200,50 L250,70 L300,30" style="stroke: var(--success)"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="metric-card" data-metric="block-propagation" data-type="time" data-current="1.2" data-previous="0.9" data-unit="s" data-status="warning">
+                    <div class="tooltip">Block Propagation: Time taken for blocks to spread across the network</div>
+                    <div class="trend-indicator trend-down">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <div class="metric-title">Block Propagation</div>
+                    <div class="metric-value">1.2s</div>
+                    <div class="metric-change negative">
+                        <i class="fas fa-arrow-up"></i>
+                        +0.3s from average
+                    </div>
+                    <div class="chart-container">
+                        <svg class="chart" viewBox="0 0 300 100" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="areaGradient3" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="var(--warning)" stop-opacity="0.3"/>
+                                    <stop offset="100%" stop-color="var(--warning)" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                            <path class="chart-area" d="M0,100 L50,90 L100,70 L150,50 L200,60 L250,80 L300,40 L300,100 Z" style="fill: url(#areaGradient3)"></path>
+                            <path class="chart-line" d="M0,100 L50,90 L100,70 L150,50 L200,60 L250,80 L300,40" style="stroke: var(--warning)"></path>
+                        </svg>
                     </div>
                 </div>
             </div>
@@ -1231,7 +1867,7 @@
                         </div>
                         
                         <ul class="node-list">
-                            <li class="node-item">
+                            <li class="node-item" data-type="bitcoin" data-status="online">
                                 <div class="node-avatar">
                                     <i class="fab fa-bitcoin"></i>
                                 </div>
@@ -1242,7 +1878,7 @@
                                 <div class="node-status status-connected"></div>
                             </li>
                             
-                            <li class="node-item">
+                            <li class="node-item" data-type="bitcoin" data-status="online">
                                 <div class="node-avatar">
                                     <i class="fab fa-bitcoin"></i>
                                 </div>
@@ -1253,7 +1889,7 @@
                                 <div class="node-status status-connected"></div>
                             </li>
                             
-                            <li class="node-item">
+                            <li class="node-item" data-type="bridge" data-status="offline">
                                 <div class="node-avatar">
                                     <i class="fas fa-bridge"></i>
                                 </div>
@@ -1264,7 +1900,7 @@
                                 <div class="node-status status-disconnected"></div>
                             </li>
                             
-                            <li class="node-item">
+                            <li class="node-item" data-type="starknet" data-status="syncing">
                                 <div class="node-avatar">
                                     <i class="fas fa-layer-group"></i>
                                 </div>
@@ -1285,7 +1921,7 @@
                         <div class="card-header">
                             <h2 class="card-title"><i class="fas fa-info-circle"></i> Node Details</h2>
                             <div class="card-actions">
-                                <button class="btn btn-sm">
+                                <button class="btn btn-sm" id="configureBtn">
                                     <i class="fas fa-cog"></i>
                                     Configure
                                 </button>
@@ -1309,7 +1945,7 @@
                                 <div class="progress-value">42%</div>
                             </div>
                             <div class="progress-bar">
-                                <div class="progress-fill" style="width: 42%; background: var(--info);"></div>
+                                <div class="progress-fill" style="width: 42%; background: linear-gradient(90deg, var(--info), #6ba8ff);"></div>
                             </div>
                         </div>
                         
@@ -1319,7 +1955,7 @@
                                 <div class="progress-value">64%</div>
                             </div>
                             <div class="progress-bar">
-                                <div class="progress-fill" style="width: 64%; background: var(--warning);"></div>
+                                <div class="progress-fill" style="width: 64%; background: linear-gradient(90deg, var(--warning), #f7b955);"></div>
                             </div>
                         </div>
                         
@@ -1378,25 +2014,21 @@
                         </div>
                         
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <button class="btn btn-secondary tooltip" title="Restart the selected node">
+                            <button class="btn btn-secondary" id="restartBtn">
                                 <i class="fas fa-sync-alt"></i>
                                 Restart Node
-                                <span class="tooltip-text">Safely restart the node service</span>
                             </button>
-                            <button class="btn btn-secondary tooltip" title="Access node console">
+                            <button class="btn btn-secondary" id="consoleBtn">
                                 <i class="fas fa-terminal"></i>
                                 Console Access
-                                <span class="tooltip-text">Open terminal access to the node</span>
                             </button>
-                            <button class="btn tooltip" title="View detailed performance metrics">
+                            <button class="btn" id="performanceBtn">
                                 <i class="fas fa-chart-line"></i>
                                 Performance Stats
-                                <span class="tooltip-text">Display real-time performance data</span>
                             </button>
-                            <button class="btn btn-secondary tooltip" title="Update node software">
+                            <button class="btn btn-secondary" id="updateBtn">
                                 <i class="fas fa-code-branch"></i>
                                 Update Software
-                                <span class="tooltip-text">Install latest software updates</span>
                             </button>
                         </div>
                     </div>
@@ -1462,59 +2094,6 @@
         </div>
     </div>
 
-    <!-- Node Configuration Modal -->
-    <div id="configNodeModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-cog"></i> Configure Node</h2>
-                <button class="modal-close">&times;</button>
-            </div>
-            <form id="configNodeForm">
-                <div class="form-group">
-                    <label for="configNodeName">Node Name</label>
-                    <input type="text" id="configNodeName" required>
-                </div>
-                <div class="form-group">
-                    <label for="configNodeType">Node Type</label>
-                    <select id="configNodeType" required>
-                        <option value="bitcoin">Bitcoin Node</option>
-                        <option value="bridge">Bridge Node</option>
-                        <option value="starknet">Starknet Node</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="configNodeLocation">Location</label>
-                    <input type="text" id="configNodeLocation" required>
-                </div>
-                <div class="form-group">
-                    <label for="configNodeIP">IP Address</label>
-                    <input type="text" id="configNodeIP" required>
-                </div>
-                <div class="form-group">
-                    <label for="configNodeVersion">Version</label>
-                    <input type="text" id="configNodeVersion" required>
-                </div>
-                <div class="form-group">
-                    <label for="configMaxConnections">Max Connections</label>
-                    <input type="number" id="configMaxConnections" min="1" max="1000" value="125">
-                </div>
-                <div class="form-group">
-                    <label for="configLogLevel">Log Level</label>
-                    <select id="configLogLevel">
-                        <option value="error">Error</option>
-                        <option value="warn">Warning</option>
-                        <option value="info" selected>Info</option>
-                        <option value="debug">Debug</option>
-                    </select>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeConfigModal()">Cancel</button>
-                    <button type="submit" class="btn">Save Configuration</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Add Node Modal -->
     <div id="addNodeModal" class="modal">
         <div class="modal-content">
@@ -1569,54 +2148,11 @@
             document.getElementById('addNodeForm').reset();
         }
 
-        function openConfigModal() {
-            const selectedNode = document.querySelector('.node-item[style*="rgba(16, 185, 129, 0.1)"]');
-            if (!selectedNode) {
-                showNotification('Please select a node first', 'error');
-                return;
-            }
-
-            const nodeName = selectedNode.querySelector('.node-name').textContent;
-            const nodeMeta = selectedNode.querySelector('.node-meta').textContent.split(' • ');
-            const location = nodeMeta[0];
-            const version = nodeMeta[1];
-
-            // Pre-fill form with current node data
-            document.getElementById('configNodeName').value = nodeName;
-            document.getElementById('configNodeLocation').value = location;
-            document.getElementById('configNodeVersion').value = version;
-            document.getElementById('configNodeIP').value = '192.168.1.101:8333'; // Default
-
-            // Determine node type from icon
-            const icon = selectedNode.querySelector('.node-avatar i');
-            if (icon.classList.contains('fa-bitcoin')) {
-                document.getElementById('configNodeType').value = 'bitcoin';
-            } else if (icon.classList.contains('fa-layer-group')) {
-                document.getElementById('configNodeType').value = 'starknet';
-            } else {
-                document.getElementById('configNodeType').value = 'bridge';
-            }
-
-            document.getElementById('configNodeModal').style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeConfigModal() {
-            document.getElementById('configNodeModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
-            document.getElementById('configNodeForm').reset();
-        }
-
         // Close modal when clicking outside
         window.onclick = function(event) {
-            const addModal = document.getElementById('addNodeModal');
-            const configModal = document.getElementById('configNodeModal');
-
-            if (event.target == addModal) {
+            const modal = document.getElementById('addNodeModal');
+            if (event.target == modal) {
                 closeModal();
-            }
-            if (event.target == configModal) {
-                closeConfigModal();
             }
         }
 
@@ -1645,7 +2181,6 @@
 
         // Chart data
         let chartData = [120, 125, 118, 130, 128, 135, 122, 128, 140, 138, 128, 132];
-        let chartLabels = ['-11m', '-10m', '-9m', '-8m', '-7m', '-6m', '-5m', '-4m', '-3m', '-2m', '-1m', 'Now'];
 
         // Simple chart drawing function
         function drawChart() {
@@ -1718,12 +2253,11 @@
         // Simple interactivity for demonstration
         document.addEventListener('DOMContentLoaded', function() {
             // Add Node button
-            const addNodeBtn = document.querySelector('.header-actions .btn');
+            const addNodeBtn = document.getElementById('addNodeBtn');
             addNodeBtn.addEventListener('click', openModal);
 
-            // Modal close buttons
+            // Modal close button
             document.querySelector('#addNodeModal .modal-close').addEventListener('click', closeModal);
-            document.querySelector('#configNodeModal .modal-close').addEventListener('click', closeConfigModal);
 
             // Initialize chart
             drawChart();
@@ -1742,6 +2276,8 @@
                 const nodeList = document.querySelector('.node-list');
                 const newNodeItem = document.createElement('li');
                 newNodeItem.className = 'node-item';
+                newNodeItem.setAttribute('data-type', nodeType);
+                newNodeItem.setAttribute('data-status', 'online');
 
                 let iconClass = 'fab fa-bitcoin';
                 if (nodeType === 'bridge') iconClass = 'fas fa-bridge';
@@ -1778,41 +2314,8 @@
                 showNotification('Node added successfully!', 'success');
             });
 
-            // Config Node form submission
-            document.getElementById('configNodeForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const nodeName = document.getElementById('configNodeName').value;
-                const nodeType = document.getElementById('configNodeType').value;
-                const nodeLocation = document.getElementById('configNodeLocation').value;
-                const nodeIP = document.getElementById('configNodeIP').value;
-                const nodeVersion = document.getElementById('configNodeVersion').value;
-
-                // Update selected node
-                const selectedNode = document.querySelector('.node-item[style*="rgba(16, 185, 129, 0.1)"]');
-                if (selectedNode) {
-                    selectedNode.querySelector('.node-name').textContent = nodeName;
-                    selectedNode.querySelector('.node-meta').textContent = `${nodeLocation} • ${nodeVersion}`;
-
-                    // Update icon based on type
-                    const avatar = selectedNode.querySelector('.node-avatar i');
-                    if (nodeType === 'bitcoin') {
-                        avatar.className = 'fab fa-bitcoin';
-                    } else if (nodeType === 'starknet') {
-                        avatar.className = 'fas fa-layer-group';
-                    } else {
-                        avatar.className = 'fas fa-bridge';
-                    }
-                }
-
-                closeConfigModal();
-
-                // Show success notification
-                showNotification('Node configuration updated successfully!', 'success');
-            });
-
             // Refresh button animation
-            const refreshBtn = document.querySelector('.header-actions .btn-secondary');
+            const refreshBtn = document.getElementById('refreshBtn');
             refreshBtn.addEventListener('click', function() {
                 this.querySelector('i').classList.add('fa-spin');
                 setTimeout(() => {
@@ -1854,56 +2357,59 @@
             });
 
             // Node actions
-            const actionButtons = document.querySelectorAll('.card button');
-            actionButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const action = this.textContent.trim();
-                    const nodeName = document.querySelector('.card-header h2').textContent.replace(' Details', '');
+            const restartBtn = document.getElementById('restartBtn');
+            const consoleBtn = document.getElementById('consoleBtn');
+            const performanceBtn = document.getElementById('performanceBtn');
+            const updateBtn = document.getElementById('updateBtn');
+            const configureBtn = document.getElementById('configureBtn');
 
-                    switch(action) {
-                        case 'Restart Node':
-                            showNotification(`Restarting ${nodeName}...`, 'success');
-                            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Restarting...';
-                            setTimeout(() => {
-                                this.innerHTML = '<i class="fas fa-sync-alt"></i> Restart Node';
-                                showNotification(`${nodeName} restarted successfully!`, 'success');
-                            }, 2000);
-                            break;
-                        case 'Console Access':
-                            showNotification(`Opening console for ${nodeName}...`, 'success');
-                            // Simulate opening console
-                            setTimeout(() => {
-                                alert(`Console access granted for ${nodeName}\n\nThis would open a terminal/console window in a real application.`);
-                            }, 500);
-                            break;
-                        case 'Performance Stats':
-                            showNotification(`Loading performance stats for ${nodeName}...`, 'success');
-                            // Simulate loading stats
-                            setTimeout(() => {
-                                const stats = {
-                                    cpu: Math.floor(Math.random() * 100),
-                                    memory: Math.floor(Math.random() * 100),
-                                    network: Math.floor(Math.random() * 100)
-                                };
-                                alert(`${nodeName} Performance Stats:\n\nCPU Usage: ${stats.cpu}%\nMemory Usage: ${stats.memory}%\nNetwork I/O: ${stats.network}%`);
-                            }, 1000);
-                            break;
-                        case 'Update Software':
-                            showNotification(`Checking for updates for ${nodeName}...`, 'success');
-                            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
-                            setTimeout(() => {
-                                this.innerHTML = '<i class="fas fa-code-branch"></i> Update Software';
-                                showNotification(`${nodeName} updated to latest version!`, 'success');
-                            }, 3000);
-                            break;
-                        case 'Configure':
-                            showNotification(`Opening configuration for ${nodeName}...`, 'success');
-                            setTimeout(() => {
-                                openConfigModal();
-                            }, 500);
-                            break;
-                    }
-                });
+            restartBtn.addEventListener('click', function() {
+                const nodeName = document.querySelector('.card-header h2').textContent.replace(' Details', '');
+                showNotification(`Restarting ${nodeName}...`, 'success');
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Restarting...';
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-sync-alt"></i> Restart Node';
+                    showNotification(`${nodeName} restarted successfully!`, 'success');
+                }, 2000);
+            });
+
+            consoleBtn.addEventListener('click', function() {
+                const nodeName = document.querySelector('.card-header h2').textContent.replace(' Details', '');
+                showNotification(`Opening console for ${nodeName}...`, 'success');
+                setTimeout(() => {
+                    alert(`Console access granted for ${nodeName}\n\nThis would open a terminal/console window in a real application.`);
+                }, 500);
+            });
+
+            performanceBtn.addEventListener('click', function() {
+                const nodeName = document.querySelector('.card-header h2').textContent.replace(' Details', '');
+                showNotification(`Loading performance stats for ${nodeName}...`, 'success');
+                setTimeout(() => {
+                    const stats = {
+                                        cpu: Math.floor(Math.random() * 100),
+                                        memory: Math.floor(Math.random() * 100),
+                                        network: Math.floor(Math.random() * 100)
+                                    };
+                    alert(`${nodeName} Performance Stats:\n\nCPU Usage: ${stats.cpu}%\nMemory Usage: ${stats.memory}%\nNetwork I/O: ${stats.network}%`);
+                }, 1000);
+            });
+
+            updateBtn.addEventListener('click', function() {
+                const nodeName = document.querySelector('.card-header h2').textContent.replace(' Details', '');
+                showNotification(`Checking for updates for ${nodeName}...`, 'success');
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-code-branch"></i> Update Software';
+                    showNotification(`${nodeName} updated to latest version!`, 'success');
+                }, 3000);
+            });
+
+            configureBtn.addEventListener('click', function() {
+                const nodeName = document.querySelector('.card-header h2').textContent.replace(' Details', '');
+                showNotification(`Opening configuration for ${nodeName}...`, 'success');
+                setTimeout(() => {
+                    alert(`Configuration panel for ${nodeName}\n\nThis would open a configuration interface in a real application.`);
+                }, 500);
             });
             
             // Filter and search functionality
@@ -1924,7 +2430,8 @@
                 nodeItems.forEach(item => {
                     const nodeName = item.querySelector('.node-name').textContent.toLowerCase();
                     const nodeMeta = item.querySelector('.node-meta').textContent.toLowerCase();
-                    const nodeStatus = item.querySelector('.node-status');
+                    const nodeType = item.getAttribute('data-type');
+                    const nodeStatus = item.getAttribute('data-status');
 
                     let typeMatch = true;
                     let statusMatch = true;
@@ -1932,16 +2439,16 @@
 
                     // Type filter
                     if (typeValue !== 'All Nodes') {
-                        if (typeValue === 'Bitcoin' && !nodeName.includes('bitcoin')) typeMatch = false;
-                        if (typeValue === 'Bridge' && !nodeName.includes('bridge')) typeMatch = false;
-                        if (typeValue === 'Starknet' && !nodeName.includes('starknet')) typeMatch = false;
+                        if (typeValue === 'Bitcoin' && nodeType !== 'bitcoin') typeMatch = false;
+                        if (typeValue === 'Bridge' && nodeType !== 'bridge') typeMatch = false;
+                        if (typeValue === 'Starknet' && nodeType !== 'starknet') typeMatch = false;
                     }
 
                     // Status filter
                     if (statusValue !== 'All Statuses') {
-                        if (statusValue === 'Online' && !nodeStatus.classList.contains('status-connected')) statusMatch = false;
-                        if (statusValue === 'Offline' && !nodeStatus.classList.contains('status-disconnected')) statusMatch = false;
-                        if (statusValue === 'Syncing' && !nodeStatus.classList.contains('status-syncing')) statusMatch = false;
+                        if (statusValue === 'Online' && nodeStatus !== 'online') statusMatch = false;
+                        if (statusValue === 'Offline' && nodeStatus !== 'offline') statusMatch = false;
+                        if (statusValue === 'Syncing' && nodeStatus !== 'syncing') statusMatch = false;
                     }
 
                     // Search filter
@@ -2050,6 +2557,536 @@
                     syncSpeedEl.textContent = Math.round(newSpeed);
                 }
             }, 5000);
+
+            // Interactive Metric Cards Functionality
+            class NodeMetricsManager {
+                constructor() {
+                    this.metrics = {
+                        'network-health': {
+                            current: 94,
+                            previous: 91,
+                            unit: '%',
+                            type: 'percentage',
+                            status: 'good',
+                            data: [85, 87, 89, 91, 90, 92, 94, 93, 95, 94, 96, 94],
+                            thresholds: { good: 90, warning: 75, critical: 50 }
+                        },
+                        'data-throughput': {
+                            current: 45,
+                            previous: 37,
+                            unit: 'MB/s',
+                            type: 'throughput',
+                            status: 'good',
+                            data: [32, 35, 38, 40, 37, 42, 45, 43, 47, 45, 48, 45],
+                            thresholds: { good: 40, warning: 25, critical: 10 }
+                        },
+                        'block-propagation': {
+                            current: 1.2,
+                            previous: 0.9,
+                            unit: 's',
+                            type: 'time',
+                            status: 'warning',
+                            data: [2.1, 1.9, 1.7, 1.5, 1.3, 1.1, 0.9, 1.0, 1.2, 1.1, 1.3, 1.2],
+                            thresholds: { good: 1.0, warning: 2.0, critical: 5.0 }
+                        }
+                    };
+
+                    this.charts = {};
+                    this.updateInterval = null;
+                    this.init();
+                }
+
+                init() {
+                    this.setupEventListeners();
+                    this.initializeCharts();
+                    this.startRealTimeUpdates();
+                }
+
+                setupEventListeners() {
+                    const metricCards = document.querySelectorAll('.metric-card');
+                    metricCards.forEach(card => {
+                        card.addEventListener('click', (e) => this.handleMetricClick(e, card));
+                        card.addEventListener('mouseenter', (e) => this.handleMetricHover(e, card));
+                        card.addEventListener('mouseleave', (e) => this.handleMetricLeave(e, card));
+                    });
+                }
+
+                handleMetricClick(event, card) {
+                    const metricType = card.dataset.metric;
+                    if (!metricType) return;
+
+                    card.classList.add('clicked');
+                    setTimeout(() => card.classList.remove('clicked'), 200);
+
+                    this.showMetricDetails(metricType);
+                }
+
+                handleMetricHover(event, card) {
+                    const metricType = card.dataset.metric;
+                    if (!metricType) return;
+
+                    this.animateChart(card);
+                }
+
+                handleMetricLeave(event, card) {
+                    // Reset chart animation
+                    const chartLine = card.querySelector('.chart-line');
+                    const chartArea = card.querySelector('.chart-area');
+                    if (chartLine && chartArea) {
+                        chartLine.style.strokeDashoffset = '300';
+                        chartArea.style.opacity = '0';
+                    }
+                }
+
+                animateChart(card) {
+                    const chartLine = card.querySelector('.chart-line');
+                    const chartArea = card.querySelector('.chart-area');
+                    if (chartLine && chartArea) {
+                        setTimeout(() => {
+                            chartLine.style.strokeDashoffset = '0';
+                            chartArea.style.opacity = '1';
+                        }, 100);
+                    }
+                }
+
+                initializeCharts() {
+                    const metricCards = document.querySelectorAll('.metric-card');
+                    metricCards.forEach(card => {
+                        const metricType = card.dataset.metric;
+                        if (metricType && this.metrics[metricType]) {
+                            this.updateChart(card, metricType);
+                        }
+                    });
+                }
+
+                updateChart(card, metricType) {
+                    const metric = this.metrics[metricType];
+                    const chartContainer = card.querySelector('.chart-container');
+                    const existingCanvas = chartContainer.querySelector('.metric-sparkline');
+
+                    if (existingCanvas) {
+                        this.updateSparkline(existingCanvas, metric);
+                    } else {
+                        this.createSparkline(chartContainer, metric);
+                    }
+                }
+
+                createSparkline(container, metric) {
+                    const canvas = document.createElement('canvas');
+                    canvas.className = 'metric-sparkline';
+                    canvas.width = 60;
+                    canvas.height = 30;
+                    container.appendChild(canvas);
+                    this.updateSparkline(canvas, metric);
+                }
+
+                updateSparkline(canvas, metric) {
+                    const ctx = canvas.getContext('2d');
+                    const width = canvas.width;
+                    const height = canvas.height;
+
+                    ctx.clearRect(0, 0, width, height);
+
+                    if (metric.data.length < 2) return;
+
+                    const maxValue = Math.max(...metric.data);
+                    const minValue = Math.min(...metric.data);
+                    const range = maxValue - minValue || 1;
+
+                    ctx.strokeStyle = this.getMetricColor(metric.status);
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+
+                    metric.data.forEach((value, index) => {
+                        const x = (width / (metric.data.length - 1)) * index;
+                        const y = height - ((value - minValue) / range) * (height * 0.8) - height * 0.1;
+
+                        if (index === 0) {
+                            ctx.moveTo(x, y);
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                    });
+
+                    ctx.stroke();
+
+                    // Draw current value point
+                    const currentIndex = metric.data.length - 1;
+                    const currentX = (width / (metric.data.length - 1)) * currentIndex;
+                    const currentY = height - ((metric.data[currentIndex] - minValue) / range) * (height * 0.8) - height * 0.1;
+
+                    ctx.fillStyle = this.getMetricColor(metric.status);
+                    ctx.beginPath();
+                    ctx.arc(currentX, currentY, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                getMetricColor(status) {
+                    switch (status) {
+                        case 'good': return 'var(--success)';
+                        case 'warning': return 'var(--warning)';
+                        case 'critical': return 'var(--danger)';
+                        default: return 'var(--primary)';
+                    }
+                }
+
+                updateMetric(metricType, newValue) {
+                    const metric = this.metrics[metricType];
+                    if (!metric) return;
+
+                    metric.previous = metric.current;
+                    metric.current = newValue;
+
+                    // Update status based on thresholds
+                    if (metric.thresholds) {
+                        if (newValue >= metric.thresholds.good) {
+                            metric.status = 'good';
+                        } else if (newValue >= metric.thresholds.warning) {
+                            metric.status = 'warning';
+                        } else {
+                            metric.status = 'critical';
+                        }
+                    }
+
+                    // Add to data history
+                    metric.data.push(newValue);
+                    if (metric.data.length > 12) {
+                        metric.data.shift();
+                    }
+
+                    this.updateDisplay(metricType);
+                }
+
+                updateDisplay(metricType) {
+                    const metric = this.metrics[metricType];
+                    const card = document.querySelector(`[data-metric="${metricType}"]`);
+                    if (!card) return;
+
+                    const valueElement = card.querySelector('.metric-value');
+                    const changeElement = card.querySelector('.metric-change');
+                    const trendIndicator = card.querySelector('.trend-indicator');
+
+                    if (valueElement) {
+                        const formattedValue = metric.type === 'percentage' ? `${Math.round(metric.current)}%` :
+                                            metric.type === 'throughput' ? `${Math.round(metric.current)} MB/s` :
+                                            `${metric.current.toFixed(1)}s`;
+                        valueElement.textContent = formattedValue;
+                    }
+
+                    if (changeElement && trendIndicator) {
+                        const change = metric.current - metric.previous;
+                        const changePercent = (change / metric.previous * 100).toFixed(1);
+
+                        if (Math.abs(change) > 0.01) {
+                            const isPositive = change > 0;
+                            const changeIcon = isPositive ? 'fa-arrow-up' : 'fa-arrow-down';
+                            const changeClass = isPositive ? 'positive' : 'negative';
+
+                            changeElement.className = `metric-change ${changeClass}`;
+                            changeElement.innerHTML = `<i class="fas ${changeIcon}"></i> ${isPositive ? '+' : ''}${changePercent}% from last update`;
+
+                            trendIndicator.className = `trend-indicator ${isPositive ? 'trend-up' : 'trend-down'}`;
+                            trendIndicator.innerHTML = `<i class="fas ${changeIcon}"></i>`;
+                        }
+                    }
+
+                    this.updateChart(card, metricType);
+                }
+
+                showMetricDetails(metricType) {
+                    const metric = this.metrics[metricType];
+                    if (!metric) return;
+
+                    // Create or update modal
+                    let modal = document.getElementById('metricModal');
+                    if (!modal) {
+                        modal = this.createMetricModal();
+                        document.body.appendChild(modal);
+                    }
+
+                    this.populateMetricModal(modal, metricType, metric);
+                    modal.style.display = 'block';
+                    document.body.style.overflow = 'hidden';
+                }
+
+                createMetricModal() {
+                    const modal = document.createElement('div');
+                    modal.id = 'metricModal';
+                    modal.className = 'metric-modal';
+                    modal.innerHTML = `
+                        <div class="metric-modal-content">
+                            <div class="metric-modal-header">
+                                <div class="metric-modal-title">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span id="modalTitle">Metric Details</span>
+                                </div>
+                                <button class="metric-modal-close">&times;</button>
+                            </div>
+                            <div class="metric-modal-body">
+                                <div class="metric-detail-grid" id="metricDetailGrid">
+                                </div>
+                                <div class="metric-chart-container">
+                                    <div class="metric-chart-title">
+                                        <i class="fas fa-chart-area"></i>
+                                        Historical Data
+                                        <button class="export-btn" onclick="exportMetricData()">
+                                            <i class="fas fa-download"></i>
+                                            Export
+                                        </button>
+                                    </div>
+                                    <canvas id="metricHistoryChart" width="600" height="300"></canvas>
+                                </div>
+                                <div class="history-table-container" style="margin-top: 24px;">
+                                    <h3 style="color: white; margin-bottom: 16px;">Recent Values</h3>
+                                    <table class="history-table" id="historyTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Time</th>
+                                                <th>Value</th>
+                                                <th>Change</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="historyTableBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Add close functionality
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === modal || e.target.classList.contains('metric-modal-close')) {
+                            this.closeMetricModal();
+                        }
+                    });
+
+                    return modal;
+                }
+
+                populateMetricModal(modal, metricType, metric) {
+                    const titleElement = modal.querySelector('#modalTitle');
+                    const detailGrid = modal.querySelector('#metricDetailGrid');
+
+                    if (titleElement) {
+                        titleElement.textContent = this.getMetricTitle(metricType);
+                    }
+
+                    if (detailGrid) {
+                        detailGrid.innerHTML = `
+                            <div class="metric-detail-card">
+                                <div class="metric-detail-title">Current Value</div>
+                                <div class="metric-detail-value">${metric.current.toFixed(1)} ${metric.unit}</div>
+                                <div class="metric-detail-change positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    ${(metric.current - metric.previous).toFixed(1)} from previous
+                                </div>
+                            </div>
+                            <div class="metric-detail-card">
+                                <div class="metric-detail-title">Status</div>
+                                <div class="metric-detail-value" style="color: ${this.getMetricColor(metric.status)}">
+                                    ${metric.status.toUpperCase()}
+                                </div>
+                                <div class="metric-detail-change">
+                                    <i class="fas fa-info-circle"></i>
+                                    Based on thresholds
+                                </div>
+                            </div>
+                            <div class="metric-detail-card">
+                                <div class="metric-detail-title">Average (12 points)</div>
+                                <div class="metric-detail-value">${this.calculateAverage(metric.data).toFixed(1)} ${metric.unit}</div>
+                                <div class="metric-detail-change">
+                                    <i class="fas fa-chart-line"></i>
+                                    Trend analysis
+                                </div>
+                            </div>
+                            <div class="metric-detail-card">
+                                <div class="metric-detail-title">Peak Value</div>
+                                <div class="metric-detail-value">${Math.max(...metric.data).toFixed(1)} ${metric.unit}</div>
+                                <div class="metric-detail-change positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    Historical high
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    this.drawHistoryChart(metric);
+                    this.populateHistoryTable(metric);
+                }
+
+                getMetricTitle(metricType) {
+                    const titles = {
+                        'network-health': 'Network Health Details',
+                        'data-throughput': 'Data Throughput Details',
+                        'block-propagation': 'Block Propagation Details'
+                    };
+                    return titles[metricType] || 'Metric Details';
+                }
+
+                calculateAverage(data) {
+                    return data.reduce((sum, value) => sum + value, 0) / data.length;
+                }
+
+                drawHistoryChart(metric) {
+                    const canvas = document.getElementById('metricHistoryChart');
+                    if (!canvas) return;
+
+                    const ctx = canvas.getContext('2d');
+                    const width = canvas.width;
+                    const height = canvas.height;
+
+                    ctx.clearRect(0, 0, width, height);
+
+                    if (metric.data.length < 2) return;
+
+                    const maxValue = Math.max(...metric.data);
+                    const minValue = Math.min(...metric.data);
+                    const range = maxValue - minValue || 1;
+
+                    // Draw grid
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                    ctx.lineWidth = 1;
+
+                    for (let i = 0; i <= 5; i++) {
+                        const y = (height / 5) * i;
+                        ctx.beginPath();
+                        ctx.moveTo(0, y);
+                        ctx.lineTo(width, y);
+                        ctx.stroke();
+                    }
+
+                    // Draw area under curve
+                    const gradient = ctx.createLinearGradient(0, 0, 0, height);
+                    gradient.addColorStop(0, this.getMetricColor(metric.status) + '20');
+                    gradient.addColorStop(1, this.getMetricColor(metric.status) + '05');
+
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+
+                    metric.data.forEach((value, index) => {
+                        const x = (width / (metric.data.length - 1)) * index;
+                        const y = height - ((value - minValue) / range) * (height * 0.8) - height * 0.1;
+
+                        if (index === 0) {
+                            ctx.moveTo(x, y);
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                    });
+
+                    ctx.lineTo(width, height);
+                    ctx.lineTo(0, height);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Draw line
+                    ctx.strokeStyle = this.getMetricColor(metric.status);
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+
+                    metric.data.forEach((value, index) => {
+                        const x = (width / (metric.data.length - 1)) * index;
+                        const y = height - ((value - minValue) / range) * (height * 0.8) - height * 0.1;
+
+                        if (index === 0) {
+                            ctx.moveTo(x, y);
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                    });
+
+                    ctx.stroke();
+                }
+
+                populateHistoryTable(metric) {
+                    const tableBody = document.getElementById('historyTableBody');
+                    if (!tableBody) return;
+
+                    tableBody.innerHTML = '';
+
+                    metric.data.slice(-10).reverse().forEach((value, index) => {
+                        const row = document.createElement('tr');
+                        const timeAgo = (metric.data.length - index) * 5; // 5 seconds per data point
+                        const change = index === 0 ? 0 : value - metric.data[metric.data.length - index];
+
+                        row.innerHTML = `
+                            <td>${timeAgo}s ago</td>
+                            <td>${value.toFixed(1)} ${metric.unit}</td>
+                            <td class="${change >= 0 ? 'positive' : 'negative'}">
+                                <i class="fas fa-arrow-${change >= 0 ? 'up' : 'down'}"></i>
+                                ${change >= 0 ? '+' : ''}${change.toFixed(1)}
+                            </td>
+                        `;
+
+                        tableBody.appendChild(row);
+                    });
+                }
+
+                closeMetricModal() {
+                    const modal = document.getElementById('metricModal');
+                    if (modal) {
+                        modal.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }
+                }
+
+                startRealTimeUpdates() {
+                    // Update metrics every 5 seconds
+                    this.updateInterval = setInterval(() => {
+                        this.updateAllMetrics();
+                    }, 5000);
+                }
+
+                updateAllMetrics() {
+                    Object.keys(this.metrics).forEach(metricType => {
+                        const metric = this.metrics[metricType];
+                        let newValue;
+
+                        // Generate realistic new values based on metric type
+                        switch (metricType) {
+                            case 'network-health':
+                                newValue = Math.max(85, Math.min(100, metric.current + (Math.random() * 4 - 2)));
+                                break;
+                            case 'data-throughput':
+                                newValue = Math.max(20, Math.min(80, metric.current + (Math.random() * 6 - 3)));
+                                break;
+                            case 'block-propagation':
+                                newValue = Math.max(0.5, Math.min(3.0, metric.current + (Math.random() * 0.4 - 0.2)));
+                                break;
+                        }
+
+                        this.updateMetric(metricType, newValue);
+                    });
+                }
+
+                exportMetricData() {
+                    const data = Object.keys(this.metrics).map(metricType => {
+                        const metric = this.metrics[metricType];
+                        return {
+                            metric: this.getMetricTitle(metricType),
+                            current: metric.current,
+                            unit: metric.unit,
+                            status: metric.status,
+                            history: metric.data
+                        };
+                    });
+
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'node-metrics-export.json';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                }
+            }
+
+            // Initialize the metrics manager
+            const nodeMetricsManager = new NodeMetricsManager();
+
+            // Make export function globally available
+            window.exportMetricData = () => nodeMetricsManager.exportMetricData();
         });
     </script>
 </body>

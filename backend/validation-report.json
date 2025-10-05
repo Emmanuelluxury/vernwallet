@@ -1,0 +1,47 @@
+{
+  "timestamp": "2025-10-02T17:34:50.052Z",
+  "summary": {
+    "total": 32,
+    "passed": 32,
+    "failed": 0,
+    "warnings": 1
+  },
+  "results": [
+    "✅ src/lib.cairo exists",
+    "✅ src/contracts exists",
+    "✅ src/interfaces exists",
+    "✅ backend/src exists",
+    "✅ scripts exists",
+    "✅ Scarb.toml exists",
+    "✅ package.json exists",
+    "✅ Contract BitcoinUtils.cairo exists",
+    "✅ Contract CryptoUtils.cairo exists",
+    "✅ Contract SPVVerifier.cairo exists",
+    "✅ Contract BitcoinClient.cairo exists",
+    "✅ Contract BitcoinHeaders.cairo exists",
+    "✅ Contract BTCDepositManager.cairo exists",
+    "✅ Contract BTCPegOut.cairo exists",
+    "✅ Contract Bridge.cairo exists",
+    "✅ Contract EscapeHatch.cairo exists",
+    "✅ Contract SBTC.cairo exists",
+    "✅ Contract OperatorRegistry.cairo exists",
+    "✅ Project structure validation PASSED",
+    "✅ Artifact lib.starknet_artifacts.json exists",
+    "✅ Artifact bridge_Bridge.compiled_contract_class.json exists",
+    "✅ Artifact sbtc_SBTC.compiled_contract_class.json exists",
+    "✅ Artifact btcdepositmanager_BTCDepositManager.compiled_contract_class.json exists",
+    "✅ Contract compilation validation PASSED",
+    "✅ 11 contract addresses configured",
+    "✅ Backend configuration includes contract addresses",
+    "✅ Configuration validation PASSED",
+    "✅ Backend services validation PASSED",
+    "✅ Script scripts/integration-example.js loads successfully",
+    "✅ Script scripts/test-integration.js loads successfully",
+    "✅ Script scripts/update-contract-addresses.js loads successfully",
+    "✅ Integration scripts validation PASSED"
+  ],
+  "warnings": [
+    "⚠️ Backend startup test skipped: kill ESRCH"
+  ],
+  "errors": []
+}

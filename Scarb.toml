@@ -1,0 +1,72 @@
+[package]
+name = "vernwallet_bridge"
+version = "0.1.0"
+edition = "2024_07"
+description = "Integrated Bitcoin-Starknet Bridge System"
+
+[dependencies]
+starknet = ">=2.6.0"
+
+[lib]
+sierra = true
+casm = true
+name = "vernwallet_bridge"
+path = "src/lib.cairo"
+
+[[target.starknet-contract]]
+name = "bitcoinutils"
+sierra = true
+casm = true
+
+[[target.starknet-contract]]
+name = "cryptoutils"
+sierra = true
+casm = true
+
+[[target.starknet-contract]]
+name = "spvverifier"
+sierra = true
+casm = true
+
+[[target.starknet-contract]]
+name = "bitcoinclient"
+sierra = true
+casm = true
+
+[[target.starknet-contract]]
+name = "bitcoinheaders"
+sierra = true
+casm = true
+
+[[target.starknet-contract]]
+name = "btcdepositmanager"
+sierra = true
+casm = true
+
+[[target.starknet-contract]]
+name = "btcpegout"
+sierra = true
+casm = true
+
+[[target.starknet-contract]]
+name = "bridge"
+sierra = true
+casm = true
+
+[[target.starknet-contract]]
+name = "escapehatch"
+sierra = true
+casm = true
+
+[[target.starknet-contract]]
+name = "sbtc"
+sierra = true
+casm = true
+
+[[target.starknet-contract]]
+name = "operatorregistry"
+sierra = true
+casm = true
+
+[tool.scarb]
+starknet-foundry = "0.12.0"

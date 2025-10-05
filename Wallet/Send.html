@@ -330,6 +330,35 @@
             color: #00d2ff;
             font-weight: 500;
         }
+
+        .address-status {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 5px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .address-status.valid {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            display: block;
+        }
+
+        .address-status.invalid {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            display: block;
+        }
+
+        .address-status.checking {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+            border: 1px solid rgba(255, 152, 0, 0.3);
+            display: block;
+        }
         
         .transaction-details {
             background: rgba(0, 0, 0, 0.2);
@@ -718,10 +747,16 @@
                 <form class="send-form" id="sendForm">
                     <div class="form-group">
                         <label for="fromAddress">From Address</label>
-                        <select id="fromAddress">
-                            <option value="bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq">bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq (1.2543 BTC)</option>
-                            <option value="bc1q9z4m9s5vner4nj24cnv3xdrp5p6c0v0y3j5g4z">bc1q9z4m9s5vner4nj24cnv3xdrp5p6c0v0y3j5g4z (0.8421 BTC)</option>
-                        </select>
+                        <input type="text" id="fromAddress" placeholder="Enter your wallet address or select from connected wallet" readonly>
+                        <div class="address-actions">
+                            <button type="button" class="action-btn" id="connectFromWallet">
+                                <i class="fas fa-wallet"></i> Connect Wallet
+                            </button>
+                            <button type="button" class="action-btn" id="pasteFromAddress">
+                                <i class="fas fa-clipboard"></i> Paste
+                            </button>
+                        </div>
+                        <div class="address-status" id="fromAddressStatus"></div>
                     </div>
                     
                     <div class="form-group">
@@ -947,6 +982,9 @@
     <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
     <script src="https://unpkg.com/@coinbase/wallet-sdk@3.7.1/dist/index.js"></script>
 
+    <!-- Integration Script -->
+    <script src="../frontend-integration.js"></script>
+
     <script>
         // DOM Elements
         const connectWalletBtn = document.getElementById('connectWallet');
@@ -964,10 +1002,15 @@
         const networkOptions = document.querySelectorAll('.network-option');
         const maxButton = document.querySelector('.max-btn');
         const sendAmount = document.getElementById('sendAmount');
+        const fromAddressInput = document.getElementById('fromAddress');
+        const fromAddressStatus = document.getElementById('fromAddressStatus');
+        const connectFromWalletBtn = document.getElementById('connectFromWallet');
+        const pasteFromAddressBtn = document.getElementById('pasteFromAddress');
 
         // Wallet connection state
         let connectedWallet = null;
         let connectedAddress = null;
+        let walletIntegration = null;
 
         // Modal functions
         function openWalletModal() {
@@ -977,6 +1020,24 @@
 
         function closeWalletModal() {
             walletModal.style.display = 'none';
+        }
+
+        // Initialize wallet integration
+        async function initializeWalletIntegration() {
+            try {
+                walletIntegration = new WalletIntegrationService();
+                await walletIntegration.initialize();
+
+                // Check for existing wallet connection
+                const existingConnection = walletIntegration.getConnectedWallet();
+                if (existingConnection) {
+                    connectedWallet = existingConnection.name;
+                    connectedAddress = existingConnection.address;
+                    updateWalletUI();
+                }
+            } catch (error) {
+                console.error('Failed to initialize wallet integration:', error);
+            }
         }
 
         // Populate wallet options with real available wallets
@@ -1041,13 +1102,13 @@
                 },
                 {
                     id: 'starknet',
-                    name: 'StarkNet Wallet',
+                    name: 'Ready Wallet',
                     type: 'StarkNet',
                     icon: 'fas fa-link',
                     isAvailable: () => window.starknet,
                     connect: async () => {
                         await window.starknet.enable();
-                        return { address: window.starknet.selectedAddress, name: window.starknet.name || 'StarkNet Wallet' };
+                        return { address: window.starknet.selectedAddress, name: window.starknet.name || 'Ready Wallet' };
                     }
                 }
             ];
@@ -1083,7 +1144,7 @@
                 closeWalletModal();
                 showNotification(`Connecting to ${wallet.name}...`);
 
-                const result = await wallet.connect();
+                const result = await walletIntegration.connectWallet(wallet.id);
 
                 connectedWallet = result.name;
                 connectedAddress = result.address;
@@ -1098,17 +1159,52 @@
         }
 
         // Connect wallet - opens modal with real wallets
-        function connectWallet() {
-            openWalletModal();
+        async function connectWallet() {
+            try {
+                const result = await walletIntegration.connectWallet();
+                connectedWallet = result.name;
+                connectedAddress = result.address;
+                updateWalletUI();
+                showNotification(`Successfully connected to ${connectedWallet}!`);
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                showNotification(`Failed to connect wallet: ${error.message}`, true);
+            }
+        }
+
+        // Connect from wallet for address input
+        async function connectFromWallet() {
+            try {
+                const result = await walletIntegration.connectWallet();
+                fromAddressInput.value = result.address;
+                validateAddress(result.address);
+                showNotification(`Address loaded from ${result.name}!`);
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                showNotification(`Failed to connect wallet: ${error.message}`, true);
+            }
+        }
+
+        // Paste address from clipboard
+        async function pasteFromAddress() {
+            try {
+                const text = await navigator.clipboard.readText();
+                fromAddressInput.value = text;
+                validateAddress(text);
+                showNotification('Address pasted from clipboard!');
+            } catch (error) {
+                console.error('Paste error:', error);
+                showNotification('Failed to paste from clipboard', true);
+            }
         }
 
 
         // Check for existing wallet connection on page load
         async function checkExistingWalletConnection() {
             try {
-                // Check StarkNet wallets first
+                // Check Ready wallets first
                 if (window.starknet && window.starknet.isConnected) {
-                    connectedWallet = window.starknet.name || 'StarkNet Wallet';
+                    connectedWallet = window.starknet.name || 'Ready Wallet';
                     connectedAddress = window.starknet.selectedAddress;
                     updateWalletUI();
                     return;
@@ -1178,11 +1274,47 @@
             }
         }
 
+        // Address validation
+        function validateAddress(address) {
+            if (!address) {
+                hideAddressStatus();
+                return false;
+            }
+
+            fromAddressStatus.className = 'address-status checking';
+            fromAddressStatus.textContent = 'Validating address...';
+            fromAddressStatus.style.display = 'block';
+
+            // Bitcoin address validation (Legacy, SegWit, Bech32)
+            const bitcoinRegex = /^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$/;
+
+            // StarkNet address validation (0x + 64 hex characters)
+            const starknetRegex = /^0x[a-fA-F0-9]{64}$/;
+
+            if (bitcoinRegex.test(address)) {
+                fromAddressStatus.className = 'address-status valid';
+                fromAddressStatus.innerHTML = '<i class="fas fa-check-circle"></i> Valid Bitcoin address';
+                return true;
+            } else if (starknetRegex.test(address)) {
+                fromAddressStatus.className = 'address-status valid';
+                fromAddressStatus.innerHTML = '<i class="fas fa-check-circle"></i> Valid StarkNet address';
+                return true;
+            } else {
+                fromAddressStatus.className = 'address-status invalid';
+                fromAddressStatus.innerHTML = '<i class="fas fa-exclamation-circle"></i> Invalid address format';
+                return false;
+            }
+        }
+
+        function hideAddressStatus() {
+            fromAddressStatus.style.display = 'none';
+        }
+
         // Initialize the dashboard
-        function init() {
+        async function init() {
+            await initializeWalletIntegration();
             setupEventListeners();
             updateTransactionPreview();
-            checkExistingWalletConnection();
         }
         
         // Set up event listeners
@@ -1197,6 +1329,21 @@
                     closeWalletModal();
                 }
             });
+
+            // Address input events
+            fromAddressInput.addEventListener('input', function() {
+                validateAddress(this.value);
+                updateTransactionPreview();
+            });
+
+            fromAddressInput.addEventListener('blur', function() {
+                if (!this.value) {
+                    hideAddressStatus();
+                }
+            });
+
+            connectFromWalletBtn.addEventListener('click', connectFromWallet);
+            pasteFromAddressBtn.addEventListener('click', pasteFromAddress);
 
             // Send specific events
             sendForm.addEventListener('submit', function(e) {
@@ -1289,39 +1436,65 @@
         function updateTransactionPreview() {
             const amount = parseFloat(sendAmount.value) || 0;
             const toAddress = document.getElementById('toAddress').value;
-            const fromAddress = document.getElementById('fromAddress').value;
-            
+            const fromAddress = fromAddressInput.value;
+
             // Update preview details
             const previewDetails = document.querySelectorAll('.transaction-details .detail-value');
             if (previewDetails.length >= 3) {
-                previewDetails[0].textContent = fromAddress;
+                previewDetails[0].textContent = fromAddress || 'Enter sender address';
                 previewDetails[1].textContent = toAddress || 'Enter recipient address';
                 previewDetails[2].textContent = `${amount.toFixed(5)} ${document.querySelector('.network-option.active').dataset.network === 'bitcoin' ? 'BTC' : 'STRK'}`;
             }
-            
-            // Enable/disable send button based on input
-            sendButton.disabled = amount <= 0 || !toAddress;
+
+            // Enable/disable send button based on input validation
+            const isValidAddress = validateAddress(fromAddress);
+            sendButton.disabled = amount <= 0 || !toAddress || !fromAddress || !isValidAddress;
         }
         
         // Process send transaction
-        function processSend() {
-            const amount = parseFloat(sendAmount.value);
-            const toAddress = document.getElementById('toAddress').value;
-            const network = document.querySelector('.network-option.active').dataset.network;
-            
-            // In a real application, this would call a smart contract or API
-            console.log(`Sending ${amount} from ${network} to ${toAddress}`);
-            
-            // Show success message
-            showNotification(`Transaction sent successfully! ${amount} ${network === 'bitcoin' ? 'BTC' : 'STRK'} is being transferred.`);
-            
-            // Close the modal
-            confirmationModal.style.display = 'none';
-            
-            // Reset form
-            sendForm.reset();
-            sendButton.disabled = true;
-            updateTransactionPreview();
+        async function processSend() {
+            try {
+                const amount = parseFloat(sendAmount.value);
+                const toAddress = document.getElementById('toAddress').value;
+                const fromAddress = fromAddressInput.value;
+                const network = document.querySelector('.network-option.active').dataset.network;
+
+                if (!fromAddress) {
+                    showNotification('Please enter a from address', true);
+                    return;
+                }
+
+                if (!validateAddress(fromAddress)) {
+                    showNotification('Please enter a valid from address', true);
+                    return;
+                }
+
+                showNotification(`Processing ${network} send transaction...`);
+
+                // Use wallet integration to send transaction
+                const result = await walletIntegration.sendTransaction({
+                    fromAddress: fromAddress,
+                    toAddress: toAddress,
+                    amount: amount,
+                    network: network
+                });
+
+                // Show success message
+                showNotification(`Transaction sent successfully! ${amount} ${network === 'bitcoin' ? 'BTC' : 'STRK'} is being transferred. TX: ${result.transactionHash?.substring(0, 10)}...`);
+
+                // Close the modal
+                confirmationModal.style.display = 'none';
+
+                // Reset form
+                sendForm.reset();
+                sendButton.disabled = true;
+                hideAddressStatus();
+                updateTransactionPreview();
+
+            } catch (error) {
+                console.error('Send transaction error:', error);
+                showNotification(`Transaction failed: ${error.message}`, true);
+            }
         }
         
         // Show notification

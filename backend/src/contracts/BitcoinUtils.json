@@ -1,0 +1,451 @@
+[
+  {
+    "type": "constructor",
+    "name": "constructor",
+    "inputs": [
+      {
+        "name": "admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "core::bool",
+    "variants": [
+      {
+        "name": "False",
+        "type": "()"
+      },
+      {
+        "name": "True",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::BitcoinAddressType",
+    "variants": [
+      {
+        "name": "P2PKH",
+        "type": "()"
+      },
+      {
+        "name": "P2SH",
+        "type": "()"
+      },
+      {
+        "name": "P2WPKH",
+        "type": "()"
+      },
+      {
+        "name": "P2WSH",
+        "type": "()"
+      },
+      {
+        "name": "P2TR",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::BitcoinNetwork",
+    "variants": [
+      {
+        "name": "Mainnet",
+        "type": "()"
+      },
+      {
+        "name": "Testnet",
+        "type": "()"
+      },
+      {
+        "name": "Regtest",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::BitcoinAddress",
+    "members": [
+      {
+        "name": "address_type",
+        "type": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::BitcoinAddressType"
+      },
+      {
+        "name": "network",
+        "type": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::BitcoinNetwork"
+      },
+      {
+        "name": "hash160",
+        "type": "core::felt252"
+      },
+      {
+        "name": "witness_version",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "witness_program",
+        "type": "core::felt252"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "validate_bitcoin_address",
+    "inputs": [
+      {
+        "name": "address",
+        "type": "core::felt252"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "(core::bool, starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::BitcoinAddress)"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::BitcoinTxIn",
+    "members": [
+      {
+        "name": "txid",
+        "type": "core::felt252"
+      },
+      {
+        "name": "vout",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "script_sig",
+        "type": "core::array::Array::<core::integer::u8>"
+      },
+      {
+        "name": "sequence",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "witness",
+        "type": "core::array::Array::<core::array::Array::<core::integer::u8>>"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::BitcoinTxOut",
+    "members": [
+      {
+        "name": "value",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "script_pubkey",
+        "type": "core::array::Array::<core::integer::u8>"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::BitcoinTransaction",
+    "members": [
+      {
+        "name": "version",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "inputs",
+        "type": "core::array::Array::<starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::BitcoinTxIn>"
+      },
+      {
+        "name": "outputs",
+        "type": "core::array::Array::<starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::BitcoinTxOut>"
+      },
+      {
+        "name": "locktime",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "txid",
+        "type": "core::felt252"
+      },
+      {
+        "name": "witness_txid",
+        "type": "core::felt252"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "parse_transaction",
+    "inputs": [
+      {
+        "name": "raw_tx",
+        "type": "core::array::Array::<core::integer::u8>"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::BitcoinTransaction"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "compute_txid",
+    "inputs": [
+      {
+        "name": "tx_data",
+        "type": "core::array::Array::<core::integer::u8>"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "struct",
+    "name": "core::integer::u256",
+    "members": [
+      {
+        "name": "low",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "high",
+        "type": "core::integer::u128"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "satoshis_to_btc",
+    "inputs": [
+      {
+        "name": "satoshis",
+        "type": "core::integer::u64"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::integer::u256"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "btc_to_satoshis",
+    "inputs": [
+      {
+        "name": "btc_amount",
+        "type": "core::integer::u256"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::integer::u64"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::AddressPrefixes",
+    "members": [
+      {
+        "name": "p2pkh",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "p2sh",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "bech32_hrp",
+        "type": "core::felt252"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::BitcoinNetworkConfig",
+    "members": [
+      {
+        "name": "magic",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "genesis_hash",
+        "type": "core::felt252"
+      },
+      {
+        "name": "max_money",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "address_prefixes",
+        "type": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::AddressPrefixes"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "get_network_params",
+    "inputs": [
+      {
+        "name": "network",
+        "type": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::BitcoinNetwork"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::BitcoinNetworkConfig"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "validate_bitcoin_amount",
+    "inputs": [
+      {
+        "name": "satoshis",
+        "type": "core::integer::u64"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::bool"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "generate_deposit_address",
+    "inputs": [
+      {
+        "name": "starknet_recipient",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "network",
+        "type": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::BitcoinNetwork"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "set_admin",
+    "inputs": [
+      {
+        "name": "new_admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "get_admin",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::AddressValidated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "address",
+        "type": "core::felt252",
+        "kind": "key"
+      },
+      {
+        "name": "address_type",
+        "type": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::BitcoinAddressType",
+        "kind": "data"
+      },
+      {
+        "name": "network",
+        "type": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::BitcoinNetwork",
+        "kind": "data"
+      },
+      {
+        "name": "is_valid",
+        "type": "core::bool",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::TransactionParsed",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "txid",
+        "type": "core::felt252",
+        "kind": "key"
+      },
+      {
+        "name": "input_count",
+        "type": "core::integer::u32",
+        "kind": "data"
+      },
+      {
+        "name": "output_count",
+        "type": "core::integer::u32",
+        "kind": "data"
+      },
+      {
+        "name": "total_input_value",
+        "type": "core::integer::u64",
+        "kind": "data"
+      },
+      {
+        "name": "total_output_value",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::Event",
+    "kind": "enum",
+    "variants": [
+      {
+        "name": "AddressValidated",
+        "type": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::AddressValidated",
+        "kind": "nested"
+      },
+      {
+        "name": "TransactionParsed",
+        "type": "starknet_bridge::contracts::BitcoinUtils::BitcoinUtils::TransactionParsed",
+        "kind": "nested"
+      }
+    ]
+  }
+]
