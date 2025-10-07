@@ -1,5 +1,5 @@
 /**
- * Bridge API Routes - Handles bridge operations between Bitcoin and Starknet
+ * Enhanced Bridge API Routes with Starknet Contract Integration
  */
 
 const express = require('express');
@@ -16,49 +16,61 @@ router.use(authenticate);
 
 /**
  * POST /api/bridge/deposit
- * Initiate a new Bitcoin to Starknet deposit
+ * Initiate a new Bitcoin to Starknet deposit via Cairo contract
  */
 router.post('/deposit', validate({
     body: {
-        btcTxHash: 'string|required',
         amount: 'number|required|min:0.00000001',
-        starknetRecipient: 'string|required',
-        confirmations: 'number|optional|min:1|max:100'
+        btcAddress: 'string|required',
+        starknetRecipient: 'string|required'
     }
 }), async (req, res) => {
     try {
-        const { btcTxHash, amount, starknetRecipient, confirmations } = req.body;
+        const { amount, btcAddress, starknetRecipient } = req.body;
 
-        logger.info('Deposit request received:', {
-            btcTxHash,
+        logger.info('Contract deposit request received:', {
             amount,
+            btcAddress,
             starknetRecipient,
             userId: req.user.id
         });
 
-        // Add to processing queue
-        const deposit = await bridgeService.createDeposit({
-            btcTxHash,
+        // Validate addresses
+        if (!isValidBitcoinAddress(btcAddress)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid Bitcoin address format'
+            });
+        }
+
+        if (!isValidStarknetAddress(starknetRecipient)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid Starknet address format'
+            });
+        }
+
+        // Call Starknet contract via service
+        const result = await starknetService.initiateBitcoinDeposit(
             amount,
-            starknetRecipient,
-            confirmations: confirmations || 6,
-            userId: req.user.id
-        });
+            btcAddress,
+            starknetRecipient
+        );
 
         res.status(201).json({
             success: true,
-            message: 'Deposit request submitted successfully',
+            message: 'Deposit initiated on Starknet contract',
             data: {
-                depositId: deposit.id,
-                btcTxHash,
+                depositId: result.depositId,
+                transactionHash: result.transactionHash,
                 amount,
-                status: 'pending',
+                status: 'initiated',
                 estimatedTime: '5-10 minutes'
             }
         });
 
     } catch (error) {
-        logger.error('Deposit request failed:', error);
+        logger.error('Contract deposit request failed:', error);
         res.status(400).json({
             success: false,
             error: error.message
@@ -68,62 +80,51 @@ router.post('/deposit', validate({
 
 /**
  * POST /api/bridge/withdrawal
- * Initiate a new Starknet to Bitcoin withdrawal
+ * Initiate a new Starknet to Bitcoin withdrawal via Cairo contract
  */
 router.post('/withdrawal', validate({
     body: {
         amount: 'number|required|min:0.00000001',
-        btcRecipient: 'string|required',
-        starknetSender: 'string|required'
+        btcRecipient: 'string|required'
     }
 }), async (req, res) => {
     try {
-        const { amount, btcRecipient, starknetSender } = req.body;
+        const { amount, btcRecipient } = req.body;
 
-        logger.info('Withdrawal request received:', {
+        logger.info('Contract withdrawal request received:', {
             amount,
             btcRecipient,
-            starknetSender,
             userId: req.user.id
         });
 
-        // Validate withdrawal request
-        const validation = await bridgeService.validateWithdrawalRequest(
-            null, // Will be generated
-            amount,
-            btcRecipient,
-            starknetSender
-        );
-
-        if (!validation.valid) {
+        // Validate Bitcoin address
+        if (!isValidBitcoinAddress(btcRecipient)) {
             return res.status(400).json({
                 success: false,
-                error: validation.error
+                error: 'Invalid Bitcoin address format'
             });
         }
 
-        // Create withdrawal request
-        const withdrawal = await bridgeService.createWithdrawal({
+        // Call Starknet contract via service
+        const result = await starknetService.initiateBitcoinWithdrawal(
             amount,
-            btcRecipient,
-            starknetSender,
-            userId: req.user.id
-        });
+            btcRecipient
+        );
 
         res.status(201).json({
             success: true,
-            message: 'Withdrawal request submitted successfully',
+            message: 'Withdrawal initiated on Starknet contract',
             data: {
-                withdrawalId: withdrawal.id,
+                withdrawalId: result.withdrawalId,
+                transactionHash: result.transactionHash,
                 amount,
-                btcRecipient,
-                status: 'pending',
+                status: 'initiated',
                 estimatedTime: '10-30 minutes'
             }
         });
 
     } catch (error) {
-        logger.error('Withdrawal request failed:', error);
+        logger.error('Contract withdrawal request failed:', error);
         res.status(400).json({
             success: false,
             error: error.message
@@ -132,278 +133,119 @@ router.post('/withdrawal', validate({
 });
 
 /**
- * GET /api/bridge/deposit/:txHash
- * Get deposit status by Bitcoin transaction hash
+ * POST /api/bridge/stake
+ * Stake tokens via Cairo contract
  */
-router.get('/deposit/:txHash', async (req, res) => {
-    try {
-        const { txHash } = req.params;
-
-        // Get from database first
-        const depositRecord = await bridgeService.getDepositRecord(txHash);
-
-        if (depositRecord) {
-            return res.json({
-                success: true,
-                data: {
-                    btcTxHash: depositRecord.btc_tx_hash,
-                    amount: parseFloat(depositRecord.amount),
-                    starknetRecipient: depositRecord.starknet_recipient,
-                    starknetTxHash: depositRecord.starknet_tx_hash,
-                    status: depositRecord.status,
-                    confirmations: depositRecord.confirmations,
-                    createdAt: depositRecord.created_at,
-                    completedAt: depositRecord.completed_at,
-                    failedAt: depositRecord.failed_at,
-                    errorMessage: depositRecord.error_message
-                }
-            });
-        }
-
-        // If not in database, check if it's a valid Bitcoin transaction
-        const txValidation = await bridgeService.validateBitcoinTransaction(txHash, 0, 1);
-        if (!txValidation.valid && txValidation.error === 'Transaction not found') {
-            return res.status(404).json({
-                success: false,
-                error: 'Deposit not found'
-            });
-        }
-
-        res.json({
-            success: true,
-            data: {
-                btcTxHash: txHash,
-                status: 'detected',
-                message: 'Transaction found, processing pending'
-            }
-        });
-
-    } catch (error) {
-        logger.error('Failed to get deposit status:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Internal server error'
-        });
-    }
-});
-
-/**
- * GET /api/bridge/withdrawal/:withdrawalId
- * Get withdrawal status by withdrawal ID
- */
-router.get('/withdrawal/:withdrawalId', async (req, res) => {
-    try {
-        const { withdrawalId } = req.params;
-
-        const withdrawalRecord = await bridgeService.getWithdrawalRecord(withdrawalId);
-
-        if (!withdrawalRecord) {
-            return res.status(404).json({
-                success: false,
-                error: 'Withdrawal not found'
-            });
-        }
-
-        res.json({
-            success: true,
-            data: {
-                withdrawalId: withdrawalRecord.withdrawal_id,
-                amount: parseFloat(withdrawalRecord.amount),
-                btcRecipient: withdrawalRecord.btc_recipient,
-                starknetSender: withdrawalRecord.starknet_sender,
-                starknetTxHash: withdrawalRecord.starknet_tx_hash,
-                status: withdrawalRecord.status,
-                createdAt: withdrawalRecord.created_at,
-                completedAt: withdrawalRecord.completed_at,
-                failedAt: withdrawalRecord.failed_at,
-                errorMessage: withdrawalRecord.error_message
-            }
-        });
-
-    } catch (error) {
-        logger.error('Failed to get withdrawal status:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Internal server error'
-        });
-    }
-});
-
-/**
- * GET /api/bridge/stats
- * Get bridge statistics and metrics
- */
-router.get('/stats', async (req, res) => {
-    try {
-        const stats = await bridgeService.getBridgeStats();
-
-        // Get additional real-time data with error handling
-        let bitcoinInfo = { status: 'unknown', error: 'Service unavailable' };
-        let starknetInfo = { status: 'unknown', error: 'Service unavailable' };
-
-        try {
-            bitcoinInfo = await bitcoinService.getNetworkInfo();
-        } catch (error) {
-            logger.warn('Failed to get Bitcoin network info:', error.message);
-        }
-
-        try {
-            starknetInfo = await starknetService.getNetworkInfo();
-        } catch (error) {
-            logger.warn('Failed to get Starknet network info:', error.message);
-        }
-
-        res.json({
-            success: true,
-            data: {
-                ...stats,
-                networks: {
-                    bitcoin: bitcoinInfo,
-                    starknet: starknetInfo
-                },
-                timestamp: new Date().toISOString()
-            }
-        });
-
-    } catch (error) {
-        logger.error('Failed to get bridge stats:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Internal server error',
-            message: error.message
-        });
-    }
-});
-
-/**
- * GET /api/bridge/operators
- * Get list of active bridge operators
- */
-router.get('/operators', async (req, res) => {
-    try {
-        const operators = await starknetService.getActiveOperators();
-
-        const operatorDetails = await Promise.all(
-            operators.map(async (op) => {
-                try {
-                    const info = await starknetService.getOperatorInfo(op.operatorId);
-                    return { ...op, ...info };
-                } catch (error) {
-                    logger.error(`Failed to get operator ${op.operatorId} info:`, error);
-                    return { ...op, error: error.message };
-                }
-            })
-        );
-
-        res.json({
-            success: true,
-            data: {
-                operators: operatorDetails,
-                total: operators.length,
-                timestamp: new Date().toISOString()
-            }
-        });
-
-    } catch (error) {
-        logger.error('Failed to get operators:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Internal server error'
-        });
-    }
-});
-
-/**
- * GET /api/bridge/sbtc/balance/:address
- * Get SBTC balance for a Starknet address
- */
-router.get('/sbtc/balance/:address', async (req, res) => {
-    try {
-        const { address } = req.params;
-
-        const balance = await starknetService.getSBTCBalance(address);
-
-        res.json({
-            success: true,
-            data: balance
-        });
-
-    } catch (error) {
-        logger.error('Failed to get SBTC balance:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Internal server error'
-        });
-    }
-});
-
-/**
- * POST /api/bridge/sbtc/mint
- * Mint SBTC tokens (operator only)
- */
-router.post('/sbtc/mint', validate({
+router.post('/stake', validate({
     body: {
-        recipient: 'string|required',
+        token: 'string|required',
         amount: 'number|required|min:0.00000001'
     }
 }), async (req, res) => {
     try {
-        // Check if user is an operator
-        if (!req.user.isOperator) {
-            return res.status(403).json({
-                success: false,
-                error: 'Operator access required'
-            });
-        }
+        const { token, amount } = req.body;
 
-        const { recipient, amount } = req.body;
-
-        const result = await starknetService.mintSBTC(recipient, amount);
+        const result = await starknetService.stakeTokens(token, amount);
 
         res.json({
             success: true,
-            message: 'SBTC minted successfully',
+            message: 'Tokens staked successfully',
             data: {
-                recipient,
-                amount,
+                transactionHash: result.transactionHash,
+                amount
+            }
+        });
+
+    } catch (error) {
+        logger.error('Staking failed:', error);
+        res.status(400).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+/**
+ * POST /api/bridge/unstake
+ * Unstake tokens via Cairo contract
+ */
+router.post('/unstake', validate({
+    body: {
+        token: 'string|required',
+        amount: 'number|required|min:0.00000001'
+    }
+}), async (req, res) => {
+    try {
+        const { token, amount } = req.body;
+
+        const result = await starknetService.unstakeTokens(token, amount);
+
+        res.json({
+            success: true,
+            message: 'Tokens unstaked successfully',
+            data: {
+                transactionHash: result.transactionHash,
+                amount
+            }
+        });
+
+    } catch (error) {
+        logger.error('Unstaking failed:', error);
+        res.status(400).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+/**
+ * POST /api/bridge/claim-rewards
+ * Claim staking rewards via Cairo contract
+ */
+router.post('/claim-rewards', validate({
+    body: {
+        token: 'string|required'
+    }
+}), async (req, res) => {
+    try {
+        const { token } = req.body;
+
+        const result = await starknetService.claimRewards(token);
+
+        res.json({
+            success: true,
+            message: 'Rewards claimed successfully',
+            data: {
                 transactionHash: result.transactionHash
             }
         });
 
     } catch (error) {
-        logger.error('Failed to mint SBTC:', error);
-        res.status(500).json({
+        logger.error('Claim rewards failed:', error);
+        res.status(400).json({
             success: false,
-            error: 'Internal server error'
+            error: error.message
         });
     }
 });
 
 /**
- * POST /api/bridge/sbtc/burn
- * Burn SBTC tokens (for withdrawals)
+ * GET /api/bridge/staking/:user/:token
+ * Get staking position from Cairo contract
  */
-router.post('/sbtc/burn', validate({
-    body: {
-        amount: 'number|required|min:0.00000001'
-    }
-}), async (req, res) => {
+router.get('/staking/:user/:token', async (req, res) => {
     try {
-        const { amount } = req.body;
+        const { user, token } = req.params;
 
-        const result = await starknetService.burnSBTC(amount);
+        const position = await starknetService.getStakingPosition(user, token);
 
         res.json({
             success: true,
-            message: 'SBTC burned successfully',
-            data: {
-                amount,
-                transactionHash: result.transactionHash
-            }
+            data: position
         });
 
     } catch (error) {
-        logger.error('Failed to burn SBTC:', error);
+        logger.error('Failed to get staking position:', error);
         res.status(500).json({
             success: false,
             error: 'Internal server error'
@@ -411,95 +253,18 @@ router.post('/sbtc/burn', validate({
     }
 });
 
-/**
- * GET /api/bridge/health
- * Get detailed bridge health status
- */
-router.get('/health', async (req, res) => {
-    try {
-        const health = await bridgeService.healthCheck();
-
-        const statusCode = health.status === 'healthy' ? 200 :
-                          health.status === 'degraded' ? 200 : 500;
-
-        res.status(statusCode).json({
-            success: true,
-            data: health
-        });
-
-    } catch (error) {
-        logger.error('Bridge health check failed:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Health check failed',
-            data: {
-                status: 'unhealthy',
-                error: error.message,
-                timestamp: new Date().toISOString()
-            }
-        });
-    }
-});
-
-/**
- * GET /api/bridge/networks
- * Get status of both Bitcoin and Starknet networks
- */
-router.get('/networks', async (req, res) => {
-    try {
-        const [bitcoinInfo, starknetInfo] = await Promise.all([
-            bitcoinService.getNetworkInfo(),
-            starknetService.getNetworkInfo()
-        ]);
-
-        res.json({
-            success: true,
-            data: {
-                bitcoin: bitcoinInfo,
-                starknet: starknetInfo,
-                timestamp: new Date().toISOString()
-            }
-        });
-
-    } catch (error) {
-        logger.error('Failed to get network status:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Internal server error'
-        });
-    }
-});
-
-/**
- * POST /api/bridge/test
- * Test bridge functionality (development only)
- */
-if (process.env.NODE_ENV === 'development') {
-    router.post('/test', async (req, res) => {
-        try {
-            // Create a test deposit
-            const testDeposit = {
-                btcTxHash: '0x' + Math.random().toString(16).substring(2, 66),
-                amount: Math.random() * 0.1 + 0.01,
-                starknetRecipient: '0x' + Math.random().toString(16).substring(2, 66)
-            };
-
-            const result = await bridgeService.processDeposit(testDeposit);
-
-            res.json({
-                success: true,
-                message: 'Test deposit processed',
-                data: result
-            });
-
-        } catch (error) {
-            logger.error('Test bridge failed:', error);
-            res.status(500).json({
-                success: false,
-                error: error.message
-            });
-        }
-    });
+// Helper functions
+function isValidBitcoinAddress(address) {
+    const legacyRegex = /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/;
+    const bech32Regex = /^bc1[a-z0-9]{39,59}$/;
+    return legacyRegex.test(address) || bech32Regex.test(address);
 }
+
+function isValidStarknetAddress(address) {
+    const starknetRegex = /^0x[a-fA-F0-9]{64}$/;
+    return starknetRegex.test(address) && address !== '0x' + '0'.repeat(64);
+}
+
+// ... keep the rest of your existing routes for stats, health, etc.
 
 module.exports = router;

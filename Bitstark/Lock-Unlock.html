@@ -119,7 +119,7 @@
             color: white;
             border: none;
             padding: 12px 24px;
-            border-radius: 8px;
+            border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
@@ -127,22 +127,123 @@
             align-items: center;
             gap: 8px;
             box-shadow: 0 4px 6px rgba(124, 58, 237, 0.25);
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
         }
-        
+
+        .connect-wallet::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .connect-wallet:hover::before {
+            left: 100%;
+        }
+
         .connect-wallet:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(124, 58, 237, 0.3);
         }
 
         .connect-wallet.connected {
-            background: linear-gradient(135deg, var(--secondary), #0d966c);
+            background: linear-gradient(135deg, #4caf50, #45a049);
             cursor: default;
         }
 
         .connect-wallet.connected:hover {
              transform: none;
-             box-shadow: 0 4px 6px rgba(16, 185, 129, 0.25);
-         }
+             box-shadow: 0 4px 6px rgba(76, 175, 80, 0.25);
+          }
+
+        .btn {
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.4);
+        }
+
+        .btn.connected {
+            background: linear-gradient(to right, #4caf50, #45a049);
+            cursor: default;
+        }
+
+        .btn.connected:hover {
+            transform: none;
+            box-shadow: 0 4px 6px rgba(76, 175, 80, 0.25);
+        }
+
+        .disconnect-btn {
+            margin-left: 10px;
+            padding: 4px 8px;
+            background: rgba(239, 68, 68, 0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            font-size: 0.8rem;
+        }
+
+        .disconnect-btn:hover {
+            background: rgba(239, 68, 68, 0.4);
+            transform: scale(1.1);
+        }
 
          /* Enhanced Wallet Connection Styles */
          .wallet-connection-status {
@@ -989,6 +1090,18 @@
             .tabs {
                 flex-direction: column;
             }
+
+            .disconnect-btn {
+                margin-left: 8px;
+                width: 18px;
+                height: 18px;
+                font-size: 0.7rem;
+            }
+
+            .btn.connected {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
         }
 
 
@@ -1038,7 +1151,7 @@
                     <li><a href="#" class="active">Lock/Unlock</a></li>
                     <li><a href="../Wallet/History.html">History</a></li>
                 </ul>
-                <button class="connect-wallet" id="connectWallet">
+                <button class="btn btn-primary" id="connectWallet">
                     <i class="fas fa-wallet"></i>
                     Connect Wallet
                 </button>
@@ -1403,7 +1516,6 @@
 
     <script>
         // DOM Elements
-        const connectWalletBtn = document.getElementById('connectWallet');
         const walletModal = document.getElementById('walletModal');
         const closeModalBtn = document.getElementById('closeModal');
         const walletOptionsContainer = document.getElementById('walletOptions');
@@ -1428,6 +1540,9 @@
         // Wallet connection state
         let connectedWallet = null;
         let connectedAddress = null;
+
+        // DOM Elements
+        const connectWalletBtn = document.getElementById('connectWallet');
 
         // Available wallets configuration
         const availableWallets = [
@@ -1590,10 +1705,15 @@
 
                 const result = await wallet.connect();
 
+                if (!result || !result.address) {
+                    throw new Error('No address returned from wallet');
+                }
+
                 connectedWallet = result.name;
                 connectedAddress = result.address;
 
                 updateWalletUI();
+                useConnectedAddressForForms();
                 showNotification(`Successfully connected to ${connectedWallet}!`);
 
             } catch (error) {
@@ -1605,6 +1725,103 @@
         // Connect wallet - show modal with all available real wallets
         function connectWallet() {
             openWalletModal();
+        }
+
+        // Set up wallet event listeners
+        function setupWalletEventListeners() {
+            // Listen for wallet events
+            if (window.ethereum) {
+                window.ethereum.on('accountsChanged', handleAccountsChanged);
+                window.ethereum.on('chainChanged', handleChainChanged);
+                window.ethereum.on('disconnect', handleDisconnect);
+            }
+
+            if (window.starknet) {
+                window.starknet.on('accountsChanged', handleStarknetAccountsChanged);
+                window.starknet.on('networkChanged', handleStarknetNetworkChanged);
+            }
+        }
+
+        // Handle account changes
+        function handleAccountsChanged(accounts) {
+            if (accounts.length === 0) {
+                // User disconnected
+                disconnectWallet();
+            } else if (accounts[0] !== connectedAddress) {
+                // Account changed
+                connectedAddress = accounts[0];
+                updateWalletUI();
+                showNotification('Account changed in wallet');
+                useConnectedAddressForForms();
+            }
+        }
+
+        // Handle chain changes
+        function handleChainChanged(chainId) {
+            showNotification(`Network changed to ${getNetworkName(chainId)}`);
+        }
+
+        // Handle disconnect
+        function handleDisconnect() {
+            disconnectWallet();
+            showNotification('Wallet disconnected');
+        }
+
+        // Handle Starknet account changes
+        function handleStarknetAccountsChanged(accounts) {
+            if (!accounts || accounts.length === 0) {
+                disconnectWallet();
+            } else if (accounts[0] !== connectedAddress) {
+                connectedAddress = accounts[0];
+                updateWalletUI();
+                showNotification('Starknet account changed');
+                useConnectedAddressForForms();
+            }
+        }
+
+        // Handle Starknet network changes
+        function handleStarknetNetworkChanged(network) {
+            showNotification('Starknet network changed');
+        }
+
+        // Get network name from chain ID
+        function getNetworkName(chainId) {
+            const networks = {
+                '0x1': 'Ethereum Mainnet',
+                '0x5': 'Goerli Testnet',
+                '0xaa36a7': 'Sepolia Testnet',
+                '0x89': 'Polygon Mainnet'
+            };
+            return networks[chainId] || `Chain ${chainId}`;
+        }
+
+        // Auto-populate forms with connected wallet address
+        function useConnectedAddressForForms() {
+            if (connectedAddress) {
+                // Populate lock form addresses based on current tab
+                const lockTab = document.getElementById('lockTab');
+                if (lockTab && lockTab.classList.contains('active')) {
+                    // For lock tab, populate Bitcoin address
+                    const fromAddressInput = document.getElementById('fromAddress');
+                    if (fromAddressInput) {
+                        fromAddressInput.value = connectedAddress;
+                        // Trigger validation
+                        const event = new Event('input', { bubbles: true });
+                        fromAddressInput.dispatchEvent(event);
+                    }
+                } else {
+                    // For unlock tab, populate StarkNet address
+                    const unlockFromAddressInput = document.getElementById('unlockFromAddress');
+                    if (unlockFromAddressInput) {
+                        unlockFromAddressInput.value = connectedAddress;
+                        // Trigger validation
+                        const event = new Event('input', { bubbles: true });
+                        unlockFromAddressInput.dispatchEvent(event);
+                    }
+                }
+
+                showNotification('Wallet address populated in form');
+            }
         }
 
         // Event listeners
@@ -1688,6 +1905,7 @@
                 if (connectedAddress) {
                     fromAddressInput.value = connectedAddress;
                     updateAddressStatus(isValidBitcoinAddress(connectedAddress), 'Using connected wallet address');
+                    showNotification('Connected wallet address used');
                 } else {
                     showNotification('No wallet connected. Please connect a wallet first.', true);
                 }
@@ -1759,6 +1977,7 @@
                 if (connectedAddress) {
                     unlockFromAddressInput.value = connectedAddress;
                     updateUnlockAddressStatus(isValidStarknetAddress(connectedAddress), 'Using connected wallet address');
+                    showNotification('Connected wallet address used for unlock');
                 } else {
                     showNotification('No wallet connected. Please connect a wallet first.', true);
                 }
@@ -1790,10 +2009,78 @@
         // Initialize the interface
         function init() {
             setupEventListeners();
+            setupWalletEventListeners();
             simulateLockProgress();
             checkExistingWalletConnection();
             initializeAddressInput(); // Initialize lock address input enhancement
             initializeUnlockAddressInput(); // Initialize unlock address input enhancement
+        }
+
+        // Check for existing wallet connection on page load
+        async function checkExistingWalletConnection() {
+            try {
+                // Check StarkNet wallets first
+                if (window.starknet && window.starknet.isConnected) {
+                    connectedWallet = window.starknet.name || 'Ready Wallet';
+                    connectedAddress = window.starknet.selectedAddress;
+                    updateWalletUI();
+                    return;
+                }
+
+                // Check Ethereum wallets
+                if (window.ethereum) {
+                    try {
+                        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                        if (accounts.length > 0) {
+                            connectedAddress = accounts[0];
+                            connectedWallet = getEthereumWalletName();
+                            updateWalletUI();
+                            return;
+                        }
+                    } catch (error) {
+                        // Continue if request fails
+                    }
+                }
+
+                // Check Phantom (Solana)
+                if (window.solana && window.solana.isPhantom) {
+                    try {
+                        const response = await window.solana.connect({ onlyIfTrusted: true });
+                        connectedWallet = 'Phantom';
+                        connectedAddress = response.publicKey.toString();
+                        updateWalletUI();
+                        return;
+                    } catch (error) {
+                        // User hasn't connected before
+                    }
+                }
+
+                // Check Solflare (Solana)
+                if (window.solflare && window.solflare.isSolflare) {
+                    try {
+                        const response = await window.solflare.connect({ onlyIfTrusted: true });
+                        connectedWallet = 'Solflare';
+                        connectedAddress = response.publicKey.toString();
+                        updateWalletUI();
+                        return;
+                    } catch (error) {
+                        // User hasn't connected before
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking existing wallet connection:', error);
+            }
+        }
+
+        // Get Ethereum wallet name
+        function getEthereumWalletName() {
+            if (window.ethereum.isMetaMask) return 'MetaMask';
+            if (window.ethereum.isCoinbaseWallet) return 'Coinbase Wallet';
+            if (window.ethereum.isTrust) return 'Trust Wallet';
+            if (window.ethereum.isExodus) return 'Exodus';
+            if (window.ethereum.isLedger) return 'Ledger';
+            if (window.ethereum.isTrezor) return 'Trezor';
+            return 'Ethereum Wallet';
         }
 
         // Set up event listeners
@@ -1991,8 +2278,61 @@
         // Update wallet UI
         function updateWalletUI() {
             if (connectedWallet && connectedAddress) {
-                connectWalletBtn.innerHTML = `<i class="fas fa-wallet"></i> ${connectedAddress.substring(0, 6)}...${connectedAddress.substring(connectedAddress.length - 4)}`;
+                connectWalletBtn.innerHTML = `
+                    <i class="fas fa-wallet"></i> ${connectedAddress.substring(0, 6)}...${connectedAddress.substring(connectedAddress.length - 4)}
+                    <span class="disconnect-btn" onclick="disconnectWallet(event)" title="Disconnect Wallet">
+                        <i class="fas fa-times"></i>
+                    </span>
+                `;
                 connectWalletBtn.classList.add('connected');
+            } else {
+                connectWalletBtn.innerHTML = `<i class="fas fa-wallet"></i> Connect Wallet`;
+                connectWalletBtn.classList.remove('connected');
+            }
+        }
+
+        // Disconnect wallet
+        async function disconnectWallet(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+
+            // Reset connection state
+            connectedWallet = null;
+            connectedAddress = null;
+
+            // Update UI
+            updateWalletUI();
+            showNotification('Wallet disconnected');
+
+            // Clear address inputs if they exist
+            const fromAddressInput = document.getElementById('fromAddress');
+            const toAddressInput = document.getElementById('toAddress');
+            const unlockFromAddressInput = document.getElementById('unlockFromAddress');
+            const unlockToAddressInput = document.getElementById('unlockToAddress');
+
+            if (fromAddressInput) {
+                fromAddressInput.value = '';
+                const addressStatus = document.getElementById('addressStatus');
+                if (addressStatus) addressStatus.innerHTML = '';
+            }
+
+            if (toAddressInput) {
+                toAddressInput.value = '';
+                const starknetAddressStatus = document.getElementById('starknetAddressStatus');
+                if (starknetAddressStatus) starknetAddressStatus.innerHTML = '';
+            }
+
+            if (unlockFromAddressInput) {
+                unlockFromAddressInput.value = '';
+                const unlockAddressStatus = document.getElementById('unlockAddressStatus');
+                if (unlockAddressStatus) unlockAddressStatus.innerHTML = '';
+            }
+
+            if (unlockToAddressInput) {
+                unlockToAddressInput.value = '';
+                const unlockBitcoinAddressStatus = document.getElementById('unlockBitcoinAddressStatus');
+                if (unlockBitcoinAddressStatus) unlockBitcoinAddressStatus.innerHTML = '';
             }
         }
 
@@ -2455,6 +2795,7 @@
                 if (connectedAddress) {
                     toAddressInput.value = connectedAddress;
                     updateStarknetAddressStatus(isValidStarknetAddress(connectedAddress), 'Using connected wallet address');
+                    showNotification('Connected wallet address used for destination');
                 } else {
                     showNotification('No wallet connected. Please connect a wallet first.', true);
                 }
@@ -2533,6 +2874,7 @@
                 if (connectedAddress) {
                     unlockToAddressInput.value = connectedAddress;
                     updateUnlockBitcoinAddressStatus(isValidBitcoinAddress(connectedAddress), 'Using connected wallet address');
+                    showNotification('Connected wallet address used for destination');
                 } else {
                     showNotification('No wallet connected. Please connect a wallet first.', true);
                 }

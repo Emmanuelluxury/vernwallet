@@ -1181,8 +1181,51 @@
         // Update wallet UI
         function updateWalletUI() {
             if (connectedWallet && connectedAddress) {
-                connectWalletBtn.innerHTML = `<i class="fas fa-wallet"></i> ${connectedAddress.substring(0, 6)}...${connectedAddress.substring(connectedAddress.length - 4)}`;
+                connectWalletBtn.innerHTML = `
+                    <i class="fas fa-wallet"></i> ${connectedAddress.substring(0, 6)}...${connectedAddress.substring(connectedAddress.length - 4)}
+                    <span class="disconnect-btn" onclick="disconnectWallet(event)" title="Disconnect Wallet">
+                        <i class="fas fa-times"></i>
+                    </span>
+                `;
                 connectWalletBtn.classList.add('connected');
+            } else {
+                connectWalletBtn.innerHTML = `<i class="fas fa-wallet"></i> Connect Wallet`;
+                connectWalletBtn.classList.remove('connected');
+            }
+        }
+
+        // Disconnect wallet
+        function disconnectWallet(event) {
+            event.stopPropagation();
+
+            try {
+                // Disconnect from specific wallet
+                if (connectedWallet === 'Ready Wallet' && window.starknet) {
+                    // For StarkNet wallets, we can disable the connection
+                    window.starknet.selectedAddress = null;
+                } else if (connectedWallet === 'MetaMask' && window.ethereum && window.ethereum.isMetaMask) {
+                    // For MetaMask, we don't have a direct disconnect method, but we can clear local state
+                } else if (connectedWallet === 'Coinbase Wallet' && window.ethereum && window.ethereum.isCoinbaseWallet) {
+                    // For Coinbase Wallet, we don't have a direct disconnect method, but we can clear local state
+                } else if (connectedWallet === 'Phantom' && window.solana && window.solana.isPhantom) {
+                    window.solana.disconnect();
+                } else if (connectedWallet === 'Solflare' && window.solflare && window.solflare.isSolflare) {
+                    window.solflare.disconnect();
+                }
+
+                // Clear local state
+                connectedWallet = null;
+                connectedAddress = null;
+
+                // Update UI
+                updateWalletUI();
+
+                // Show notification
+                showNotification('Wallet disconnected successfully');
+
+            } catch (error) {
+                console.error('Error disconnecting wallet:', error);
+                showNotification('Error disconnecting wallet', true);
             }
         }
 

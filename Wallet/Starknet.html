@@ -431,6 +431,26 @@
             box-shadow: 0 4px 6px rgba(76, 175, 80, 0.25);
         }
 
+        .disconnect-btn {
+            margin-left: 10px;
+            padding: 4px 8px;
+            background: rgba(239, 68, 68, 0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            font-size: 0.8rem;
+        }
+
+        .disconnect-btn:hover {
+            background: rgba(239, 68, 68, 0.4);
+            transform: scale(1.1);
+        }
+
         
         .transactions-container {
             margin-top: 40px;
@@ -1108,8 +1128,16 @@
         // Update wallet UI
         function updateWalletUI() {
             if (connectedWallet && connectedAddress) {
-                connectWalletBtn.innerHTML = `<i class="fas fa-wallet"></i> ${connectedAddress.substring(0, 6)}...${connectedAddress.substring(connectedAddress.length - 4)}`;
+                connectWalletBtn.innerHTML = `
+                    <i class="fas fa-wallet"></i> ${connectedAddress.substring(0, 6)}...${connectedAddress.substring(connectedAddress.length - 4)}
+                    <span class="disconnect-btn" onclick="disconnectWallet(event)" title="Disconnect Wallet">
+                        <i class="fas fa-times"></i>
+                    </span>
+                `;
                 connectWalletBtn.classList.add('connected');
+            } else {
+                connectWalletBtn.innerHTML = `<i class="fas fa-wallet"></i> Connect Wallet`;
+                connectWalletBtn.classList.remove('connected');
             }
         }
         
@@ -1120,7 +1148,7 @@
                 if (window.starknet && window.starknet.isConnected) {
                     connectedWallet = window.starknet.name || 'Ready Wallet';
                     connectedAddress = window.starknet.selectedAddress;
-                    updateWalletUI();
+                    // Don't update UI automatically - only store connection info
                     return;
                 }
 
@@ -1131,7 +1159,7 @@
                         if (accounts.length > 0) {
                             connectedAddress = accounts[0];
                             connectedWallet = getEthereumWalletName();
-                            updateWalletUI();
+                            // Don't update UI automatically - only store connection info
                             return;
                         }
                     } catch (error) {
@@ -1145,7 +1173,7 @@
                         const response = await window.solana.connect({ onlyIfTrusted: true });
                         connectedWallet = 'Phantom';
                         connectedAddress = response.publicKey.toString();
-                        updateWalletUI();
+                        // Don't update UI automatically - only store connection info
                         return;
                     } catch (error) {
                         // User hasn't connected before
@@ -1158,7 +1186,7 @@
                         const response = await window.solflare.connect({ onlyIfTrusted: true });
                         connectedWallet = 'Solflare';
                         connectedAddress = response.publicKey.toString();
-                        updateWalletUI();
+                        // Don't update UI automatically - only store connection info
                         return;
                     } catch (error) {
                         // User hasn't connected before
@@ -1167,6 +1195,21 @@
             } catch (error) {
                 console.error('Error checking existing wallet connection:', error);
             }
+        }
+
+        // Disconnect wallet
+        async function disconnectWallet(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+
+            // Reset connection state
+            connectedWallet = null;
+            connectedAddress = null;
+
+            // Update UI
+            updateWalletUI();
+            showNotification('Wallet disconnected');
         }
 
         // Get Ethereum wallet name
