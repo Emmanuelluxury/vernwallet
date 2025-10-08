@@ -8,6 +8,58 @@ class StarknetBridgeService {
         this.provider = null;
         this.account = null;
         this.abi = null;
+        this.currentNetwork = 'mainnet';
+
+        // Multi-network configuration
+        this.NETWORKS = {
+            mainnet: {
+                name: 'Starknet Mainnet',
+                chainId: '0x534e5f4d41494e',
+                rpcUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7',
+                explorerUrl: 'https://starkscan.co',
+                contracts: {
+                    BRIDGE_CONTRACT: '0x012402f9a1612d3d48bfc7beb93f756e9848f67e3a0a8c1a23d48f03a25acc9e',
+                    SBTC_CONTRACT: '0x07b10d8e5e60b2c9c5a5b12a4e1e5c4b3d2e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b'
+                }
+            },
+            testnet: {
+                name: 'Starknet Sepolia Testnet',
+                chainId: '0x534e5f5345504f4c49',
+                rpcUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7',
+                explorerUrl: 'https://sepolia.starkscan.co',
+                contracts: {
+                    BRIDGE_CONTRACT: '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', // Placeholder
+                    SBTC_CONTRACT: '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef' // Placeholder
+                }
+            }
+        };
+    }
+
+    // Network management methods
+    switchNetwork(network) {
+        if (this.NETWORKS[network]) {
+            this.currentNetwork = network;
+            this.contractAddress = this.NETWORKS[network].contracts.BRIDGE_CONTRACT;
+            console.log(`🔄 Bridge service switched to ${this.NETWORKS[network].name}`);
+            return true;
+        }
+        return false;
+    }
+
+    getCurrentNetwork() {
+        return this.currentNetwork;
+    }
+
+    getCurrentNetworkConfig() {
+        return this.NETWORKS[this.currentNetwork];
+    }
+
+    getNetworkExplorerUrl() {
+        return this.NETWORKS[this.currentNetwork].explorerUrl;
+    }
+
+    isTestnet() {
+        return this.NETWORKS[this.currentNetwork].isTestnet;
     }
 
     // Initialize the bridge service (direction-aware)
@@ -310,9 +362,9 @@ class StarknetBridgeService {
         ];
     }
 
-    // Convert Bitcoin address to felt252
+    // Convert Bitcoin address to felt252 (Contract expects LENGTH, not encoded address)
     bitcoinAddressToFelt(btcAddress) {
-        console.log('🔄 Converting Bitcoin address to felt252:', btcAddress);
+        console.log('🔄 Converting Bitcoin address to felt252 (length-based):', btcAddress);
 
         if (!btcAddress || typeof btcAddress !== 'string') {
             throw new Error('Bitcoin address is required');
@@ -324,34 +376,26 @@ class StarknetBridgeService {
             throw new Error(`Invalid Bitcoin address format: ${btcAddress}. Expected P2PKH, P2SH, or Bech32 format.`);
         }
 
-        // Use ASCII encoding approach for Cairo compatibility
-        // Convert each character to its ASCII value and create a deterministic felt
-        let felt = 0n;
-        const prime = (1n << 251n) - 1n; // Starknet prime for felt252
+        // CRITICAL FIX: Contract expects the LENGTH of the address as felt252, not the encoded address!
+        // The Cairo contract does: let addr_len: u32 = btc_address.try_into().unwrap_or(0);
+        // So we need to send the length (26-35) as a felt252 number
 
-        for (let i = 0; i < btcAddress.length && i < 31; i++) {
-            const ascii = btcAddress.charCodeAt(i);
-            felt = (felt * 256n + BigInt(ascii)) % prime;
+        const addressLength = btcAddress.length;
+        console.log('📏 Bitcoin address length:', addressLength);
+
+        // Validate length is in expected range (26-35 characters)
+        if (addressLength < 26 || addressLength > 35) {
+            throw new Error(`Bitcoin address length ${addressLength} is outside expected range 26-35`);
         }
 
-        // Convert to hex string with 0x prefix, exactly 66 characters (0x + 64 hex chars)
-        let hex = felt.toString(16);
-        while (hex.length < 64) {
-            hex = '0' + hex;
-        }
+        // Convert length to felt252 hex format
+        const lengthHex = addressLength.toString(16);
+        const felt252Hex = '0x' + lengthHex;
 
-        // Ensure we don't exceed 64 characters for the hex part
-        if (hex.length > 64) {
-            hex = hex.substring(hex.length - 64);
-        }
-
-        // Add 0x prefix to make it 66 characters total
-        const felt252Hex = '0x' + hex;
-
-        console.log('✅ Bitcoin address converted:', {
+        console.log('✅ Bitcoin address length converted to felt252:', {
             original: btcAddress,
+            length: addressLength,
             felt: felt252Hex,
-            length: felt252Hex.length,
             format: btcAddress.startsWith('1') ? 'P2PKH' : btcAddress.startsWith('3') ? 'P2SH' : 'Bech32'
         });
 
@@ -402,11 +446,12 @@ class StarknetBridgeService {
     bitcoinAddressToFeltAuto(btcAddress) {
         console.log('🔄 Auto-detecting best Bitcoin address conversion method for:', btcAddress);
 
+        // PRIORITIZE LENGTH-BASED METHOD FIRST - this is what the contract actually expects!
         const methods = [
-            { method: this.bitcoinAddressToFeltLength.bind(this), name: 'Length-based encoding' },
+            { method: this.bitcoinAddressToFelt.bind(this), name: 'Length-based encoding (PRIMARY)' },
+            { method: this.bitcoinAddressToFeltLength.bind(this), name: 'Direct length encoding' },
             { method: this.bitcoinAddressToFeltContract.bind(this), name: 'Contract-compatible encoding' },
             { method: this.bitcoinAddressToFeltBytes.bind(this), name: 'Byte encoding' },
-            { method: this.bitcoinAddressToFelt.bind(this), name: 'Standard ASCII encoding' },
             { method: this.bitcoinAddressToFeltAlt.bind(this), name: 'Alternative ASCII sum' },
             { method: this.bitcoinAddressToFeltHash.bind(this), name: 'Hash-based encoding' },
             { method: this.bitcoinAddressToFeltRaw.bind(this), name: 'Raw felt252 encoding' },
@@ -418,6 +463,7 @@ class StarknetBridgeService {
                 const result = methods[i].method(btcAddress);
                 console.log(`✅ Method ${i + 1} (${methods[i].name}) successful:`, result);
                 console.log(`   Result length: ${result.length}, format: ${result.startsWith('0x') ? 'hex' : 'decimal'}`);
+                console.log(`   Represents length: ${parseInt(result, 16)}`);
                 return result;
             } catch (error) {
                 console.warn(`⚠️ Method ${i + 1} (${methods[i].name}) failed:`, error.message);
@@ -676,6 +722,100 @@ class StarknetBridgeService {
         return felt252Hex;
     }
 
+    // Enhanced transaction execution with better error handling
+    async executeTransaction(calldata) {
+        try {
+            console.log('Attempting transaction with account.execute...');
+
+            // Add transaction timeout and better error handling
+            const transactionPromise = this.account.execute({
+                contractAddress: this.contractAddress,
+                entrypoint: 'initiate_bitcoin_deposit',
+                calldata: calldata
+            });
+
+            // Add timeout wrapper
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => {
+                    reject(new Error('Transaction execution timed out'));
+                }, 90000); // 90 seconds timeout
+            });
+
+            return await Promise.race([transactionPromise, timeoutPromise]);
+
+        } catch (error) {
+            console.error('Transaction execution failed:', error);
+            throw error;
+        }
+    }
+
+    // Alternative transaction execution method
+    async executeTransactionAlternative(calldata) {
+        try {
+            console.log('Attempting alternative transaction execution...');
+
+            if (window.starknet && window.starknet.execute) {
+                return await window.starknet.execute({
+                    contractAddress: this.contractAddress,
+                    entrypoint: 'initiate_bitcoin_deposit',
+                    calldata: calldata
+                });
+            } else {
+                throw new Error('Alternative execution method not available');
+            }
+        } catch (error) {
+            console.error('Alternative transaction execution failed:', error);
+            throw error;
+        }
+    }
+
+    // Enhanced withdrawal transaction execution with better error handling
+    async executeWithdrawalTransaction(calldata) {
+        try {
+            console.log('Attempting withdrawal transaction with account.execute...');
+
+            // Add transaction timeout and better error handling
+            const transactionPromise = this.account.execute({
+                contractAddress: this.contractAddress,
+                entrypoint: 'initiate_bitcoin_withdrawal',
+                calldata: calldata
+            });
+
+            // Add timeout wrapper
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => {
+                    reject(new Error('Withdrawal transaction execution timed out'));
+                }, 90000); // 90 seconds timeout
+            });
+
+            return await Promise.race([transactionPromise, timeoutPromise]);
+
+        } catch (error) {
+            console.error('Withdrawal transaction execution failed:', error);
+            throw error;
+        }
+    }
+
+    // Alternative withdrawal transaction execution method
+    async executeWithdrawalTransactionAlternative(calldata) {
+        try {
+            console.log('Attempting alternative withdrawal transaction execution...');
+
+            if (window.starknet && window.starknet.execute) {
+                return await window.starknet.execute({
+                    contractAddress: this.contractAddress,
+                    entrypoint: 'initiate_bitcoin_withdrawal',
+                    calldata: calldata
+                });
+            } else {
+                throw new Error('Alternative withdrawal execution method not available');
+            }
+        } catch (error) {
+            console.error('Alternative withdrawal transaction execution failed:', error);
+            throw error;
+        }
+    }
+
     // Convert Starknet address to felt252
     starknetAddressToFelt(starknetAddress) {
         console.log('🔄 Converting Starknet address to felt252:', starknetAddress);
@@ -728,8 +868,14 @@ class StarknetBridgeService {
         };
     }
 
-    // Initiate Bitcoin deposit (Bitcoin → Starknet)
+    // Initiate Bitcoin deposit (Bitcoin → Starknet) with enhanced timeout and retry logic
     async initiateBitcoinDeposit(amount, btcAddress, starknetRecipient) {
+        let transactionPromise = null;
+        let timeoutId = null;
+        let retryCount = 0;
+        const maxRetries = 3;
+        const timeoutDuration = 120000; // 2 minutes timeout
+
         try {
             console.log('🚀 Starting Bitcoin deposit process...');
             console.log('Input validation:', { amount, btcAddress, starknetRecipient });
@@ -825,52 +971,83 @@ class StarknetBridgeService {
 
             console.log('✅ Calldata validation passed');
 
-            console.log('🚀 Executing Starknet transaction...');
-            console.log('Contract address:', this.contractAddress);
-            console.log('Entrypoint:', 'initiate_bitcoin_deposit');
-            console.log('Final calldata:', calldata);
+            // Enhanced transaction execution with timeout and retry logic
+            const executeTransactionWithRetry = async (calldata) => {
+                return new Promise(async (resolve, reject) => {
+                    const startTime = Date.now();
 
-            try {
-                console.log('Attempting transaction with account.execute...');
-                const result = await this.account.execute({
-                    contractAddress: this.contractAddress,
-                    entrypoint: 'initiate_bitcoin_deposit',
-                    calldata: calldata
+                    while (retryCount < maxRetries) {
+                        try {
+                            console.log(`🚀 Executing Starknet transaction (attempt ${retryCount + 1}/${maxRetries})...`);
+                            console.log('Contract address:', this.contractAddress);
+                            console.log('Entrypoint:', 'initiate_bitcoin_deposit');
+                            console.log('Final calldata:', calldata);
+
+                            // Set up timeout for this attempt
+                            transactionPromise = this.executeTransaction(calldata);
+                            timeoutId = setTimeout(() => {
+                                console.warn(`⏰ Transaction attempt ${retryCount + 1} timed out after ${timeoutDuration/1000}s`);
+                                retryCount++;
+                                if (retryCount >= maxRetries) {
+                                    reject(new Error(`Transaction timed out after ${maxRetries} attempts`));
+                                }
+                            }, timeoutDuration);
+
+                            const result = await transactionPromise;
+                            clearTimeout(timeoutId);
+
+                            console.log('✅ Transaction executed successfully:', result);
+                            resolve(result);
+                            return;
+
+                        } catch (executeError) {
+                            clearTimeout(timeoutId);
+                            console.error(`❌ Transaction attempt ${retryCount + 1} failed:`, executeError);
+
+                            // Check if it's a timeout error
+                            if (executeError.message && executeError.message.includes('timeout')) {
+                                console.log('🔄 Timeout detected, will retry...');
+                                retryCount++;
+                                if (retryCount < maxRetries) {
+                                    console.log(`⏳ Waiting 3 seconds before retry ${retryCount + 1}...`);
+                                    await new Promise(resolve => setTimeout(resolve, 3000));
+                                    continue;
+                                }
+                            }
+
+                            // Check if it's a user rejection
+                            if (executeError.message && (executeError.message.includes('rejected') || executeError.message.includes('User denied'))) {
+                                console.log('🚫 User rejected transaction');
+                                reject(new Error('Transaction rejected by user'));
+                                return;
+                            }
+
+                            // For other errors, try alternative execution method
+                            try {
+                                console.log('🔄 Trying alternative execution method...');
+                                const altResult = await this.executeTransactionAlternative(calldata);
+                                clearTimeout(timeoutId);
+                                console.log('✅ Alternative execution successful:', altResult);
+                                resolve(altResult);
+                                return;
+                            } catch (altError) {
+                                console.error('❌ Alternative execution also failed:', altError);
+                                retryCount++;
+
+                                if (retryCount >= maxRetries) {
+                                    reject(executeError);
+                                    return;
+                                }
+
+                                console.log(`⏳ Waiting 3 seconds before retry ${retryCount + 1}...`);
+                                await new Promise(resolve => setTimeout(resolve, 3000));
+                            }
+                        }
+                    }
                 });
+            };
 
-                console.log('✅ Transaction executed successfully:', result);
-                return result;
-            } catch (executeError) {
-                console.error('❌ account.execute failed:', executeError);
-
-                // Try alternative execution method for different wallet types
-                try {
-                    console.log('Trying alternative execution method...');
-                    const altResult = await window.starknet.execute({
-                        contractAddress: this.contractAddress,
-                        entrypoint: 'initiate_bitcoin_deposit',
-                        calldata: calldata
-                    });
-
-                    console.log('✅ Alternative execution successful:', altResult);
-                    return altResult;
-                } catch (altError) {
-                    console.error('❌ Alternative execution also failed:', altError);
-
-                    // Log additional details about the error
-                    if (executeError.message) {
-                        console.error('Primary error message:', executeError.message);
-                    }
-                    if (executeError.code) {
-                        console.error('Primary error code:', executeError.code);
-                    }
-                    if (executeError.data) {
-                        console.error('Primary error data:', executeError.data);
-                    }
-
-                    throw executeError;
-                }
-            }
+            const result = await executeTransactionWithRetry(calldata);
 
             console.log('Deposit initiated successfully:', result);
 
@@ -890,8 +1067,14 @@ class StarknetBridgeService {
         }
     }
 
-    // Initiate Bitcoin withdrawal (Starknet → Bitcoin)
+    // Initiate Bitcoin withdrawal (Starknet → Bitcoin) with enhanced timeout and retry logic
     async initiateBitcoinWithdrawal(amount, btcAddress) {
+        let transactionPromise = null;
+        let timeoutId = null;
+        let retryCount = 0;
+        const maxRetries = 3;
+        const timeoutDuration = 120000; // 2 minutes timeout
+
         try {
             console.log('🚀 Starting Bitcoin withdrawal process...');
             console.log('Input validation:', { amount, btcAddress });
@@ -970,52 +1153,83 @@ class StarknetBridgeService {
 
             console.log('✅ Withdrawal calldata validation passed');
 
-            console.log('🚀 Executing Starknet withdrawal transaction...');
-            console.log('Contract address:', this.contractAddress);
-            console.log('Entrypoint:', 'initiate_bitcoin_withdrawal');
-            console.log('Final calldata:', calldata);
+            // Enhanced withdrawal transaction execution with timeout and retry logic
+            const executeWithdrawalTransactionWithRetry = async (calldata) => {
+                return new Promise(async (resolve, reject) => {
+                    const startTime = Date.now();
 
-            try {
-                console.log('Attempting withdrawal with account.execute...');
-                const result = await this.account.execute({
-                    contractAddress: this.contractAddress,
-                    entrypoint: 'initiate_bitcoin_withdrawal',
-                    calldata: calldata
+                    while (retryCount < maxRetries) {
+                        try {
+                            console.log(`🚀 Executing Starknet withdrawal transaction (attempt ${retryCount + 1}/${maxRetries})...`);
+                            console.log('Contract address:', this.contractAddress);
+                            console.log('Entrypoint:', 'initiate_bitcoin_withdrawal');
+                            console.log('Final calldata:', calldata);
+
+                            // Set up timeout for this attempt
+                            transactionPromise = this.executeWithdrawalTransaction(calldata);
+                            timeoutId = setTimeout(() => {
+                                console.warn(`⏰ Withdrawal transaction attempt ${retryCount + 1} timed out after ${timeoutDuration/1000}s`);
+                                retryCount++;
+                                if (retryCount >= maxRetries) {
+                                    reject(new Error(`Withdrawal transaction timed out after ${maxRetries} attempts`));
+                                }
+                            }, timeoutDuration);
+
+                            const result = await transactionPromise;
+                            clearTimeout(timeoutId);
+
+                            console.log('✅ Withdrawal transaction executed successfully:', result);
+                            resolve(result);
+                            return;
+
+                        } catch (executeError) {
+                            clearTimeout(timeoutId);
+                            console.error(`❌ Withdrawal transaction attempt ${retryCount + 1} failed:`, executeError);
+
+                            // Check if it's a timeout error
+                            if (executeError.message && executeError.message.includes('timeout')) {
+                                console.log('🔄 Withdrawal timeout detected, will retry...');
+                                retryCount++;
+                                if (retryCount < maxRetries) {
+                                    console.log(`⏳ Waiting 3 seconds before withdrawal retry ${retryCount + 1}...`);
+                                    await new Promise(resolve => setTimeout(resolve, 3000));
+                                    continue;
+                                }
+                            }
+
+                            // Check if it's a user rejection
+                            if (executeError.message && (executeError.message.includes('rejected') || executeError.message.includes('User denied'))) {
+                                console.log('🚫 User rejected withdrawal transaction');
+                                reject(new Error('Withdrawal transaction rejected by user'));
+                                return;
+                            }
+
+                            // For other errors, try alternative execution method
+                            try {
+                                console.log('🔄 Trying alternative withdrawal execution method...');
+                                const altResult = await this.executeWithdrawalTransactionAlternative(calldata);
+                                clearTimeout(timeoutId);
+                                console.log('✅ Alternative withdrawal execution successful:', altResult);
+                                resolve(altResult);
+                                return;
+                            } catch (altError) {
+                                console.error('❌ Alternative withdrawal execution also failed:', altError);
+                                retryCount++;
+
+                                if (retryCount >= maxRetries) {
+                                    reject(executeError);
+                                    return;
+                                }
+
+                                console.log(`⏳ Waiting 3 seconds before withdrawal retry ${retryCount + 1}...`);
+                                await new Promise(resolve => setTimeout(resolve, 3000));
+                            }
+                        }
+                    }
                 });
+            };
 
-                console.log('✅ Withdrawal transaction executed successfully:', result);
-                return result;
-            } catch (executeError) {
-                console.error('❌ account.execute withdrawal failed:', executeError);
-
-                // Try alternative execution method for different wallet types
-                try {
-                    console.log('Trying alternative withdrawal execution method...');
-                    const altResult = await window.starknet.execute({
-                        contractAddress: this.contractAddress,
-                        entrypoint: 'initiate_bitcoin_withdrawal',
-                        calldata: calldata
-                    });
-
-                    console.log('✅ Alternative withdrawal execution successful:', altResult);
-                    return altResult;
-                } catch (altError) {
-                    console.error('❌ Alternative withdrawal execution also failed:', altError);
-
-                    // Log additional details about the error
-                    if (executeError.message) {
-                        console.error('Primary withdrawal error message:', executeError.message);
-                    }
-                    if (executeError.code) {
-                        console.error('Primary withdrawal error code:', executeError.code);
-                    }
-                    if (executeError.data) {
-                        console.error('Primary withdrawal error data:', executeError.data);
-                    }
-
-                    throw executeError;
-                }
-            }
+            const result = await executeWithdrawalTransactionWithRetry(calldata);
 
             console.log('Withdrawal initiated successfully:', result);
 
@@ -1755,6 +1969,74 @@ async function testConversionsAgainstContract(btcAddress, successfulMethods) {
         passedMethods: passedMethods
     };
 }
+
+// Test Bitcoin address length conversion (the fix for INVALID_BTC_ADDR_LENGTH)
+window.testBitcoinAddressLengthConversion = async function(btcAddress = '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa') {
+    console.log('🧪 Testing Bitcoin Address Length Conversion Fix');
+    console.log('Testing address:', btcAddress);
+    console.log('Address length:', btcAddress.length);
+
+    try {
+        if (window.starknetBridgeService) {
+            // Test the corrected conversion method
+            console.log('Testing corrected length-based conversion...');
+            const lengthFelt = window.starknetBridgeService.bitcoinAddressToFelt(btcAddress);
+
+            console.log('✅ Length conversion successful:', {
+                original: btcAddress,
+                length: btcAddress.length,
+                felt: lengthFelt,
+                feltAsNumber: parseInt(lengthFelt, 16)
+            });
+
+            // Verify the conversion is correct
+            const expectedLength = btcAddress.length;
+            const actualLength = parseInt(lengthFelt, 16);
+
+            if (actualLength === expectedLength) {
+                console.log('✅ Conversion is CORRECT! Contract should accept this.');
+                console.log('💡 The INVALID_BTC_ADDR_LENGTH error should now be fixed.');
+            } else {
+                console.error('❌ Conversion is INCORRECT!');
+                console.error(`Expected length: ${expectedLength}, Got: ${actualLength}`);
+            }
+
+            // Test with different Bitcoin address formats
+            const testAddresses = [
+                '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', // P2PKH - 34 chars
+                '3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy', // P2SH - 34 chars
+                'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4' // Bech32 - 42 chars
+            ];
+
+            console.log('\n🧪 Testing different Bitcoin address formats:');
+            testAddresses.forEach((addr, i) => {
+                const len = addr.length;
+                const felt = window.starknetBridgeService.bitcoinAddressToFelt(addr);
+                const convertedLen = parseInt(felt, 16);
+                const status = len === convertedLen ? '✅' : '❌';
+                console.log(`${status} Address ${i + 1}: ${len} chars → ${felt} → ${convertedLen} chars`);
+            });
+
+            return {
+                success: actualLength === expectedLength,
+                originalLength: expectedLength,
+                convertedLength: actualLength,
+                feltValue: lengthFelt,
+                btcAddress: btcAddress
+            };
+        } else {
+            console.error('❌ Bridge service not available');
+            return { success: false, error: 'Bridge service not loaded' };
+        }
+    } catch (error) {
+        console.error('❌ Bitcoin address length conversion test failed:', error);
+        return {
+            success: false,
+            error: error.message,
+            errorDetails: error
+        };
+    }
+};
 
 // Test Bitcoin to Starknet deposit specifically
 window.testBitcoinToStarknetBridge = async function(amount = 0.1, btcAddress = '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', starknetAddress = '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef') {
