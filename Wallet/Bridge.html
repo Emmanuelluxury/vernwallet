@@ -97,6 +97,12 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 30px;
         }
+
+        .wallet-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
         
         .logo {
             display: flex;
@@ -1279,6 +1285,16 @@
                 gap: 20px;
             }
 
+            .wallet-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .wallet-buttons .btn {
+                font-size: 0.8rem;
+                padding: 6px 12px;
+            }
+
             .disconnect-btn {
                 margin-left: 8px;
                 width: 18px;
@@ -1342,7 +1358,7 @@
                 <div class="logo-icon"><i class="fa-solid fa-bridge"></i></div>
                 <div class="logo-text">Bitcoin-Starknet Bridge</div>
             </div>
-            
+
             <nav>
                 <ul>
                     <li><a href="../Bitcoin/Blocks.html">Dashboard</a></li>
@@ -1353,10 +1369,17 @@
                 </ul>
             </nav>
 
-            <button class="btn btn-primary" id="connectWallet">
-                <i class="fas fa-wallet"></i>
-                Connect Wallet
-            </button>
+            <div class="wallet-buttons">
+                <!-- Xverse Wallet Button -->
+                <button type="button" class="btn btn-outline" id="connectXverseBtn" style="font-size: 0.85rem; padding: 8px 16px; border-color: #f7931a; color: #f7931a; background: rgba(247, 147, 26, 0.1); margin-right: 10px;">
+                    <i class="fas fa-bitcoin" style="color: #f7931a;"></i> Xverse
+                </button>
+
+                <!-- Ready Wallet Button -->
+                <button type="button" class="btn btn-outline" id="connectReadyBtn" style="font-size: 0.85rem; padding: 8px 16px; border-color: var(--primary); color: var(--primary); background: rgba(124, 58, 237, 0.1); margin-right: 10px;">
+                    <i class="fas fa-link" style="color: var(--primary);"></i> Ready
+                </button>
+            </div>
         </header>
         
         <h1 class="dashboard-title">Bridge Assets</h1>
@@ -1434,20 +1457,6 @@
                     </div>
                 </div>
 
-                <!-- Wallet Status Indicator -->
-                <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin: 20px 0; text-align: center;">
-                    <div id="walletStatus" style="font-size: 0.9rem; color: var(--gray);">
-                        <i class="fas fa-info-circle"></i>
-                        <span id="walletStatusText">
-                            For Bitcoin→Starknet transfers: Connect your Bitcoin wallet first, then your Starknet wallet when ready to bridge.
-                        </span>
-                    </div>
-                    <div id="starknetConnectSection" style="margin-top: 10px; display: none;">
-                        <button type="button" class="btn btn-outline" id="connectStarknetBtn" style="font-size: 0.85rem; padding: 8px 16px;">
-                            <i class="fas fa-link"></i> Connect Starknet Wallet
-                        </button>
-                    </div>
-                </div>
                 
                 <form class="bridge-form" id="bridgeForm">
                     <div class="form-group">
@@ -1679,20 +1688,6 @@
     </div>
     
 
-    <!-- Wallet Modal -->
-    <div class="modal" id="walletModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Select Wallet</h3>
-                <button class="close-modal" id="closeModal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="wallet-options" id="walletOptions">
-                <!-- Real wallets will be populated dynamically -->
-            </div>
-        </div>
-    </div>
 
     <!-- Notification -->
     <div class="notification" id="notification">
@@ -1710,8 +1705,8 @@
     <script>
         // Bridge Configuration
         const BRIDGE_CONFIG = {
-            // Contract addresses (update these with deployed contract addresses)
-            BRIDGE_CONTRACT: '0x012402f9a1612d3d48bfc7beb93f756e9848f67e3a0a8c1a23d48f03a25acc9e',
+            // Contract addresses (updated to match deployed contract addresses)
+            BRIDGE_CONTRACT: '0x043fc7f2dfb8207e9a666a35e951a2df10039701ca8fff04c1713609df80f941',
             SBTC_CONTRACT: '0x07b10d8e5e60b2c9c5a5b12a4e1e5c4b3d2e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b',
 
             // Token configurations
@@ -1728,25 +1723,35 @@
                 }
             },
 
-            // Multi-Network Configuration
+            // Multi-Network Configuration with multiple RPC endpoints for reliability
             NETWORKS: {
                 mainnet: {
                     name: 'Starknet Mainnet',
                     chainId: '0x534e5f4d41494e', // SN_MAIN
-                    rpcUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7',
+                    rpcUrls: [
+                        'https://starknet-mainnet.public.blastapi.io/rpc/v0_7',
+                        'https://starknet-mainnet.g.alchemy.com/v2/demo',
+                        'https://rpc.starknet.lava.build',
+                        'https://starknet.public.blastapi.io'
+                    ],
                     explorerUrl: 'https://starkscan.co',
                     isTestnet: false,
                     warning: null,
                     // Contract addresses for mainnet
                     contracts: {
-                        BRIDGE_CONTRACT: '0x012402f9a1612d3d48bfc7beb93f756e9848f67e3a0a8c1a23d48f03a25acc9e',
+                        BRIDGE_CONTRACT: '0x043fc7f2dfb8207e9a666a35e951a2df10039701ca8fff04c1713609df80f941',
                         SBTC_CONTRACT: '0x07b10d8e5e60b2c9c5a5b12a4e1e5c4b3d2e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b'
                     }
                 },
                 testnet: {
                     name: 'Starknet Sepolia Testnet',
                     chainId: '0x534e5f5345504f4c49', // SN_SEPOLIA
-                    rpcUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7',
+                    rpcUrls: [
+                        'https://starknet-sepolia.public.blastapi.io/rpc/v0_7',
+                        'https://starknet-sepolia.g.alchemy.com/v2/demo',
+                        'https://rpc.starknet-sepolia.lava.build',
+                        'https://starknet-sepolia.public.blastapi.io'
+                    ],
                     explorerUrl: 'https://sepolia.starkscan.co',
                     isTestnet: true,
                     warning: '⚠️ TESTNET: This is a test network. Tokens have no real value.',
@@ -1766,10 +1771,107 @@
                 return this.NETWORKS[this.currentNetwork];
             },
 
+            // Get current RPC URL for the network
+            getCurrentRpcUrl: function() {
+                const network = this.NETWORKS[this.currentNetwork];
+                if (!network || !network.rpcUrls) {
+                    throw new Error(`No RPC URLs configured for network: ${this.currentNetwork}`);
+                }
+                return network.rpcUrls[this.currentRpcIndex || 0];
+            },
+
+            // Switch to next RPC endpoint for the current network
+            switchToNextRpc: function() {
+                const network = this.NETWORKS[this.currentNetwork];
+                if (!network || !network.rpcUrls || network.rpcUrls.length === 0) {
+                    throw new Error(`No RPC URLs available for network: ${this.currentNetwork}`);
+                }
+
+                this.currentRpcIndex = (this.currentRpcIndex || 0) + 1;
+                if (this.currentRpcIndex >= network.rpcUrls.length) {
+                    this.currentRpcIndex = 0;
+                }
+
+                const newRpcUrl = this.getCurrentRpcUrl();
+                console.log(`🔄 Switched to RPC endpoint: ${newRpcUrl}`);
+
+                return newRpcUrl;
+            },
+
+            // Test RPC endpoint connectivity
+            testRpcEndpoint: async function(rpcUrl) {
+                const startTime = Date.now();
+                try {
+                    const response = await fetch(rpcUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            jsonrpc: '2.0',
+                            method: 'starknet_blockNumber',
+                            params: [],
+                            id: 1
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.error) {
+                        throw new Error(`RPC Error: ${data.error.message}`);
+                    }
+
+                    return {
+                        success: true,
+                        blockNumber: data.result,
+                        latency: Date.now() - startTime
+                    };
+                } catch (error) {
+                    return {
+                        success: false,
+                        error: error.message,
+                        latency: Date.now() - startTime
+                    };
+                }
+            },
+
+            // Find the best available RPC endpoint
+            findBestRpcEndpoint: async function() {
+                const network = this.NETWORKS[this.currentNetwork];
+                if (!network || !network.rpcUrls || network.rpcUrls.length === 0) {
+                    throw new Error(`No RPC URLs configured for network: ${this.currentNetwork}`);
+                }
+
+                console.log(`🔍 Testing ${network.rpcUrls.length} RPC endpoints for ${network.name}...`);
+
+                for (let i = 0; i < network.rpcUrls.length; i++) {
+                    const rpcUrl = network.rpcUrls[i];
+                    console.log(`Testing RPC ${i + 1}/${network.rpcUrls.length}: ${rpcUrl}`);
+
+                    const result = await this.testRpcEndpoint(rpcUrl);
+
+                    if (result.success) {
+                        console.log(`✅ RPC endpoint ${i + 1} is working (latency: ${result.latency}ms)`);
+                        this.currentRpcIndex = i;
+                        return { rpcUrl, index: i };
+                    } else {
+                        console.log(`❌ RPC endpoint ${i + 1} failed: ${result.error}`);
+                    }
+                }
+
+                // If no endpoint is working, throw error with details
+                throw new Error(`All RPC endpoints failed for ${network.name}`);
+            },
+
             // Switch network
             switchNetwork: function(network) {
                 if (this.NETWORKS[network]) {
                     this.currentNetwork = network;
+                    this.currentRpcIndex = 0; // Reset RPC index when switching networks
                     // Update contract addresses
                     this.BRIDGE_CONTRACT = this.NETWORKS[network].contracts.BRIDGE_CONTRACT;
                     this.SBTC_CONTRACT = this.NETWORKS[network].contracts.SBTC_CONTRACT;
@@ -1796,10 +1898,6 @@
         let currentDirection = bridgeState.currentDirection;
 
         // DOM Elements
-        const connectWalletBtn = document.getElementById('connectWallet');
-        const walletModal = document.getElementById('walletModal');
-        const closeModalBtn = document.getElementById('closeModal');
-        const walletOptionsContainer = document.getElementById('walletOptions');
         const notification = document.getElementById('notification');
         const notificationText = document.getElementById('notificationText');
         const bridgeForm = document.getElementById('bridgeForm');
@@ -1829,13 +1927,590 @@
         const connectStarknetBtn = document.getElementById('connectStarknetBtn');
         const starknetConnectSection = document.getElementById('starknetConnectSection');
 
+        // New wallet connect buttons
+        const connectXverseBtn = document.getElementById('connectXverseBtn');
+        const connectReadyBtn = document.getElementById('connectReadyBtn');
+
         // Wallet connection state
         let connectedWallet = null;
         let connectedAddress = null;
 
+        // Connect to Xverse wallet using Sats Connect
+        async function connectToXverseWallet() {
+            try {
+                // Check if Sats Connect is available and has request method
+                if (window.satsConnect && typeof window.satsConnect.request === 'function') {
+                    console.log('🔄 Using Sats Connect for Xverse...');
+
+                    const response = await window.satsConnect.request('getAddresses', {
+                        purposes: ['ordinals', 'payment'],
+                        message: 'Connect to Bitcoin-Starknet Bridge'
+                    });
+
+                    if (response && response.addresses && response.addresses.length > 0) {
+                        const bitcoinAddress = response.addresses.find(addr => addr.purpose === 'payment')?.address ||
+                                              response.addresses[0].address;
+
+                        return {
+                            address: bitcoinAddress,
+                            name: 'Xverse Wallet',
+                            provider: window.satsConnect,
+                            type: 'bitcoin'
+                        };
+                    }
+                }
+
+                // Fallback to direct Xverse API
+                if (window.xverse && typeof window.xverse.request === 'function') {
+                    console.log('🔄 Using Xverse direct API...');
+
+                    const result = await window.xverse.request('getAddresses', {
+                        purposes: ['ordinals', 'payment']
+                    });
+
+                    if (result && result.addresses && result.addresses.length > 0) {
+                        const bitcoinAddress = result.addresses.find(addr => addr.purpose === 'payment')?.address ||
+                                              result.addresses[0].address;
+
+                        return {
+                            address: bitcoinAddress,
+                            name: 'Xverse Wallet',
+                            provider: window.xverse,
+                            type: 'bitcoin'
+                        };
+                    }
+                }
+
+                // Fallback to Unisat
+                if (window.unisat && typeof window.unisat.requestAccounts === 'function') {
+                    console.log('🔄 Using Unisat wallet...');
+                    const accounts = await window.unisat.requestAccounts();
+                    if (accounts && accounts.length > 0) {
+                        return {
+                            address: accounts[0],
+                            name: 'Unisat Wallet',
+                            provider: window.unisat,
+                            type: 'bitcoin'
+                        };
+                    }
+                }
+
+                // Final fallback: Check for any Bitcoin wallet
+                if (window.bitcoin) {
+                    console.log('🔄 Using generic Bitcoin wallet API...');
+                    const accounts = await window.bitcoin.requestAccounts();
+                    if (accounts && accounts.length > 0) {
+                        return {
+                            address: accounts[0],
+                            name: 'Bitcoin Wallet',
+                            provider: window.bitcoin,
+                            type: 'bitcoin'
+                        };
+                    }
+                }
+
+                throw new Error('Xverse wallet not available. Please install Xverse extension.');
+
+            } catch (error) {
+                console.error('Xverse connection error:', error);
+                throw error;
+            }
+        }
+
+        // Connect to Ready wallet (Starknet) - Shows wallet popup for user to click connect
+        async function connectToReadyWallet() {
+            try {
+                console.log('🔄 Opening Ready wallet popup...');
+
+                if (!window.starknet) {
+                    throw new Error('Ready wallet not detected. Please install Argent X, Braavos, or another Starknet wallet.');
+                }
+
+                // Enable the wallet (this triggers the wallet popup)
+                await window.starknet.enable();
+
+                if (!window.starknet.selectedAddress) {
+                    throw new Error('No address selected in Ready wallet');
+                }
+
+                console.log('✅ Ready wallet connected successfully');
+                return {
+                    address: window.starknet.selectedAddress,
+                    name: 'Ready Wallet',
+                    provider: window.starknet,
+                    type: 'starknet'
+                };
+
+            } catch (error) {
+                console.error('Ready wallet connection error:', error);
+
+                if (error.message.includes('rejected') || error.code === 4001) {
+                    throw new Error('Wallet connection cancelled by user');
+                }
+
+                if (error.message.includes('not detected') || error.message.includes('not available')) {
+                    throw new Error('Ready wallet not found. Please install Argent X, Braavos, or another Starknet wallet.');
+                }
+
+                throw error;
+            }
+        }
+
+        // Connect to Xverse Wallet (Bitcoin)
+        async function connectToXverseWallet() {
+            try {
+                if (!window.xverse && !window.satsConnect && !window.ethereum?.isXverse) {
+                    throw new Error('Xverse wallet not detected. Please install Xverse wallet extension.');
+                }
+
+                if (typeof window.xverse?.enable !== 'function' && typeof window.satsConnect?.request !== 'function' && typeof window.ethereum?.request !== 'function') {
+                    throw new Error('Xverse wallet does not support connection. Please update your wallet.');
+                }
+
+                console.log('🔄 Connecting to Xverse wallet...');
+
+                // Try different Xverse connection methods
+                let address;
+
+                // Method 1: Direct Xverse API
+                if (window.xverse && typeof window.xverse.enable === 'function') {
+                    await window.xverse.enable();
+                    if (window.xverse.selectedAddress) {
+                        address = window.xverse.selectedAddress;
+                    }
+                }
+
+                // Method 2: Sats Connect API
+                if (!address && window.satsConnect && typeof window.satsConnect.request === 'function') {
+                    const response = await window.satsConnect.request('getAddresses', {
+                        purposes: ['ordinals', 'payment'],
+                        message: 'Connect to VernWallet Bridge'
+                    });
+                    if (response && response.addresses && response.addresses.length > 0) {
+                        address = response.addresses.find(addr => addr.purpose === 'payment')?.address ||
+                                  response.addresses[0].address;
+                    }
+                }
+
+                // Method 3: Ethereum-style connection (Xverse can work with Ethereum API)
+                if (!address && window.ethereum && window.ethereum.isXverse) {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    if (accounts && accounts.length > 0) {
+                        address = accounts[0];
+                    }
+                }
+
+                if (!address) {
+                    throw new Error('No Xverse address selected');
+                }
+
+                return {
+                    address: address,
+                    name: 'Xverse Wallet',
+                    provider: window.xverse || window.satsConnect || window.ethereum,
+                    type: 'bitcoin'
+                };
+
+            } catch (error) {
+                console.error('Xverse wallet connection error:', error);
+
+                if (error.message.includes('rejected') || error.code === 4001) {
+                    throw new Error('Wallet connection rejected by user');
+                }
+
+                throw error;
+            }
+        }
+
+        // Connect to Xverse Wallet (Bitcoin) - Shows wallet popup for user to click connect
+        async function connectToXverseWallet() {
+            try {
+                console.log('🔄 Opening Xverse wallet popup...');
+
+                // Check if Xverse is available - be more permissive
+                if (!window.xverse && !window.satsConnect && !window.ethereum?.isXverse && !window.ethereum) {
+                    throw new Error('Xverse wallet not detected. Please install Xverse wallet extension.');
+                }
+
+                let address;
+
+                // Method 1: Sats Connect API (preferred for Xverse - shows popup)
+                if (window.satsConnect && typeof window.satsConnect.request === 'function') {
+                    console.log('🔄 Using Sats Connect for Xverse (popup)...');
+                    try {
+                        const response = await window.satsConnect.request('getAddresses', {
+                            purposes: ['ordinals', 'payment'],
+                            message: 'Connect to VernWallet Bridge'
+                        });
+
+                        if (response && response.addresses && response.addresses.length > 0) {
+                            address = response.addresses.find(addr => addr.purpose === 'payment')?.address ||
+                                      response.addresses[0].address;
+                            console.log('✅ Got address from Sats Connect:', address);
+                        }
+                    } catch (satsError) {
+                        console.log('⚠️ Sats Connect failed:', satsError.message);
+                    }
+                }
+
+                // Method 2: Direct Xverse API (shows popup)
+                if (!address && window.xverse && typeof window.xverse.request === 'function') {
+                    console.log('🔄 Using Xverse direct API (popup)...');
+                    try {
+                        const result = await window.xverse.request('getAddresses', {
+                            purposes: ['ordinals', 'payment']
+                        });
+
+                        if (result && result.addresses && result.addresses.length > 0) {
+                            address = result.addresses.find(addr => addr.purpose === 'payment')?.address ||
+                                      result.addresses[0].address;
+                            console.log('✅ Got address from Xverse direct API:', address);
+                        }
+                    } catch (xverseError) {
+                        console.log('⚠️ Xverse direct API failed:', xverseError.message);
+                    }
+                }
+
+                // Method 3: Unisat (Xverse can work with Unisat API)
+                if (!address && window.unisat && typeof window.unisat.requestAccounts === 'function') {
+                    console.log('🔄 Using Unisat wallet (popup)...');
+                    try {
+                        const accounts = await window.unisat.requestAccounts();
+                        if (accounts && accounts.length > 0) {
+                            address = accounts[0];
+                            console.log('✅ Got address from Unisat:', address);
+                        }
+                    } catch (unisatError) {
+                        console.log('⚠️ Unisat failed:', unisatError.message);
+                    }
+                }
+
+                // Method 4: Generic Bitcoin wallet API
+                if (!address && window.bitcoin && typeof window.bitcoin.requestAccounts === 'function') {
+                    console.log('🔄 Using generic Bitcoin wallet API (popup)...');
+                    try {
+                        const accounts = await window.bitcoin.requestAccounts();
+                        if (accounts && accounts.length > 0) {
+                            address = accounts[0];
+                            console.log('✅ Got address from generic Bitcoin API:', address);
+                        }
+                    } catch (bitcoinError) {
+                        console.log('⚠️ Generic Bitcoin API failed:', bitcoinError.message);
+                    }
+                }
+
+                // Method 5: Fallback to Ethereum API (some Xverse versions work with this)
+                if (!address && window.ethereum && typeof window.ethereum.request === 'function') {
+                    console.log('🔄 Using Ethereum API fallback (popup)...');
+                    try {
+                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                        if (accounts && accounts.length > 0) {
+                            address = accounts[0];
+                            console.log('✅ Got address from Ethereum API:', address);
+                        }
+                    } catch (ethError) {
+                        console.log('⚠️ Ethereum API failed:', ethError.message);
+                    }
+                }
+
+                if (!address) {
+                    console.error('❌ No address obtained from any Xverse connection method');
+                    throw new Error('Could not connect to Xverse wallet. Please ensure Xverse is installed and try again.');
+                }
+
+                console.log('✅ Xverse wallet connected successfully with address:', address);
+                return {
+                    address: address,
+                    name: 'Xverse Wallet',
+                    provider: window.xverse || window.satsConnect || window.unisat || window.bitcoin || window.ethereum,
+                    type: 'bitcoin'
+                };
+
+            } catch (error) {
+                console.error('Xverse wallet connection error:', error);
+
+                if (error.message.includes('rejected') || error.code === 4001) {
+                    throw new Error('Wallet connection cancelled by user');
+                }
+
+                if (error.message.includes('not detected') || error.message.includes('not available')) {
+                    throw new Error('Xverse wallet not found. Please install the Xverse extension.');
+                }
+
+                throw error;
+            }
+        }
+
+        // Update wallet buttons to show connected addresses
+        function updateWalletUI() {
+            if (connectedWallet && connectedAddress) {
+                // Update Xverse button if connected to Xverse
+                if (connectedWallet.includes('Xverse') && connectXverseBtn) {
+                    connectXverseBtn.innerHTML = `
+                        <i class="fas fa-bitcoin"></i>
+                        <span style="font-size: 0.75rem; display: block; margin-top: 2px;">
+                            ${connectedAddress.substring(0, 6)}...${connectedAddress.substring(connectedAddress.length - 4)}
+                        </span>
+                    `;
+                    connectXverseBtn.classList.add('connected');
+                    connectXverseBtn.style.background = 'linear-gradient(to right, #4caf50, #45a049)';
+                    connectXverseBtn.style.borderColor = '#4caf50';
+                }
+
+                // Update Ready button if connected to Ready
+                if (connectedWallet.includes('Ready') && connectReadyBtn) {
+                    connectReadyBtn.innerHTML = `
+                        <i class="fas fa-link"></i>
+                        <span style="font-size: 0.75rem; display: block; margin-top: 2px;">
+                            ${connectedAddress.substring(0, 6)}...${connectedAddress.substring(connectedAddress.length - 4)}
+                        </span>
+                    `;
+                    connectReadyBtn.classList.add('connected');
+                    connectReadyBtn.style.background = 'linear-gradient(to right, #4caf50, #45a049)';
+                    connectReadyBtn.style.borderColor = '#4caf50';
+                }
+            } else {
+                // Reset buttons to default state
+                if (connectXverseBtn) {
+                    connectXverseBtn.innerHTML = '<i class="fas fa-bitcoin" style="color: #f7931a;"></i> Xverse';
+                    connectXverseBtn.classList.remove('connected');
+                    connectXverseBtn.style.background = 'rgba(247, 147, 26, 0.1)';
+                    connectXverseBtn.style.borderColor = '#f7931a';
+                }
+
+                if (connectReadyBtn) {
+                    connectReadyBtn.innerHTML = '<i class="fas fa-link" style="color: var(--primary);"></i> Ready';
+                    connectReadyBtn.classList.remove('connected');
+                    connectReadyBtn.style.background = 'rgba(124, 58, 237, 0.1)';
+                    connectReadyBtn.style.borderColor = 'var(--primary)';
+                }
+            }
+        }
+
+        // Add event listeners for wallet buttons
+        if (connectXverseBtn) {
+            connectXverseBtn.addEventListener('click', async () => {
+                try {
+                    console.log('🔄 Connecting to Xverse wallet...');
+                    const result = await connectToXverseWallet();
+                    if (result) {
+                        connectedWallet = result.name;
+                        connectedAddress = result.address;
+                        updateWalletUI();
+                        showNotification(`✅ Connected to ${result.name}`);
+                    }
+                } catch (error) {
+                    console.error('Xverse connection failed:', error);
+                    showNotification(`❌ Xverse connection failed: ${error.message}`, true);
+                }
+            });
+        }
+
+        if (connectReadyBtn) {
+            connectReadyBtn.addEventListener('click', async () => {
+                try {
+                    console.log('🔄 Connecting to Ready wallet...');
+                    const result = await connectToReadyWallet();
+                    if (result) {
+                        connectedWallet = result.name;
+                        connectedAddress = result.address;
+                        updateWalletUI();
+                        showNotification(`✅ Connected to ${result.name}`);
+                    }
+                } catch (error) {
+                    console.error('Ready connection failed:', error);
+                    showNotification(`❌ Ready connection failed: ${error.message}`, true);
+                }
+            });
+        }
+
         // Available wallets configuration - context-aware based on bridge direction
         const getAvailableWallets = () => {
             const bitcoinWallets = [
+                {
+                    id: 'xverse',
+                    name: 'Xverse Wallet',
+                    type: 'Bitcoin',
+                    icon: 'fas fa-bitcoin',
+                    isAvailable: () => {
+                        try {
+                            // Method 1: Check for Xverse wallet global object
+                            if (typeof window !== 'undefined' && window.xverse) {
+                                return true;
+                            }
+
+                            // Method 2: Check for Xverse in ethereum providers
+                            if (window.ethereum) {
+                                // Check if current provider is Xverse
+                                if (window.ethereum.isXverse ||
+                                    window.ethereum.constructor?.name?.includes('Xverse') ||
+                                    window.ethereum.constructor?.toString().toLowerCase().includes('xverse')) {
+                                    return true;
+                                }
+
+                                // Check providers array for Xverse
+                                if (window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
+                                    const xverseProvider = window.ethereum.providers.find(p =>
+                                        p.isXverse ||
+                                        p.constructor?.name?.includes('Xverse') ||
+                                        p.constructor?.toString().toLowerCase().includes('xverse')
+                                    );
+                                    if (xverseProvider) return true;
+                                }
+                            }
+
+                            // Method 3: Check user agent for Xverse indicators
+                            if (typeof navigator !== 'undefined') {
+                                const userAgent = navigator.userAgent.toLowerCase();
+                                if (userAgent.includes('xverse') ||
+                                    userAgent.includes('xversewallet') ||
+                                    userAgent.includes('xverse-bitcoin')) {
+                                    return true;
+                                }
+                            }
+
+                            // Method 4: Check for Xverse-specific wallet properties
+                            if (typeof window !== 'undefined') {
+                                // Check for common Xverse wallet properties
+                                const xverseProps = ['xverse', 'Xverse', 'xverseWallet', 'XverseWallet'];
+                                for (const prop of xverseProps) {
+                                    if (window[prop] && (window[prop].isXverse || window[prop].isConnected)) {
+                                        return true;
+                                    }
+                                }
+                            }
+
+                            // Method 5: Try to detect Xverse through wallet connection attempt
+                            if (window.ethereum && typeof window.ethereum.request === 'function') {
+                                // This is a fallback - if we have ethereum and can make requests, assume it might be Xverse
+                                // This is less reliable but better than missing the wallet
+                                return true;
+                            }
+
+                            return false;
+                        } catch (error) {
+                            console.warn('Error detecting Xverse wallet:', error);
+                            return false;
+                        }
+                    },
+                    connect: async () => {
+                        const walletName = 'Xverse Wallet';
+
+                        try {
+                            // Check if Sats Connect is available (Xverse's Bitcoin wallet API)
+                            if (window.satsConnect || window.XverseProviders?.BitcoinProvider) {
+                                console.log('🔄 Connecting via Sats Connect (Xverse Bitcoin API)...');
+
+                                // Use Sats Connect to request addresses
+                                const response = await window.satsConnect.request('getAddresses', {
+                                    purposes: ['ordinals', 'payment'],
+                                    message: 'Connect to Bitcoin-Starknet Bridge'
+                                });
+
+                                if (response && response.addresses && response.addresses.length > 0) {
+                                    const bitcoinAddress = response.addresses.find(addr => addr.purpose === 'payment')?.address ||
+                                                          response.addresses[0].address;
+
+                                    console.log('✅ Connected to Xverse via Sats Connect');
+                                    return {
+                                        address: bitcoinAddress,
+                                        name: walletName,
+                                        provider: window.satsConnect || window.XverseProviders.BitcoinProvider,
+                                        type: 'bitcoin'
+                                    };
+                                }
+                            }
+
+                            // Fallback: Try Xverse's direct API
+                            if (window.xverse && typeof window.xverse.request === 'function') {
+                                console.log('🔄 Trying Xverse direct API...');
+
+                                try {
+                                    const result = await window.xverse.request('getAddresses', {
+                                        purposes: ['ordinals', 'payment']
+                                    });
+
+                                    if (result && result.addresses && result.addresses.length > 0) {
+                                        const bitcoinAddress = result.addresses.find(addr => addr.purpose === 'payment')?.address ||
+                                                              result.addresses[0].address;
+
+                                        console.log('✅ Connected via Xverse direct API');
+                                        return {
+                                            address: bitcoinAddress,
+                                            name: walletName,
+                                            provider: window.xverse,
+                                            type: 'bitcoin'
+                                        };
+                                    }
+                                } catch (directError) {
+                                    console.log('⚠️ Xverse direct API failed, trying other methods');
+                                }
+                            }
+
+                            // Fallback: Try Unisat or other Bitcoin wallet APIs
+                            if (window.unisat) {
+                                console.log('🔄 Trying Unisat wallet...');
+                                const accounts = await window.unisat.requestAccounts();
+                                if (accounts && accounts.length > 0) {
+                                    console.log('✅ Connected via Unisat');
+                                    return {
+                                        address: accounts[0],
+                                        name: 'Unisat Wallet',
+                                        provider: window.unisat,
+                                        type: 'bitcoin'
+                                    };
+                                }
+                            }
+
+                            // Final fallback: Ethereum-style connection (for compatibility)
+                            if (window.ethereum) {
+                                console.log('🔄 Trying Ethereum-style connection...');
+
+                                let provider = window.ethereum;
+
+                                // Check if it's Xverse in Ethereum mode
+                                if (window.ethereum.isXverse) {
+                                    provider = window.ethereum;
+                                } else if (window.ethereum.providers) {
+                                    const xverseProvider = window.ethereum.providers.find(p => p.isXverse);
+                                    if (xverseProvider) {
+                                        provider = xverseProvider;
+                                    }
+                                }
+
+                                const accounts = await provider.request({ method: 'eth_requestAccounts' });
+
+                                if (accounts && accounts.length > 0) {
+                                    console.log('✅ Connected via Ethereum API (Xverse)');
+                                    return {
+                                        address: accounts[0],
+                                        name: walletName,
+                                        provider: provider,
+                                        type: 'ethereum'
+                                    };
+                                }
+                            }
+
+                            throw new Error('Unable to connect to Xverse wallet. Please ensure Xverse is installed and try again.');
+
+                        } catch (error) {
+                            console.error('❌ Xverse wallet connection error:', error);
+
+                            // Handle user rejection
+                            if (error.code === 4001 || error.message.includes('rejected') || error.message.includes('denied')) {
+                                throw new Error('Connection rejected by user');
+                            }
+
+                            // Handle wallet not found
+                            if (error.message.includes('not found') || error.message.includes('not available')) {
+                                throw new Error('Xverse wallet not detected. Please install the Xverse extension.');
+                            }
+
+                            // Re-throw other errors
+                            throw error;
+                        }
+                    }
+                },
                 {
                     id: 'trustwallet',
                     name: 'Trust Wallet',
@@ -2305,19 +2980,20 @@
             if (currentDirection === 'to-starknet') {
                 // For Bitcoin→Starknet, we need Bitcoin wallet connected first
                 if (!connectedAddress) {
-                    showNotification('Please connect your Bitcoin wallet (Trust Wallet, Coinbase, etc.) first.', true);
+                    showNotification('Please connect your Bitcoin wallet (Xverse Wallet, Trust Wallet, Coinbase, etc.) first.', true);
                     return false;
                 }
 
                 // More permissive Bitcoin wallet detection
                 const walletName = connectedWallet ? connectedWallet.toLowerCase() : '';
-                const isBitcoinWallet = walletName.includes('trust') ||
-                                      walletName.includes('coinbase') ||
-                                      walletName.includes('phantom') ||
-                                      walletName.includes('metamask') ||
-                                      walletName.includes('brave') ||
-                                      walletName.includes('wallet') ||
-                                      window.ethereum; // If ethereum is available, assume it's a Bitcoin-compatible wallet
+                const isBitcoinWallet = walletName.includes('xverse') ||
+                                  walletName.includes('trust') ||
+                                  walletName.includes('coinbase') ||
+                                  walletName.includes('phantom') ||
+                                  walletName.includes('metamask') ||
+                                  walletName.includes('brave') ||
+                                  walletName.includes('wallet') ||
+                                  window.ethereum; // If ethereum is available, assume it's a Bitcoin-compatible wallet
 
                 if (!isBitcoinWallet) {
                     showNotification('Please connect a Bitcoin-compatible wallet for Bitcoin→Starknet transfers.', true);
@@ -2328,14 +3004,15 @@
             } else {
                 // For Starknet→Bitcoin, we need Bitcoin wallet for destination address, Starknet wallet only for transaction execution
                 if (!connectedAddress) {
-                    showNotification('Please connect your Bitcoin wallet to set the destination address.', true);
+                    showNotification('Please connect your Bitcoin wallet (Xverse Wallet, Trust Wallet, Coinbase, etc.) to set the destination address.', true);
                     return false;
                 }
 
                 // For Starknet→Bitcoin, Bitcoin wallet is used for destination address
                 // Starknet wallet will be required only when executing the transaction
                 const walletName = connectedWallet ? connectedWallet.toLowerCase() : '';
-                const isBitcoinWallet = walletName.includes('trust') ||
+                const isBitcoinWallet = walletName.includes('xverse') ||
+                                      walletName.includes('trust') ||
                                       walletName.includes('coinbase') ||
                                       walletName.includes('phantom') ||
                                       walletName.includes('metamask') ||
@@ -2406,76 +3083,69 @@
             showNotification(`❌ ${userMessage}`, true);
         }
 
-        // Check for existing wallet connection on page load
+        // Check for existing wallet connection on page load (no auto-connect)
         async function checkExistingWalletConnection() {
             try {
-                // Check StarkNet wallets first
-                if (window.starknet && window.starknet.isConnected) {
-                    connectedWallet = window.starknet.name || 'Ready Wallet';
-                    connectedAddress = window.starknet.selectedAddress;
-                    // Don't update UI automatically - only store connection info
-                    return;
-                }
+                // Only check if wallets are available, don't auto-connect
+                console.log('Checking wallet availability without auto-connection...');
 
-                // Check Ethereum wallets with enhanced detection
-                if (window.ethereum) {
-                    try {
-                        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-                        if (accounts.length > 0) {
-                            connectedAddress = accounts[0];
-                            connectedWallet = getEthereumWalletName();
-                            // Don't update UI automatically - only store connection info
-                            return;
-                        }
-                    } catch (error) {
-                        // Continue if request fails
-                    }
-                }
-
-                // Check Phantom (Solana) with enhanced detection
-                if (window.solana && window.solana.isPhantom) {
-                    try {
-                        const response = await window.solana.connect({ onlyIfTrusted: true });
-                        connectedWallet = 'Phantom';
-                        connectedAddress = response.publicKey.toString();
-                        // Don't update UI automatically - only store connection info
-                        return;
-                    } catch (error) {
-                        // User hasn't connected before
-                    }
-                }
-
-                // Check Solflare (Solana) with enhanced detection
-                if (window.solflare && window.solflare.isSolflare) {
-                    try {
-                        const response = await window.solflare.connect({ onlyIfTrusted: true });
-                        connectedWallet = 'Solflare';
-                        connectedAddress = response.publicKey.toString();
-                        // Don't update UI automatically - only store connection info
-                        return;
-                    } catch (error) {
-                        // User hasn't connected before
-                    }
-                }
-
-                // Check for any already connected wallet using availableWallets
-                const wallets = getAvailableWallets();
-                for (const wallet of wallets) {
-                    try {
-                        if (wallet.isAvailable()) {
-                            const result = await wallet.connect();
-                            if (result && result.address) {
-                                connectedWallet = result.name;
-                                connectedAddress = result.address;
-                                return;
+                // Check if Xverse is available
+                const xverseWallet = {
+                    id: 'xverse',
+                    name: 'Xverse Wallet',
+                    type: 'Bitcoin',
+                    isAvailable: () => {
+                        try {
+                            if (typeof window !== 'undefined' && window.xverse) {
+                                return true;
                             }
+
+                            if (window.ethereum) {
+                                if (window.ethereum.isXverse ||
+                                    window.ethereum.constructor?.name?.includes('Xverse') ||
+                                    window.ethereum.constructor?.toString().toLowerCase().includes('xverse')) {
+                                    return true;
+                                }
+
+                                if (window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
+                                    const xverseProvider = window.ethereum.providers.find(p =>
+                                        p.isXverse ||
+                                        p.constructor?.name?.includes('Xverse') ||
+                                        p.constructor?.toString().toLowerCase().includes('xverse')
+                                    );
+                                    if (xverseProvider) return true;
+                                }
+                            }
+
+                            if (typeof navigator !== 'undefined') {
+                                const userAgent = navigator.userAgent.toLowerCase();
+                                if (userAgent.includes('xverse') ||
+                                    userAgent.includes('xversewallet') ||
+                                    userAgent.includes('xverse-bitcoin')) {
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        } catch (error) {
+                            return false;
                         }
-                    } catch (error) {
-                        // Continue checking other wallets
                     }
-                }
+                };
+
+                // Check if Ready wallet is available
+                const readyWallet = {
+                    id: 'starknet',
+                    name: 'Ready Wallet',
+                    type: 'StarkNet',
+                    isAvailable: () => window.starknet
+                };
+
+                console.log('Xverse wallet available:', xverseWallet.isAvailable());
+                console.log('Ready wallet available:', readyWallet.isAvailable());
+
             } catch (error) {
-                console.error('Error checking existing wallet connection:', error);
+                console.error('Error checking wallet availability:', error);
             }
         }
 
@@ -2692,15 +3362,7 @@
         // Set up event listeners
         function setupEventListeners() {
             // Wallet connection events
-            connectWalletBtn.addEventListener('click', connectWallet);
-            closeModalBtn.addEventListener('click', closeWalletModal);
 
-            // Close modal when clicking outside
-            walletModal.addEventListener('click', (e) => {
-                if (e.target === walletModal) {
-                    closeWalletModal();
-                }
-            });
 
             // Network direction selection
             networkOptions.forEach(option => {
@@ -2765,6 +3427,42 @@
                     } finally {
                         connectStarknetBtn.disabled = false;
                         connectStarknetBtn.innerHTML = '<i class="fas fa-link"></i> Connect Starknet Wallet';
+                    }
+                });
+            }
+
+            // Xverse wallet connection
+            if (connectXverseBtn) {
+                connectXverseBtn.addEventListener('click', async function() {
+                    try {
+                        connectXverseBtn.disabled = true;
+                        connectXverseBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+
+                        await connectToSpecificWallet('xverse');
+                    } catch (error) {
+                        console.error('Failed to connect Xverse wallet:', error);
+                        showNotification(`Failed to connect Xverse wallet: ${error.message}`, true);
+                    } finally {
+                        connectXverseBtn.disabled = false;
+                        connectXverseBtn.innerHTML = '<i class="fas fa-bitcoin"></i> Connect Xverse Wallet';
+                    }
+                });
+            }
+
+            // Ready wallet connection
+            if (connectReadyBtn) {
+                connectReadyBtn.addEventListener('click', async function() {
+                    try {
+                        connectReadyBtn.disabled = true;
+                        connectReadyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+
+                        await connectToSpecificWallet('starknet');
+                    } catch (error) {
+                        console.error('Failed to connect Ready wallet:', error);
+                        showNotification(`Failed to connect Ready wallet: ${error.message}`, true);
+                    } finally {
+                        connectReadyBtn.disabled = false;
+                        connectReadyBtn.innerHTML = '<i class="fas fa-link"></i> Connect Ready Wallet';
                     }
                 });
             }
@@ -2916,7 +3614,13 @@
                 if (isAvailable) {
                     const walletIndex = wallets.findIndex(w => w.id === wallet.id);
 
-                    if (walletIndex < 3) {
+                    if (wallet.id === 'xverse') {
+                        // Xverse Wallet gets special priority styling as the real wallet
+                        optionElement.style.borderColor = 'var(--primary)';
+                        optionElement.style.background = 'rgba(124, 58, 237, 0.1)';
+                        optionElement.style.borderWidth = '2px';
+                        optionElement.style.fontWeight = '600';
+                    } else if (walletIndex < 3) {
                         // Top 3 wallets for current direction get special styling
                         optionElement.style.borderColor = 'var(--primary)';
                         optionElement.style.background = 'rgba(124, 58, 237, 0.05)';
@@ -2969,19 +3673,118 @@
             }
         }
 
-        // Connect wallet - show modal with all available real wallets
-        function connectWallet() {
-            console.log(`🔄 Opening wallet modal for direction: ${currentDirection}`);
+        // Connect to specific wallet by ID
+        async function connectToSpecificWallet(walletId) {
+            try {
+                showNotification(`Connecting to ${walletId === 'xverse' ? 'Xverse' : 'Ready'} wallet...`);
 
-            // For Bitcoin→Starknet, ensure we're showing Bitcoin wallets first
-            if (currentDirection === 'to-starknet') {
-                console.log('💡 Bitcoin→Starknet: Prioritizing Bitcoin wallets in modal');
-            } else {
-                console.log('💡 Starknet→Bitcoin: Prioritizing Starknet wallets in modal');
+                // Get available wallets
+                const wallets = getAvailableWallets();
+
+                // Find the specific wallet
+                const targetWallet = wallets.find(wallet => wallet.id === walletId);
+
+                if (!targetWallet) {
+                    // If Xverse wallet not found in configured wallets, try fallback detection
+                    if (walletId === 'xverse') {
+                        console.log('⚠️ Xverse wallet not found in configured wallets, trying fallback detection...');
+
+                        // Try to detect Xverse through ethereum provider
+                        if (window.ethereum && typeof window.ethereum.request === 'function') {
+                            console.log('✅ Using ethereum provider as fallback for Xverse');
+                            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                            if (accounts && accounts.length > 0) {
+                                return {
+                                    address: accounts[0],
+                                    name: 'Xverse Wallet',
+                                    provider: window.ethereum
+                                };
+                            }
+                        }
+
+                        throw new Error('Xverse wallet not found. Please ensure Xverse extension is installed and enabled.');
+                    }
+
+                    // If Xverse wallet not found in configured wallets, try fallback detection
+                    if (walletId === 'xverse') {
+                        console.log('⚠️ Xverse wallet not found in configured wallets, trying fallback detection...');
+
+                        // Try to detect Xverse through ethereum provider
+                        if (window.ethereum && typeof window.ethereum.request === 'function') {
+                            console.log('✅ Using ethereum provider as fallback for Xverse');
+                            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                            if (accounts && accounts.length > 0) {
+                                return {
+                                    address: accounts[0],
+                                    name: 'Xverse Wallet',
+                                    provider: window.ethereum
+                                };
+                            }
+                        }
+
+                        throw new Error('Xverse wallet not found. Please ensure Xverse extension is installed and enabled. If you have Xverse installed, try refreshing the page or checking if it appears in the main wallet modal.');
+                    }
+
+                    throw new Error(`${walletId === 'xverse' ? 'Xverse' : 'Ready'} wallet not found in available wallets`);
+                }
+
+                // Check if wallet is available
+                if (!targetWallet.isAvailable()) {
+                    // For Xverse, try fallback detection
+                    if (walletId === 'xverse' && window.ethereum) {
+                        console.log('⚠️ Xverse not detected by standard method, trying fallback...');
+                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                        if (accounts && accounts.length > 0) {
+                            return {
+                                address: accounts[0],
+                                name: 'Xverse Wallet',
+                                provider: window.ethereum
+                            };
+                        }
+                    }
+
+                    throw new Error(`${walletId === 'xverse' ? 'Xverse' : 'Ready'} wallet is not installed or not available. Please ensure the extension is enabled and try refreshing the page.`);
+                }
+
+                // Connect to the wallet
+                const result = await targetWallet.connect();
+
+                connectedWallet = result.name;
+                connectedAddress = result.address;
+
+                updateWalletUI();
+                updateWalletStatusDisplay();
+                showNotification(`✅ Successfully connected to ${connectedWallet}!`);
+
+                // Initialize bridge service after successful wallet connection
+                try {
+                    await initializeBridgeService();
+                    await loadContractState();
+                    startPeriodicRefresh();
+
+                    // Direction-specific success messages
+                    if (walletId === 'xverse') {
+                        showNotification('✅ Xverse wallet connected! Ready to receive BTC from Starknet bridge.');
+                    } else {
+                        showNotification('✅ Ready wallet connected! Ready for Starknet operations.');
+                    }
+                } catch (bridgeError) {
+                    console.warn('Bridge service initialization failed:', bridgeError.message);
+
+                    if (walletId === 'xverse') {
+                        showNotification('✅ Xverse wallet connected! Ready to receive BTC.', false);
+                    } else {
+                        showNotification('✅ Ready wallet connected! Bridge service ready.', false);
+                    }
+                }
+
+            } catch (error) {
+                console.error(`Failed to connect to ${walletId} wallet:`, error);
+                showNotification(`Failed to connect to ${walletId === 'xverse' ? 'Xverse' : 'Ready'} wallet: ${error.message}`, true);
+                throw error;
             }
-
-            openWalletModal();
         }
+
 
         // Disconnect wallet
         async function disconnectWallet(event) {
@@ -3248,17 +4051,49 @@
 
         // Update wallet UI
         function updateWalletUI() {
+            // Reset all wallet buttons to disconnected state
+            const xverseBtn = document.getElementById('connectXverseBtn');
+            const readyBtn = document.getElementById('connectReadyBtn');
+
+            // Reset Xverse button
+            if (xverseBtn) {
+                xverseBtn.innerHTML = '<i class="fas fa-bitcoin" style="color: #f7931a;"></i> Xverse';
+                xverseBtn.classList.remove('connected');
+            }
+
+            // Reset Ready button
+            if (readyBtn) {
+                readyBtn.innerHTML = '<i class="fas fa-link" style="color: var(--primary);"></i> Ready';
+                readyBtn.classList.remove('connected');
+            }
+
+            // Update the appropriate button based on connected wallet
             if (connectedWallet && connectedAddress) {
-                connectWalletBtn.innerHTML = `
-                    <i class="fas fa-wallet"></i> ${connectedAddress.substring(0, 6)}...${connectedAddress.substring(connectedAddress.length - 4)}
-                    <span class="disconnect-btn" onclick="disconnectWallet(event)" title="Disconnect Wallet">
-                        <i class="fas fa-times"></i>
-                    </span>
-                `;
-                connectWalletBtn.classList.add('connected');
-            } else {
-                connectWalletBtn.innerHTML = `<i class="fas fa-wallet"></i> Connect Wallet`;
-                connectWalletBtn.classList.remove('connected');
+                const shortAddress = `${connectedAddress.substring(0, 6)}...${connectedAddress.substring(connectedAddress.length - 4)}`;
+
+                if (connectedWallet.toLowerCase().includes('xverse')) {
+                    // Update Xverse button
+                    if (xverseBtn) {
+                        xverseBtn.innerHTML = `
+                            <i class="fas fa-bitcoin" style="color: #f7931a;"></i> ${shortAddress}
+                            <span class="disconnect-btn" onclick="disconnectWallet(event)" title="Disconnect Wallet">
+                                <i class="fas fa-times"></i>
+                            </span>
+                        `;
+                        xverseBtn.classList.add('connected');
+                    }
+                } else if (connectedWallet.toLowerCase().includes('ready') || connectedWallet.toLowerCase().includes('starknet')) {
+                    // Update Ready button
+                    if (readyBtn) {
+                        readyBtn.innerHTML = `
+                            <i class="fas fa-link" style="color: var(--primary);"></i> ${shortAddress}
+                            <span class="disconnect-btn" onclick="disconnectWallet(event)" title="Disconnect Wallet">
+                                <i class="fas fa-times"></i>
+                            </span>
+                        `;
+                        readyBtn.classList.add('connected');
+                    }
+                }
             }
 
             // Update wallet status display
@@ -3280,8 +4115,13 @@
                                           walletName.includes('brave') || walletName.includes('wallet') || window.ethereum;
 
                     if (isBitcoinWallet) {
-                        walletStatusText.textContent = `✅ Bitcoin wallet connected: ${connectedWallet}. Ready to set destination address and bridge!`;
-                        walletStatusText.style.color = 'var(--secondary)';
+                        if (connectedWallet === 'Xverse Wallet') {
+                            walletStatusText.textContent = `✅ Xverse Wallet (Real Wallet) connected! Ready to set destination address and bridge Bitcoin→Starknet.`;
+                            walletStatusText.style.color = 'var(--secondary)';
+                        } else {
+                            walletStatusText.textContent = `✅ Bitcoin wallet connected: ${connectedWallet}. Ready to set destination address and bridge!`;
+                            walletStatusText.style.color = 'var(--secondary)';
+                        }
 
                         // Show Starknet connect button if Starknet wallet not connected
                         if (!window.starknet || (!window.starknet.isConnected && !window.starknet.selectedAddress)) {
@@ -3290,7 +4130,7 @@
                             starknetConnectSection.style.display = 'none';
                         }
                     } else {
-                        walletStatusText.textContent = `⚠️ Connected wallet may not be Bitcoin-compatible. For Bitcoin→Starknet transfers, please use Trust Wallet, Coinbase, Phantom, MetaMask, or other Bitcoin-compatible wallets.`;
+                        walletStatusText.textContent = `⚠️ Connected wallet may not be Bitcoin-compatible. For Bitcoin→Starknet transfers, please use Xverse Wallet, Trust Wallet, Coinbase, Phantom, MetaMask, or other Bitcoin-compatible wallets.`;
                         walletStatusText.style.color = 'var(--warning)';
                         starknetConnectSection.style.display = 'none';
                     }
@@ -3300,26 +4140,25 @@
                     starknetConnectSection.style.display = 'none';
                 }
             } else {
-                // Starknet→Bitcoin direction - Bitcoin wallet for destination, Starknet wallet only for execution
+                // Starknet→Bitcoin direction - Xverse wallet for receiving BTC, Ready wallet for Starknet operations
                 if (connectedWallet && connectedAddress) {
                     const walletName = connectedWallet.toLowerCase();
-                    const isBitcoinWallet = walletName.includes('trust') || walletName.includes('coinbase') ||
-                                          walletName.includes('phantom') || walletName.includes('metamask') ||
-                                          walletName.includes('brave') || walletName.includes('wallet') || window.ethereum;
 
-                    if (isBitcoinWallet) {
-                        walletStatusText.textContent = `✅ Bitcoin wallet connected: ${connectedWallet}. Ready to set destination address! Starknet wallet will be required for transaction execution.`;
+                    if (connectedWallet === 'Xverse Wallet') {
+                        walletStatusText.textContent = `✅ Xverse Wallet connected! Ready to receive BTC from Starknet. Connect Ready wallet for Starknet operations.`;
                         walletStatusText.style.color = 'var(--secondary)';
-
-                        // For Starknet→Bitcoin, we don't need Starknet wallet for UI setup
+                        starknetConnectSection.style.display = 'none';
+                    } else if (walletName.includes('ready') || walletName.includes('argent') || walletName.includes('braavos') || window.starknet) {
+                        walletStatusText.textContent = `✅ Ready wallet connected! Ready for Starknet operations. Connect Xverse wallet to receive BTC.`;
+                        walletStatusText.style.color = 'var(--secondary)';
                         starknetConnectSection.style.display = 'none';
                     } else {
-                        walletStatusText.textContent = `⚠️ Connected wallet may not be Bitcoin-compatible. For Starknet→Bitcoin transfers, please use Trust Wallet, Coinbase, Phantom, MetaMask, or other Bitcoin-compatible wallets for the destination address.`;
-                        walletStatusText.style.color = 'var(--warning)';
+                        walletStatusText.textContent = `✅ ${connectedWallet} connected. For Starknet→Bitcoin bridging, connect both Xverse wallet (to receive BTC) and Ready wallet (for Starknet operations).`;
+                        walletStatusText.style.color = 'var(--secondary)';
                         starknetConnectSection.style.display = 'none';
                     }
                 } else {
-                    walletStatusText.textContent = '💡 Connect your Bitcoin wallet (Trust Wallet, Coinbase, Phantom, MetaMask) to set the destination address. Starknet wallet will be required only when executing the transaction.';
+                    walletStatusText.textContent = '💡 For Starknet→Bitcoin bridging: Connect Xverse wallet to receive BTC, and Ready wallet for Starknet operations.';
                     walletStatusText.style.color = 'var(--gray)';
                     starknetConnectSection.style.display = 'none';
                 }
@@ -3833,7 +4672,7 @@
                     // For Bitcoin→Starknet, we use the Bitcoin wallet that the user connected
                     // The Bitcoin wallet will handle the transaction signing
                     if (!connectedWallet || !connectedAddress) {
-                        showNotification('Please connect your Bitcoin wallet first.', true);
+                        showNotification('Please connect your Bitcoin wallet (Xverse Wallet recommended) first.', true);
                         bridgeButton.disabled = false;
                         bridgeButton.innerHTML = '<i class="fas fa-bridge"></i> Bridge Now';
                         return;
@@ -4719,7 +5558,80 @@
             console.log('  - refreshWalletDetection()');
             console.log('  - showAllWallets()');
             console.log('  - debugWalletConnection()');
+            console.log('  - testWalletButtons() - Test new wallet connect buttons');
+            console.log('  - debugXverseWallet() - Debug Xverse wallet specifically');
+
+            // Auto-run wallet button test
+            console.log('🧪 Auto-testing wallet connect buttons...');
+            testWalletButtons();
         }, 2000);
+
+        // Test function for wallet connect buttons
+        window.testWalletButtons = function() {
+            console.log('🧪 Testing Wallet Connect Buttons...');
+
+            // Check if buttons exist in DOM
+            const xverseBtn = document.getElementById('connectXverseBtn');
+            const readyBtn = document.getElementById('connectReadyBtn');
+
+            console.log('Xverse button found:', !!xverseBtn);
+            console.log('Ready button found:', !!readyBtn);
+
+            if (xverseBtn) {
+                console.log('✅ Xverse button HTML:', xverseBtn.outerHTML.substring(0, 100) + '...');
+                console.log('✅ Xverse button has click listener:', !!xverseBtn.onclick);
+            }
+
+            if (readyBtn) {
+                console.log('✅ Ready button HTML:', readyBtn.outerHTML.substring(0, 100) + '...');
+                console.log('✅ Ready button has click listener:', !!readyBtn.onclick);
+            }
+
+            // Test wallet availability
+            console.log('\n📋 Testing wallet availability for Starknet→Bitcoin direction:');
+            currentDirection = 'to-bitcoin';
+            const wallets = getAvailableWallets();
+
+            console.log(`Found ${wallets.length} wallets for Starknet→Bitcoin:`);
+            wallets.forEach((wallet, i) => {
+                const isAvailable = wallet.isAvailable();
+                console.log(`  ${i+1}. ${wallet.name} (${wallet.type}) - ${isAvailable ? '✅ Available' : '❌ Not Available'}`);
+
+                if (wallet.id === 'xverse' || wallet.id === 'starknet') {
+                    console.log(`     💡 This is a ${wallet.id === 'xverse' ? 'Xverse' : 'Ready'} wallet - should have dedicated button`);
+                }
+            });
+
+            // Test specific wallet connection functions
+            console.log('\n🔧 Testing specific wallet connection functions:');
+            console.log('connectToSpecificWallet function exists:', typeof connectToSpecificWallet === 'function');
+
+            // Test wallet status display update
+            console.log('\n🎨 Testing wallet status display:');
+            updateWalletStatusDisplay();
+
+            const statusText = document.getElementById('walletStatusText');
+            if (statusText) {
+                console.log('✅ Wallet status display updated');
+                console.log('Current status text:', statusText.textContent.substring(0, 100) + '...');
+            }
+
+            console.log('\n🎉 Wallet connect buttons test completed!');
+            console.log('💡 To test actual wallet connections:');
+            console.log('  1. Open browser to http://localhost:8000/Bridge.html');
+            console.log('  2. Click "Starknet to Bitcoin" direction');
+            console.log('  3. Try clicking "Connect Xverse Wallet" and "Connect Ready Wallet" buttons');
+            console.log('  4. Check console for connection logs');
+
+            return {
+                xverseButtonExists: !!xverseBtn,
+                readyButtonExists: !!readyBtn,
+                xverseButtonHasListener: !!(xverseBtn && xverseBtn.onclick),
+                readyButtonHasListener: !!(readyBtn && readyBtn.onclick),
+                walletCount: wallets.length,
+                availableWallets: wallets.filter(w => w.isAvailable()).length
+            };
+        };
 
         // Check wallet readiness for transactions
         function checkWalletReadiness() {
@@ -4783,6 +5695,7 @@
             console.log('window.starknet:', !!window.starknet);
             console.log('window.solana:', !!window.solana);
             console.log('window.trustwallet:', !!window.trustwallet);
+            console.log('window.xverse:', !!window.xverse);
 
             if (window.ethereum) {
                 console.log('Ethereum provider details:', {
@@ -4790,10 +5703,29 @@
                     isTrust: window.ethereum.isTrust,
                     isCoinbaseWallet: window.ethereum.isCoinbaseWallet,
                     isBraveWallet: window.ethereum.isBraveWallet,
+                    isXverse: window.ethereum.isXverse,
                     selectedAddress: window.ethereum.selectedAddress,
-                    chainId: window.ethereum.chainId
+                    chainId: window.ethereum.chainId,
+                    constructorName: window.ethereum.constructor?.name
                 });
+
+                if (window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
+                    console.log('Ethereum providers array:');
+                    window.ethereum.providers.forEach((p, i) => {
+                        console.log(`  Provider ${i}:`, {
+                            isMetaMask: p.isMetaMask,
+                            isTrust: p.isTrust,
+                            isCoinbaseWallet: p.isCoinbaseWallet,
+                            isBraveWallet: p.isBraveWallet,
+                            isXverse: p.isXverse,
+                            constructorName: p.constructor?.name
+                        });
+                    });
+                }
             }
+
+            // Check user agent
+            console.log('User Agent:', navigator.userAgent);
 
             // Check current connection state
             console.log('Current connection state:', {
@@ -4813,10 +5745,124 @@
             return {
                 hasEthereum: !!window.ethereum,
                 hasStarknet: !!window.starknet,
+                hasXverse: !!window.xverse,
                 connectedWallet: connectedWallet,
                 connectedAddress: connectedAddress,
                 availableWallets: wallets.filter(w => w.isAvailable()).length,
                 totalWallets: wallets.length
+            };
+        };
+
+        // Specific Xverse wallet debugging
+        window.debugXverseWallet = function() {
+            console.log('🔍 Xverse Wallet Specific Debug');
+            console.log('==============================');
+
+            // Check all possible Xverse indicators
+            console.log('window.xverse:', !!window.xverse);
+            if (window.xverse) {
+                console.log('window.xverse properties:', Object.getOwnPropertyNames(window.xverse));
+                console.log('window.xverse.isXverse:', window.xverse.isXverse);
+            }
+
+            console.log('window.ethereum.isXverse:', window.ethereum?.isXverse);
+            console.log('window.ethereum.constructor.name:', window.ethereum?.constructor?.name);
+
+            if (window.ethereum?.providers) {
+                console.log('Checking providers for Xverse...');
+                window.ethereum.providers.forEach((p, i) => {
+                    console.log(`Provider ${i}:`, {
+                        isXverse: p.isXverse,
+                        constructorName: p.constructor?.name,
+                        hasRequest: typeof p.request === 'function'
+                    });
+                });
+            }
+
+            // Check user agent
+            const userAgent = navigator.userAgent.toLowerCase();
+            console.log('Xverse in user agent:', userAgent.includes('xverse'));
+
+            // Test Xverse wallet availability specifically
+            const xverseWallet = {
+                id: 'xverse',
+                name: 'Xverse Wallet',
+                type: 'Bitcoin',
+                icon: 'fas fa-bitcoin',
+                isAvailable: () => {
+                    try {
+                        if (typeof window !== 'undefined' && window.xverse) {
+                            return true;
+                        }
+
+                        if (window.ethereum) {
+                            if (window.ethereum.isXverse ||
+                                window.ethereum.constructor?.name?.includes('Xverse') ||
+                                window.ethereum.constructor?.toString().toLowerCase().includes('xverse')) {
+                                return true;
+                            }
+
+                            if (window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
+                                const xverseProvider = window.ethereum.providers.find(p =>
+                                    p.isXverse ||
+                                    p.constructor?.name?.includes('Xverse') ||
+                                    p.constructor?.toString().toLowerCase().includes('xverse')
+                                );
+                                if (xverseProvider) return true;
+                            }
+                        }
+
+                        if (typeof navigator !== 'undefined') {
+                            const userAgent = navigator.userAgent.toLowerCase();
+                            if (userAgent.includes('xverse') ||
+                                userAgent.includes('xversewallet') ||
+                                userAgent.includes('xverse-bitcoin')) {
+                                return true;
+                            }
+                        }
+
+                        if (typeof window !== 'undefined') {
+                            const xverseProps = ['xverse', 'Xverse', 'xverseWallet', 'XverseWallet'];
+                            for (const prop of xverseProps) {
+                                if (window[prop] && (window[prop].isXverse || window[prop].isConnected)) {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if (window.ethereum && typeof window.ethereum.request === 'function') {
+                            return true;
+                        }
+
+                        return false;
+                    } catch (error) {
+                        console.warn('Error detecting Xverse wallet:', error);
+                        return false;
+                    }
+                }
+            };
+
+            const isAvailable = xverseWallet.isAvailable();
+            console.log('Xverse wallet available:', isAvailable);
+
+            if (isAvailable) {
+                console.log('✅ Xverse wallet should be connectable');
+                console.log('💡 Try clicking the Xverse button in the navigation bar');
+            } else {
+                console.log('❌ Xverse wallet not detected');
+                console.log('🔧 Troubleshooting steps:');
+                console.log('  1. Make sure Xverse extension is installed and enabled');
+                console.log('  2. Refresh the page');
+                console.log('  3. Try running refreshWalletDetection()');
+                console.log('  4. Check if Xverse appears in the wallet modal');
+            }
+
+            return {
+                isAvailable,
+                hasWindowXverse: !!window.xverse,
+                hasEthereumXverse: !!window.ethereum?.isXverse,
+                hasXverseInProviders: window.ethereum?.providers?.some(p => p.isXverse) || false,
+                hasXverseInUserAgent: userAgent.includes('xverse')
             };
         };
 

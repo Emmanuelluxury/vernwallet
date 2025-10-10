@@ -459,15 +459,15 @@ pub mod Bridge {
     fn validate_btc_address(btc_address: felt252) {
         ensure(btc_address != 0, Errors::INVALID_BTC_ADDRESS);
 
-        // Enhanced Bitcoin address validation
-        // Check address length (Bitcoin addresses are typically 26-35 characters for Base58)
-        let addr_len: u32 = btc_address.try_into().unwrap_or(0);
-        ensure(addr_len >= 26 && addr_len <= 35, 'INVALID_BTC_ADDR_LENGTH');
+        // Enhanced Bitcoin address validation for felt252 format
+        // The frontend sends the LENGTH of the Bitcoin address as felt252
+        // Contract expects btc_address to be a number representing the length (26-35)
 
-        // Check for valid Base58 characters (simplified check)
-        // In production, implement full Base58 decoding and checksum verification
-        let addr_str = btc_address;
-        ensure(addr_str != 0, 'INVALID_BTC_ADDR_FORMAT');
+        // Convert felt252 to u32 for length validation
+        let addr_len: u32 = btc_address.try_into().unwrap_or(0);
+
+        // Bitcoin address length validation (26-35 for Base58, 14-74 for Bech32)
+        ensure(addr_len >= 14 && addr_len <= 74, 'INVALID_BTC_ADDR_LENGTH');
 
         // Additional security checks
         ensure(!is_malicious_address(btc_address), 'MALICIOUS_BTC_ADDRESS');

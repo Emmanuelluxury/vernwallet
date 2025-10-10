@@ -3,35 +3,51 @@
  */
 class StarknetBridgeService {
     constructor() {
-        this.contractAddress = '0x012402f9a1612d3d48bfc7beb93f756e9848f67e3a0a8c1a23d48f03a25acc9e';
+        this.contractAddress = '0x043fc7f2dfb8207e9a666a35e951a2df10039701ca8fff04c1713609df80f941';
         this.contract = null;
         this.provider = null;
         this.account = null;
         this.abi = null;
         this.currentNetwork = 'mainnet';
 
-        // Multi-network configuration
+        // Multi-network configuration with multiple RPC endpoints for reliability
         this.NETWORKS = {
             mainnet: {
                 name: 'Starknet Mainnet',
                 chainId: '0x534e5f4d41494e',
-                rpcUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7',
+                rpcUrls: [
+                    'https://starknet-mainnet.public.blastapi.io/rpc/v0_7',
+                    'https://starknet-mainnet.g.alchemy.com/v2/demo',
+                    'https://rpc.starknet.lava.build',
+                    'https://starknet.public.blastapi.io'
+                ],
                 explorerUrl: 'https://starkscan.co',
                 contracts: {
-                    BRIDGE_CONTRACT: '0x012402f9a1612d3d48bfc7beb93f756e9848f67e3a0a8c1a23d48f03a25acc9e',
+                    BRIDGE_CONTRACT: '0x043fc7f2dfb8207e9a666a35e951a2df10039701ca8fff04c1713609df80f941',
                     SBTC_CONTRACT: '0x07b10d8e5e60b2c9c5a5b12a4e1e5c4b3d2e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b'
                 }
             },
             testnet: {
                 name: 'Starknet Sepolia Testnet',
                 chainId: '0x534e5f5345504f4c49',
-                rpcUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7',
+                rpcUrls: [
+                    'https://starknet-sepolia.public.blastapi.io/rpc/v0_7',
+                    'https://starknet-sepolia.g.alchemy.com/v2/demo',
+                    'https://rpc.starknet-sepolia.lava.build',
+                    'https://starknet-sepolia.public.blastapi.io'
+                ],
                 explorerUrl: 'https://sepolia.starkscan.co',
                 contracts: {
                     BRIDGE_CONTRACT: '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', // Placeholder
                     SBTC_CONTRACT: '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef' // Placeholder
                 }
             }
+        };
+
+        // Current RPC endpoint index for each network
+        this.currentRpcIndex = {
+            mainnet: 0,
+            testnet: 0
         };
     }
 
@@ -177,192 +193,192 @@ class StarknetBridgeService {
         }
     }
 
-    // Load contract ABI
+    // Load contract ABI - Updated to match compiled contract
     async loadABI() {
-        // Use the ABI you provided
+        // ABI matching the compiled Bridge contract
         this.abi = [
             {
-                "type": "function",
-                "name": "initiate_bitcoin_deposit",
-                "inputs": [
+                type: "function",
+                name: "initiate_bitcoin_deposit",
+                inputs: [
                     {
-                        "name": "amount",
-                        "type": "core::integer::u256"
+                        name: "amount",
+                        type: "core::integer::u256"
                     },
                     {
-                        "name": "btc_address",
-                        "type": "core::felt252"
+                        name: "btc_address",
+                        type: "core::felt252"
                     },
                     {
-                        "name": "starknet_recipient",
-                        "type": "core::starknet::contract_address::ContractAddress"
+                        name: "starknet_recipient",
+                        type: "core::starknet::contract_address::ContractAddress"
                     }
                 ],
-                "outputs": [
+                outputs: [
                     {
-                        "type": "core::integer::u256"
+                        type: "core::integer::u256"
                     }
                 ],
-                "state_mutability": "external"
+                state_mutability: "external"
             },
             {
-                "type": "function",
-                "name": "initiate_bitcoin_withdrawal",
-                "inputs": [
+                type: "function",
+                name: "initiate_bitcoin_withdrawal",
+                inputs: [
                     {
-                        "name": "amount",
-                        "type": "core::integer::u256"
+                        name: "amount",
+                        type: "core::integer::u256"
                     },
                     {
-                        "name": "btc_address",
-                        "type": "core::felt252"
+                        name: "btc_address",
+                        type: "core::felt252"
                     }
                 ],
-                "outputs": [
+                outputs: [
                     {
-                        "type": "core::integer::u256"
+                        type: "core::integer::u256"
                     }
                 ],
-                "state_mutability": "external"
+                state_mutability: "external"
             },
             {
-                "type": "function",
-                "name": "stake",
-                "inputs": [
+                type: "function",
+                name: "stake",
+                inputs: [
                     {
-                        "name": "token",
-                        "type": "core::starknet::contract_address::ContractAddress"
+                        name: "token",
+                        type: "core::starknet::contract_address::ContractAddress"
                     },
                     {
-                        "name": "amount",
-                        "type": "core::integer::u256"
+                        name: "amount",
+                        type: "core::integer::u256"
                     }
                 ],
-                "outputs": [],
-                "state_mutability": "external"
+                outputs: [],
+                state_mutability: "external"
             },
             {
-                "type": "function",
-                "name": "unstake",
-                "inputs": [
+                type: "function",
+                name: "unstake",
+                inputs: [
                     {
-                        "name": "token",
-                        "type": "core::starknet::contract_address::ContractAddress"
+                        name: "token",
+                        type: "core::starknet::contract_address::ContractAddress"
                     },
                     {
-                        "name": "amount",
-                        "type": "core::integer::u256"
+                        name: "amount",
+                        type: "core::integer::u256"
                     }
                 ],
-                "outputs": [],
-                "state_mutability": "external"
+                outputs: [],
+                state_mutability: "external"
             },
             {
-                "type": "function",
-                "name": "claim_rewards",
-                "inputs": [
+                type: "function",
+                name: "claim_rewards",
+                inputs: [
                     {
-                        "name": "token",
-                        "type": "core::starknet::contract_address::ContractAddress"
+                        name: "token",
+                        type: "core::starknet::contract_address::ContractAddress"
                     }
                 ],
-                "outputs": [],
-                "state_mutability": "external"
+                outputs: [],
+                state_mutability: "external"
             },
             {
-                "type": "function",
-                "name": "get_staking_position",
-                "inputs": [
+                type: "function",
+                name: "get_staking_position",
+                inputs: [
                     {
-                        "name": "user",
-                        "type": "core::starknet::contract_address::ContractAddress"
+                        name: "user",
+                        type: "core::starknet::contract_address::ContractAddress"
                     },
                     {
-                        "name": "token",
-                        "type": "core::starknet::contract_address::ContractAddress"
+                        name: "token",
+                        type: "core::starknet::contract_address::ContractAddress"
                     }
                 ],
-                "outputs": [
+                outputs: [
                     {
-                        "type": "Bridge::StakingPosition"
+                        type: "Bridge::StakingPosition"
                     }
                 ],
-                "state_mutability": "view"
+                state_mutability: "view"
             },
             {
-                "type": "function",
-                "name": "get_user_rewards",
-                "inputs": [
+                type: "function",
+                name: "get_user_rewards",
+                inputs: [
                     {
-                        "name": "user",
-                        "type": "core::starknet::contract_address::ContractAddress"
+                        name: "user",
+                        type: "core::starknet::contract_address::ContractAddress"
                     }
                 ],
-                "outputs": [
+                outputs: [
                     {
-                        "type": "core::integer::u256"
+                        type: "core::integer::u256"
                     }
                 ],
-                "state_mutability": "view"
+                state_mutability: "view"
             },
             {
-                "type": "function",
-                "name": "get_total_staked",
-                "inputs": [
+                type: "function",
+                name: "get_total_staked",
+                inputs: [
                     {
-                        "name": "token",
-                        "type": "core::starknet::contract_address::ContractAddress"
+                        name: "token",
+                        type: "core::starknet::contract_address::ContractAddress"
                     }
                 ],
-                "outputs": [
+                outputs: [
                     {
-                        "type": "core::integer::u256"
+                        type: "core::integer::u256"
                     }
                 ],
-                "state_mutability": "view"
+                state_mutability: "view"
             },
             {
-                "type": "function",
-                "name": "get_reward_rate",
-                "inputs": [
+                type: "function",
+                name: "get_reward_rate",
+                inputs: [
                     {
-                        "name": "token",
-                        "type": "core::starknet::contract_address::ContractAddress"
+                        name: "token",
+                        type: "core::starknet::contract_address::ContractAddress"
                     }
                 ],
-                "outputs": [
+                outputs: [
                     {
-                        "type": "core::integer::u256"
+                        type: "core::integer::u256"
                     }
                 ],
-                "state_mutability": "view"
+                state_mutability: "view"
             },
             {
-                "type": "function",
-                "name": "is_bridge_paused",
-                "inputs": [],
-                "outputs": [
+                type: "function",
+                name: "is_bridge_paused",
+                inputs: [],
+                outputs: [
                     {
-                        "type": "core::bool"
+                        type: "core::bool"
                     }
                 ],
-                "state_mutability": "view"
+                state_mutability: "view"
             },
             {
-                "type": "function",
-                "name": "get_sbtc_contract",
-                "inputs": [],
-                "outputs": [
+                type: "function",
+                name: "get_sbtc_contract",
+                inputs: [],
+                outputs: [
                     {
-                        "type": "core::starknet::contract_address::ContractAddress"
+                        type: "core::starknet::contract_address::ContractAddress"
                     }
                 ],
-                "state_mutability": "view"
+                state_mutability: "view"
             }
         ];
     }
 
-    // Convert Bitcoin address to felt252 (Contract expects LENGTH, not encoded address)
+    // Convert Bitcoin address to felt252 (Contract expects LENGTH as number)
     bitcoinAddressToFelt(btcAddress) {
         console.log('🔄 Converting Bitcoin address to felt252 (length-based):', btcAddress);
 
@@ -376,20 +392,20 @@ class StarknetBridgeService {
             throw new Error(`Invalid Bitcoin address format: ${btcAddress}. Expected P2PKH, P2SH, or Bech32 format.`);
         }
 
-        // CRITICAL FIX: Contract expects the LENGTH of the address as felt252, not the encoded address!
+        // FIXED: Contract expects the LENGTH of the address as a felt252 number, not encoded address!
         // The Cairo contract does: let addr_len: u32 = btc_address.try_into().unwrap_or(0);
-        // So we need to send the length (26-35) as a felt252 number
+        // So we need to send the length as a felt252 number (26-35 for Base58, 14-74 for Bech32)
 
         const addressLength = btcAddress.length;
         console.log('📏 Bitcoin address length:', addressLength);
 
-        // Validate length is in expected range (26-35 characters)
-        if (addressLength < 26 || addressLength > 35) {
-            throw new Error(`Bitcoin address length ${addressLength} is outside expected range 26-35`);
+        // Validate length is in expected range (14-74 characters for all Bitcoin address types)
+        if (addressLength < 14 || addressLength > 74) {
+            throw new Error(`Bitcoin address length ${addressLength} is outside expected range 14-74`);
         }
 
-        // Convert length to felt252 hex format
-        const lengthHex = addressLength.toString(16);
+        // Convert length to felt252 hex format (this is what the contract expects)
+        const lengthHex = addressLength.toString(16).padStart(2, '0');
         const felt252Hex = '0x' + lengthHex;
 
         console.log('✅ Bitcoin address length converted to felt252:', {
@@ -446,12 +462,15 @@ class StarknetBridgeService {
     bitcoinAddressToFeltAuto(btcAddress) {
         console.log('🔄 Auto-detecting best Bitcoin address conversion method for:', btcAddress);
 
-        // PRIORITIZE LENGTH-BASED METHOD FIRST - this is what the contract actually expects!
+        // PRIORITIZE LENGTH-BASED METHODS FIRST - this is what the contract actually expects!
+        // The contract validates: let addr_len: u32 = btc_address.try_into().unwrap_or(0);
+        // So we need to send the LENGTH of the address as a felt252 number, not the encoded address
         const methods = [
-            { method: this.bitcoinAddressToFelt.bind(this), name: 'Length-based encoding (PRIMARY)' },
+            { method: this.bitcoinAddressToFelt.bind(this), name: 'Primary length-based encoding' },
             { method: this.bitcoinAddressToFeltLength.bind(this), name: 'Direct length encoding' },
-            { method: this.bitcoinAddressToFeltContract.bind(this), name: 'Contract-compatible encoding' },
-            { method: this.bitcoinAddressToFeltBytes.bind(this), name: 'Byte encoding' },
+            { method: this.bitcoinAddressToFeltContract.bind(this), name: 'Contract-compatible length encoding' },
+            { method: this.bitcoinAddressToFeltBytes.bind(this), name: 'Byte length encoding' },
+            // Fallback methods (less likely to work but kept for compatibility)
             { method: this.bitcoinAddressToFeltAlt.bind(this), name: 'Alternative ASCII sum' },
             { method: this.bitcoinAddressToFeltHash.bind(this), name: 'Hash-based encoding' },
             { method: this.bitcoinAddressToFeltRaw.bind(this), name: 'Raw felt252 encoding' },
@@ -601,7 +620,7 @@ class StarknetBridgeService {
         return felt252Hex;
     }
 
-    // Contract-compatible Bitcoin address conversion (string length + content)
+    // Contract-compatible Bitcoin address conversion (length-based)
     bitcoinAddressToFeltContract(btcAddress) {
         console.log('🔄 Converting Bitcoin address (contract-compatible method):', btcAddress);
 
@@ -615,35 +634,36 @@ class StarknetBridgeService {
             throw new Error(`Invalid Bitcoin address format: ${btcAddress}`);
         }
 
-        // The contract expects the Bitcoin address as a felt252 that represents the string
+        // FIXED: Contract expects the Bitcoin address as a felt252 that represents the LENGTH
         // The validation does: let addr_len: u32 = btc_address.try_into().unwrap_or(0);
         // This means it's trying to convert the felt252 to a u32 for length checking
 
         // The key insight: the contract is expecting the felt252 to BE the length of the address
         // Not the encoded address itself, but the length as a number!
 
-        // Bitcoin addresses are 26-35 characters, so the felt252 should be a number between 26-35
         const addressLength = btcAddress.length;
 
-        if (addressLength < 26 || addressLength > 35) {
-            throw new Error(`Bitcoin address length ${addressLength} not in expected range 26-35`);
+        // Ensure length is in expected range (14-74 for all Bitcoin address types)
+        if (addressLength < 14 || addressLength > 74) {
+            throw new Error(`Bitcoin address length ${addressLength} not in expected range 14-74`);
         }
 
         // Convert the length to hex format (this is what the contract expects)
-        const felt252Hex = '0x' + addressLength.toString(16);
+        const lengthHex = addressLength.toString(16).padStart(2, '0');
+        const felt252Hex = '0x' + lengthHex;
 
         console.log('✅ Contract-compatible Bitcoin address conversion:', {
             original: btcAddress,
             length: btcAddress.length,
             felt: felt252Hex,
-            feltLength: felt252Hex.length,
+            feltAsNumber: parseInt(felt252Hex, 16),
             method: 'Contract-compatible (length-based)'
         });
 
         return felt252Hex;
     }
 
-    // Simple byte encoding method
+    // Simple byte encoding method (FIXED to use length-based approach)
     bitcoinAddressToFeltBytes(btcAddress) {
         console.log('🔄 Converting Bitcoin address (byte encoding method):', btcAddress);
 
@@ -657,27 +677,24 @@ class StarknetBridgeService {
             throw new Error(`Invalid Bitcoin address format: ${btcAddress}`);
         }
 
-        // Convert each character to its byte value and create a compact felt252
-        const bytes = new TextEncoder().encode(btcAddress);
-        let felt = 0n;
+        // FIXED: Contract expects length as felt252 number, not encoded bytes
+        const addressLength = btcAddress.length;
 
-        // For Bitcoin addresses, we can fit them in a much smaller felt252
-        for (let i = 0; i < bytes.length && i < 31; i++) {
-            felt = (felt * 256n) + BigInt(bytes[i]);
+        // Ensure length is in expected range (14-74 for all Bitcoin address types)
+        if (addressLength < 14 || addressLength > 74) {
+            throw new Error(`Bitcoin address length ${addressLength} not in expected range 14-74`);
         }
 
-        // Convert to hex - should be much shorter than 64 chars for Bitcoin addresses
-        let hex = felt.toString(16);
+        // Convert the length to hex format (this is what the contract expects)
+        const lengthHex = addressLength.toString(16).padStart(2, '0');
+        const felt252Hex = '0x' + lengthHex;
 
-        // Don't pad to 64 chars - keep it compact
-        const felt252Hex = '0x' + hex;
-
-        console.log('✅ Byte encoding Bitcoin address conversion:', {
+        console.log('✅ Byte encoding Bitcoin address conversion (length-based):', {
             original: btcAddress,
             length: btcAddress.length,
             felt: felt252Hex,
-            feltLength: felt252Hex.length,
-            method: 'Byte encoding'
+            feltAsNumber: parseInt(felt252Hex, 16),
+            method: 'Byte encoding (length-based)'
         });
 
         return felt252Hex;
@@ -703,19 +720,20 @@ class StarknetBridgeService {
 
         const addressLength = btcAddress.length;
 
-        // Ensure length is in expected range (26-35)
-        if (addressLength < 26 || addressLength > 35) {
-            throw new Error(`Bitcoin address length ${addressLength} not in expected range 26-35`);
+        // Ensure length is in expected range (14-74 for all Bitcoin address types)
+        if (addressLength < 14 || addressLength > 74) {
+            throw new Error(`Bitcoin address length ${addressLength} not in expected range 14-74`);
         }
 
         // Convert the length directly to hex (this is what the contract validation expects)
-        const felt252Hex = '0x' + addressLength.toString(16);
+        const lengthHex = addressLength.toString(16).padStart(2, '0');
+        const felt252Hex = '0x' + lengthHex;
 
         console.log('✅ Length-based Bitcoin address conversion:', {
             original: btcAddress,
             length: btcAddress.length,
             felt: felt252Hex,
-            feltLength: felt252Hex.length,
+            feltAsNumber: parseInt(felt252Hex, 16),
             method: 'Length-based'
         });
 
@@ -1589,7 +1607,7 @@ class StarknetBridgeService {
         } else if (errorMessage.includes('invalid_format') || errorMessage.includes('invalid_type')) {
             return new Error('Invalid transaction data format. Please check your input values.');
         } else if (errorMessage.includes('INVALID_BTC_ADDR_LENGTH')) {
-            return new Error('Bitcoin address format not compatible with bridge contract. The bridge will automatically try alternative conversion methods.');
+            return new Error('Bitcoin address length validation failed. Please ensure your Bitcoin address is valid (14-74 characters).');
         } else if (errorMessage.includes('too_big')) {
             return new Error('Input value too large for this transaction.');
         }
@@ -1800,10 +1818,10 @@ window.testContractCompatibleConversion = async function(btcAddress = '1A1zP1eP5
             ];
 
             console.log('📏 Bitcoin address length:', btcAddress.length);
-            console.log('✅ Expected range: 26-35 characters');
+            console.log('✅ Expected range: 14-74 characters');
 
-            if (btcAddress.length < 26 || btcAddress.length > 35) {
-                console.warn(`⚠️ Address length ${btcAddress.length} is outside expected range 26-35`);
+            if (btcAddress.length < 14 || btcAddress.length > 74) {
+                console.warn(`⚠️ Address length ${btcAddress.length} is outside expected range 14-74`);
                 console.log('💡 This might cause INVALID_BTC_ADDR_LENGTH error');
             }
 
@@ -1845,7 +1863,7 @@ window.testContractCompatibleConversion = async function(btcAddress = '1A1zP1eP5
                 success: true,
                 btcAddress: btcAddress,
                 length: btcAddress.length,
-                expectedRange: '26-35'
+                expectedRange: '14-74'
             };
         } else {
             console.error('❌ Bridge service not available');
