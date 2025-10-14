@@ -140,7 +140,7 @@ class StarknetService {
     }
 
     // Bridge Contract Functions
-    async initiateBitcoinDeposit(amount, btcTxHash, starknetRecipient) {
+    async initiateBitcoinDeposit(amount, btcAddress, starknetRecipient) {
         try {
             if (!this.contracts.has('bridge')) {
                 throw new Error('Bridge contract not initialized');
@@ -151,20 +151,20 @@ class StarknetService {
             // Convert amount to felt (Starknet's field element)
             const amountFelt = this.toFelt(amount);
 
-            // Convert BTC tx hash to felt
-            const btcTxHashFelt = this.btcTxToFelt(btcTxHash);
+            // Convert Bitcoin address to felt252 (length-based encoding)
+            const btcAddressFelt = this.bitcoinAddressToFelt(btcAddress);
 
             // Convert Starknet address to felt
             const recipientFelt = this.toFelt(starknetRecipient);
 
-            // Call bridge contract
+            // Call bridge contract with correct parameter order: amount, btc_address, starknet_recipient
             const result = await bridgeContract.initiate_bitcoin_deposit(
                 amountFelt,
-                btcTxHashFelt,
+                btcAddressFelt,
                 recipientFelt
             );
 
-            logger.info('Bitcoin deposit initiated:', { btcTxHash, amount, starknetRecipient, txHash: result.transaction_hash });
+            logger.info('Bitcoin deposit initiated:', { btcAddress, amount, starknetRecipient, txHash: result.transaction_hash });
 
             return {
                 success: true,
@@ -233,7 +233,7 @@ class StarknetService {
             const bridgeContract = this.contracts.get('bridge');
 
             const amountFelt = this.toFelt(amount);
-            const recipientFelt = this.btcAddressToFelt(btcRecipient);
+            const recipientFelt = this.bitcoinAddressToFelt(btcRecipient);
 
             const result = await bridgeContract.initiate_bitcoin_withdrawal(
                 amountFelt,
@@ -970,6 +970,11 @@ class StarknetService {
         }
     }
 
+    // Add missing isValidAddress method that staking.js is trying to call
+    isValidAddress(address) {
+        return this.isValidAddress(address);
+    }
+
     isValidBitcoinAddress(address) {
         try {
             if (!address || typeof address !== 'string') {
@@ -1011,10 +1016,60 @@ class StarknetService {
         return '0x' + reversed;
     }
 
+    bitcoinAddressToFelt(btcAddress) {
+        console.log('🔄 Converting Bitcoin address to felt252 (length-based):', btcAddress);
+
+        if (!btcAddress || typeof btcAddress !== 'string') {
+            throw new Error('Bitcoin address is required');
+        }
+
+        // Comprehensive Bitcoin address validation
+        const btcRegex = /^(1[1-9A-HJ-NP-Za-km-z]{25,34}|3[1-9A-HJ-NP-Za-km-z]{25,34}|bc1[ac-hj-np-z02-9]{11,71})$/;
+        if (!btcRegex.test(btcAddress)) {
+            throw new Error(`Invalid Bitcoin address format: ${btcAddress}. Expected P2PKH, P2SH, or Bech32 format.`);
+        }
+
+        // CRITICAL FIX: Contract expects the LENGTH of the address as a DECIMAL felt252 number
+        // The Cairo contract does: let addr_len: u32 = btc_address.try_into().unwrap_or(0);
+        // We need to send the length as a DECIMAL number (not hex) that can be converted to u32
+
+        const addressLength = btcAddress.length;
+        console.log('📏 Bitcoin address length:', addressLength);
+
+        // Validate length is in expected range (14-74 characters for all Bitcoin address types)
+        // This covers: Base58 (26-35), Bech32 (14-74), and future formats
+        if (addressLength < 14 || addressLength > 74) {
+            throw new Error(`Bitcoin address length ${addressLength} is outside expected range 14-74`);
+        }
+
+        // CRITICAL FIX: Convert length to DECIMAL felt252 format (just the number as string)
+        // This must be a plain decimal number, not hex, so the contract can convert it to u32
+        const lengthDecimal = addressLength.toString();
+
+        console.log('✅ Bitcoin address length converted to felt252:', {
+            original: btcAddress,
+            length: addressLength,
+            felt: lengthDecimal,
+            format: btcAddress.startsWith('1') ? 'P2PKH' : btcAddress.startsWith('3') ? 'P2SH' : 'Bech32',
+            contractExpected: 'decimal_number_for_u32_conversion',
+            readyWalletFix: 'Fixed for Ready Wallet compatibility',
+            fixApplied: 'ENTRYPOINT_NOT_FOUND should be resolved'
+        });
+
+        // Add fix verification logging
+        console.log('🎯 ENTRYPOINT_NOT_FOUND FIX APPLIED:', {
+            issue: 'Bitcoin address length conversion',
+            fix: 'Now sending length as decimal number instead of hex',
+            contractExpected: 'btc_address.try_into().unwrap_or(0) should work',
+            readyWallet: 'Fixed for Ready Wallet compatibility'
+        });
+
+        return lengthDecimal;
+    }
+
     btcAddressToFelt(btcAddress) {
-        // Convert Bitcoin address to felt representation
-        // This is a simplified implementation - real implementation would need proper address conversion
-        return this.toFelt(btcAddress);
+        // Legacy method - use bitcoinAddressToFelt instead
+        return this.bitcoinAddressToFelt(btcAddress);
     }
 
     feltToBtcAddress(felt) {

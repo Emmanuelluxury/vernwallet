@@ -29,8 +29,8 @@ btcDepositManager = "0x01cb8f799219ff2aa63dc6b06e35a944fdb347993c102b3e7a83d8c63
 # BTCPegOut contract
 btcPegOut = "0x06592114e225312fbd2c8068baeb2e65b743516ef5c0829ddc45766040658e2c"
 
-# Bridge contract
-bridge = "0x012402f9a1612d3d48bfc7beb93f756e9848f67e3a0a8c1a23d48f03a25acc9e"
+# Bridge contract - NEWLY DEPLOYED with multicall fixes
+bridge = "0x05ea098d3afed3c0f34258e25b0ccfbdf5893e24313dd4caed31d5f98faec7fe"
 
 # EscapeHatch contract
 escapeHatch = "0x07e01eec5443158d9ae9c36c5df009b8b2c5e20dab34489a79a25718a409a187"

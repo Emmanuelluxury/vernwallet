@@ -1,75 +1,201 @@
+
 [
   {
-    "type": "function",
-    "name": "initiate_bitcoin_deposit",
-    "inputs": [
+    "type": "struct",
+    "name": "core::integer::u256",
+    "members": [
       {
-        "name": "amount",
-        "type": "core::integer::u256"
+        "name": "low",
+        "type": "core::integer::u128"
       },
       {
-        "name": "btc_address",
+        "name": "high",
+        "type": "core::integer::u128"
+      }
+    ]
+  },
+  {
+    "type": "constructor",
+    "name": "constructor",
+    "inputs": [
+      {
+        "name": "admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "emergency_admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "bitcoin_headers_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "spv_verifier_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "sbtc_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "deposit_manager_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "operator_registry_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "peg_out_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "escape_hatch_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "btc_genesis_hash",
         "type": "core::felt252"
       },
       {
-        "name": "starknet_recipient",
+        "name": "btc_network_magic",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "btc_network_name",
+        "type": "core::felt252"
+      },
+      {
+        "name": "daily_bridge_limit",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "min_operator_bond",
+        "type": "core::integer::u256"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "set_admin",
+    "inputs": [
+      {
+        "name": "new_admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "get_admin",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "enum",
+    "name": "core::bool",
+    "variants": [
+      {
+        "name": "False",
+        "type": "()"
+      },
+      {
+        "name": "True",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "register_token",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "is_registered",
+        "type": "core::bool"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "is_registered",
+    "inputs": [
+      {
+        "name": "token",
         "type": "core::starknet::contract_address::ContractAddress"
       }
     ],
     "outputs": [
       {
-        "type": "core::integer::u256"
+        "type": "core::bool"
       }
     ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "set_wrapped_token",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "is_wrapped",
+        "type": "core::bool"
+      }
+    ],
+    "outputs": [],
     "state_mutability": "external"
   },
   {
     "type": "function",
-    "name": "initiate_bitcoin_withdrawal",
+    "name": "is_wrapped",
     "inputs": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::bool"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "deposit",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
       {
         "name": "amount",
         "type": "core::integer::u256"
       },
       {
-        "name": "btc_address",
-        "type": "core::felt252"
-      }
-    ],
-    "outputs": [
-      {
-        "type": "core::integer::u256"
-      }
-    ],
-    "state_mutability": "external"
-  },
-  {
-    "type": "function",
-    "name": "submit_bitcoin_header",
-    "inputs": [
-      {
-        "name": "header",
-        "type": "Bridge::BitcoinHeader"
-      }
-    ],
-    "outputs": [
-      {
-        "type": "core::felt252"
-      }
-    ],
-    "state_mutability": "external"
-  },
-  {
-    "type": "function",
-    "name": "register_bridge_operator",
-    "inputs": [
-      {
-        "name": "public_key",
+        "name": "dst_chain_id",
         "type": "core::felt252"
       },
       {
-        "name": "bond_amount",
-        "type": "core::integer::u256"
+        "name": "recipient",
+        "type": "core::felt252"
       }
     ],
     "outputs": [],
@@ -137,6 +263,265 @@
   },
   {
     "type": "function",
+    "name": "swap_token_to_token",
+    "inputs": [
+      {
+        "name": "router",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "token_in",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "token_out",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "amount_in",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "min_amount_out",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "to",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::integer::u256"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "initiate_bitcoin_deposit",
+    "inputs": [
+      {
+        "name": "amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "btc_address",
+        "type": "core::felt252"
+      },
+      {
+        "name": "starknet_recipient",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::integer::u256"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "initiate_bitcoin_withdrawal",
+    "inputs": [
+      {
+        "name": "amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "btc_address",
+        "type": "core::felt252"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::integer::u256"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::BitcoinHeader",
+    "members": [
+      {
+        "name": "hash",
+        "type": "core::felt252"
+      },
+      {
+        "name": "previous_block_hash",
+        "type": "core::felt252"
+      },
+      {
+        "name": "merkle_root",
+        "type": "core::felt252"
+      },
+      {
+        "name": "timestamp",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "bits",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "nonce",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "height",
+        "type": "core::integer::u32"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "submit_bitcoin_header",
+    "inputs": [
+      {
+        "name": "header",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::BitcoinHeader"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "register_bridge_operator",
+    "inputs": [
+      {
+        "name": "public_key",
+        "type": "core::felt252"
+      },
+      {
+        "name": "bond_amount",
+        "type": "core::integer::u256"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "pause_bridge",
+    "inputs": [],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "unpause_bridge",
+    "inputs": [],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "is_bridge_paused",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::bool"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_sbtc_contract",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_bitcoin_headers_contract",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_deposit_manager_contract",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_operator_registry_contract",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_peg_out_contract",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_escape_hatch_contract",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_btc_genesis_hash",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_btc_network_magic",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::integer::u32"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
     "name": "stake",
     "inputs": [
       {
@@ -180,6 +565,36 @@
     "state_mutability": "external"
   },
   {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::StakingPosition",
+    "members": [
+      {
+        "name": "user",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "staked_at",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "last_reward_update",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "reward_debt",
+        "type": "core::integer::u256"
+      }
+    ]
+  },
+  {
     "type": "function",
     "name": "get_staking_position",
     "inputs": [
@@ -194,7 +609,7 @@
     ],
     "outputs": [
       {
-        "type": "Bridge::StakingPosition"
+        "type": "starknet_bridge::contracts::Bridge::Bridge::StakingPosition"
       }
     ],
     "state_mutability": "view"
@@ -217,21 +632,274 @@
   },
   {
     "type": "function",
-    "name": "pause_bridge",
+    "name": "get_total_staked",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::integer::u256"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "set_reward_token",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "is_reward_token",
+        "type": "core::bool"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "set_reward_rate",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "rate",
+        "type": "core::integer::u256"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "get_reward_rate",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::integer::u256"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "set_emergency_admin",
+    "inputs": [
+      {
+        "name": "new_emergency_admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "get_emergency_admin",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "blacklist_token",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "unblacklist_token",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "is_token_blacklisted",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::bool"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "set_daily_bridge_limit",
+    "inputs": [
+      {
+        "name": "limit",
+        "type": "core::integer::u256"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "get_daily_bridge_limit",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::integer::u256"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_daily_bridge_usage",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::integer::u256"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "set_min_operator_bond",
+    "inputs": [
+      {
+        "name": "amount",
+        "type": "core::integer::u256"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "get_min_operator_bond",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::integer::u256"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_pause_timestamp",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::integer::u64"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_operator_count",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::integer::u32"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_btc_network_name",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "emergency_pause_bridge",
     "inputs": [],
     "outputs": [],
     "state_mutability": "external"
   },
   {
     "type": "function",
-    "name": "unpause_bridge",
+    "name": "update_contract_addresses",
+    "inputs": [
+      {
+        "name": "bitcoin_headers_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "spv_verifier_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "sbtc_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "deposit_manager_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "operator_registry_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "peg_out_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "escape_hatch_contract",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "resume_from_emergency",
     "inputs": [],
     "outputs": [],
     "state_mutability": "external"
   },
   {
     "type": "function",
-    "name": "is_bridge_paused",
+    "name": "is_emergency_paused",
     "inputs": [],
     "outputs": [
       {
@@ -242,161 +910,927 @@
   },
   {
     "type": "function",
-    "name": "get_sbtc_contract",
+    "name": "register_user",
     "inputs": [],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "is_user_registered",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
     "outputs": [
       {
-        "type": "core::starknet::contract_address::ContractAddress"
+        "type": "core::bool"
       }
     ],
     "state_mutability": "view"
   },
   {
     "type": "function",
-    "name": "get_operator_registry_contract",
-    "inputs": [],
+    "name": "create_sme3",
+    "inputs": [
+      {
+        "name": "recipient1",
+        "type": "core::felt252"
+      },
+      {
+        "name": "percentage1",
+        "type": "core::felt252"
+      },
+      {
+        "name": "recipient2",
+        "type": "core::felt252"
+      },
+      {
+        "name": "percentage2",
+        "type": "core::felt252"
+      },
+      {
+        "name": "recipient3",
+        "type": "core::felt252"
+      },
+      {
+        "name": "percentage3",
+        "type": "core::felt252"
+      }
+    ],
     "outputs": [
       {
+        "type": "core::integer::u256"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "distribute_sme3_payment",
+    "inputs": [
+      {
+        "name": "total_amount",
+        "type": "core::felt252"
+      },
+      {
+        "name": "token",
+        "type": "core::felt252"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "set_supported_token",
+    "inputs": [
+      {
+        "name": "token",
         "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "supported",
+        "type": "core::bool"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "set_protocol_fee_percentage",
+    "inputs": [
+      {
+        "name": "percentage",
+        "type": "core::integer::u8"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "set_protocol_fee_collector",
+    "inputs": [
+      {
+        "name": "collector",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "get_sme3_details",
+    "inputs": [
+      {
+        "name": "sme_id",
+        "type": "core::integer::u256"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "(core::starknet::contract_address::ContractAddress, core::starknet::contract_address::ContractAddress, core::integer::u8, core::starknet::contract_address::ContractAddress, core::integer::u8, core::starknet::contract_address::ContractAddress, core::integer::u8, core::bool)"
       }
     ],
     "state_mutability": "view"
   },
   {
     "type": "function",
-    "name": "get_deposit_manager_contract",
-    "inputs": [],
+    "name": "get_user_active_sme3",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
     "outputs": [
       {
-        "type": "core::starknet::contract_address::ContractAddress"
+        "type": "core::integer::u256"
       }
     ],
     "state_mutability": "view"
   },
   {
     "type": "function",
-    "name": "get_peg_out_contract",
-    "inputs": [],
-    "outputs": [
+    "name": "get_protocol_fee_balance",
+    "inputs": [
       {
+        "name": "token",
         "type": "core::starknet::contract_address::ContractAddress"
       }
     ],
+    "outputs": [
+      {
+        "type": "core::integer::u256"
+      }
+    ],
     "state_mutability": "view"
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::MulticallCall",
+    "members": [
+      {
+        "name": "to",
+        "type": "core::felt252"
+      },
+      {
+        "name": "selector",
+        "type": "core::felt252"
+      },
+      {
+        "name": "calldata",
+        "type": "core::array::Array::<core::felt252>"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::MulticallResult",
+    "members": [
+      {
+        "name": "success",
+        "type": "core::bool"
+      },
+      {
+        "name": "return_data",
+        "type": "core::array::Array::<core::felt252>"
+      },
+      {
+        "name": "error_message",
+        "type": "core::felt252"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "multicall",
+    "inputs": [
+      {
+        "name": "calls",
+        "type": "core::array::Array::<starknet_bridge::contracts::Bridge::Bridge::MulticallCall>"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::array::Array::<starknet_bridge::contracts::Bridge::Bridge::MulticallResult>"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "struct",
+    "name": "core::array::Span::<core::felt252>",
+    "members": [
+      {
+        "name": "snapshot",
+        "type": "@core::array::Array::<core::felt252>"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "execute_multicall",
+    "inputs": [
+      {
+        "name": "calls",
+        "type": "core::array::Array::<starknet_bridge::contracts::Bridge::Bridge::MulticallCall>"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::array::Array::<core::array::Span::<core::felt252>>"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "multicall_strict",
+    "inputs": [
+      {
+        "name": "calls",
+        "type": "core::array::Array::<starknet_bridge::contracts::Bridge::Bridge::MulticallCall>"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::array::Array::<core::array::Span::<core::felt252>>"
+      }
+    ],
+    "state_mutability": "external"
+  },
+  {
+    "type": "function",
+    "name": "execute_batch",
+    "inputs": [
+      {
+        "name": "calls",
+        "type": "core::array::Array::<starknet_bridge::contracts::Bridge::Bridge::MulticallCall>"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "core::array::Array::<core::array::Span::<core::felt252>>"
+      }
+    ],
+    "state_mutability": "external"
   },
   {
     "type": "event",
-    "name": "BitcoinDepositInitiated",
-    "inputs": [
+    "name": "starknet_bridge::contracts::Bridge::Bridge::Deposited",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "from",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "dst_chain_id",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "recipient",
+        "type": "core::felt252",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::Withdrawn",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "to",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::Locked",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "from",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "dst_chain_id",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "recipient",
+        "type": "core::felt252",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::Unlocked",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "to",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::Sent",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "dst_chain_id",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "to_recipient",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "data",
+        "type": "core::felt252",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::Received",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "src_chain_id",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "from_sender",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "data",
+        "type": "core::felt252",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::Swapped",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "router",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "token_in",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "token_out",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "amount_in",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "amount_out",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "to",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::TokenRegistered",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "registered",
+        "type": "core::bool",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::WrappedSet",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "is_wrapped",
+        "type": "core::bool",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::AdminChanged",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "old_admin",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "new_admin",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::BitcoinDepositInitiated",
+    "kind": "struct",
+    "members": [
       {
         "name": "deposit_id",
         "type": "core::integer::u256",
-        "indexed": true
+        "kind": "key"
       },
       {
         "name": "user",
         "type": "core::starknet::contract_address::ContractAddress",
-        "indexed": true
+        "kind": "key"
       },
       {
         "name": "amount",
-        "type": "core::integer::u256"
+        "type": "core::integer::u256",
+        "kind": "data"
       },
       {
         "name": "btc_address",
-        "type": "core::felt252"
+        "type": "core::felt252",
+        "kind": "data"
       }
     ]
   },
   {
     "type": "event",
-    "name": "BitcoinWithdrawalInitiated",
-    "inputs": [
+    "name": "starknet_bridge::contracts::Bridge::Bridge::BitcoinWithdrawalInitiated",
+    "kind": "struct",
+    "members": [
       {
         "name": "withdrawal_id",
         "type": "core::integer::u256",
-        "indexed": true
+        "kind": "key"
       },
       {
         "name": "user",
         "type": "core::starknet::contract_address::ContractAddress",
-        "indexed": true
+        "kind": "key"
       },
       {
         "name": "amount",
-        "type": "core::integer::u256"
+        "type": "core::integer::u256",
+        "kind": "data"
       },
       {
         "name": "btc_address",
-        "type": "core::felt252"
+        "type": "core::felt252",
+        "kind": "data"
       }
     ]
   },
   {
     "type": "event",
-    "name": "Staked",
-    "inputs": [
+    "name": "starknet_bridge::contracts::Bridge::Bridge::BitcoinHeaderSubmitted",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "height",
+        "type": "core::integer::u32",
+        "kind": "key"
+      },
+      {
+        "name": "header_hash",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "previous_hash",
+        "type": "core::felt252",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::OperatorRegistered",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "operator",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "public_key",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "bond_amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::BridgePaused",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "paused_by",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "paused_at",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::BridgeUnpaused",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "unpaused_by",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "unpaused_at",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::Staked",
+    "kind": "struct",
+    "members": [
       {
         "name": "user",
         "type": "core::starknet::contract_address::ContractAddress",
-        "indexed": true
+        "kind": "key"
       },
       {
         "name": "token",
         "type": "core::starknet::contract_address::ContractAddress",
-        "indexed": true
+        "kind": "key"
       },
       {
         "name": "amount",
-        "type": "core::integer::u256"
+        "type": "core::integer::u256",
+        "kind": "data"
       },
       {
         "name": "total_staked",
-        "type": "core::integer::u256"
+        "type": "core::integer::u256",
+        "kind": "data"
       }
     ]
   },
   {
     "type": "event",
-    "name": "Unstaked",
-    "inputs": [
+    "name": "starknet_bridge::contracts::Bridge::Bridge::Unstaked",
+    "kind": "struct",
+    "members": [
       {
         "name": "user",
         "type": "core::starknet::contract_address::ContractAddress",
-        "indexed": true
+        "kind": "key"
       },
       {
         "name": "token",
         "type": "core::starknet::contract_address::ContractAddress",
-        "indexed": true
+        "kind": "key"
       },
       {
         "name": "amount",
-        "type": "core::integer::u256"
+        "type": "core::integer::u256",
+        "kind": "data"
       },
       {
         "name": "total_staked",
-        "type": "core::integer::u256"
+        "type": "core::integer::u256",
+        "kind": "data"
       }
     ]
   },
   {
     "type": "event",
-    "name": "RewardsClaimed",
-    "inputs": [
+    "name": "starknet_bridge::contracts::Bridge::Bridge::RewardsClaimed",
+    "kind": "struct",
+    "members": [
       {
         "name": "user",
         "type": "core::starknet::contract_address::ContractAddress",
-        "indexed": true
+        "kind": "key"
       },
       {
         "name": "token",
         "type": "core::starknet::contract_address::ContractAddress",
-        "indexed": true
+        "kind": "key"
       },
       {
         "name": "reward_amount",
-        "type": "core::integer::u256"
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::RewardRateUpdated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "old_rate",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "new_rate",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::Sme3Created",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "sme_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "owner",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::Sme3Distributed",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "sme_id",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "total_amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::ProtocolFeeCollected",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "token",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "fee_type",
+        "type": "core::felt252",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "starknet_bridge::contracts::Bridge::Bridge::Event",
+    "kind": "enum",
+    "variants": [
+      {
+        "name": "Deposited",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::Deposited",
+        "kind": "nested"
+      },
+      {
+        "name": "Withdrawn",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::Withdrawn",
+        "kind": "nested"
+      },
+      {
+        "name": "Locked",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::Locked",
+        "kind": "nested"
+      },
+      {
+        "name": "Unlocked",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::Unlocked",
+        "kind": "nested"
+      },
+      {
+        "name": "Sent",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::Sent",
+        "kind": "nested"
+      },
+      {
+        "name": "Received",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::Received",
+        "kind": "nested"
+      },
+      {
+        "name": "Swapped",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::Swapped",
+        "kind": "nested"
+      },
+      {
+        "name": "TokenRegistered",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::TokenRegistered",
+        "kind": "nested"
+      },
+      {
+        "name": "WrappedSet",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::WrappedSet",
+        "kind": "nested"
+      },
+      {
+        "name": "AdminChanged",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::AdminChanged",
+        "kind": "nested"
+      },
+      {
+        "name": "BitcoinDepositInitiated",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::BitcoinDepositInitiated",
+        "kind": "nested"
+      },
+      {
+        "name": "BitcoinWithdrawalInitiated",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::BitcoinWithdrawalInitiated",
+        "kind": "nested"
+      },
+      {
+        "name": "BitcoinHeaderSubmitted",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::BitcoinHeaderSubmitted",
+        "kind": "nested"
+      },
+      {
+        "name": "OperatorRegistered",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::OperatorRegistered",
+        "kind": "nested"
+      },
+      {
+        "name": "BridgePaused",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::BridgePaused",
+        "kind": "nested"
+      },
+      {
+        "name": "BridgeUnpaused",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::BridgeUnpaused",
+        "kind": "nested"
+      },
+      {
+        "name": "Staked",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::Staked",
+        "kind": "nested"
+      },
+      {
+        "name": "Unstaked",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::Unstaked",
+        "kind": "nested"
+      },
+      {
+        "name": "RewardsClaimed",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::RewardsClaimed",
+        "kind": "nested"
+      },
+      {
+        "name": "RewardRateUpdated",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::RewardRateUpdated",
+        "kind": "nested"
+      },
+      {
+        "name": "Sme3Created",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::Sme3Created",
+        "kind": "nested"
+      },
+      {
+        "name": "Sme3Distributed",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::Sme3Distributed",
+        "kind": "nested"
+      },
+      {
+        "name": "ProtocolFeeCollected",
+        "type": "starknet_bridge::contracts::Bridge::Bridge::ProtocolFeeCollected",
+        "kind": "nested"
       }
     ]
   }

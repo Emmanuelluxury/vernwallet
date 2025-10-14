@@ -90,20 +90,137 @@ class WalletIntegrationService {
 
     async connectBraavosWallet(credentials) {
         try {
-            if (typeof window !== 'undefined' && window.starknet) {
-                await window.starknet.enable();
-                return {
-                    address: window.starknet.selectedAddress,
-                    name: 'Braavos',
-                    type: 'braavos'
-                };
-            } else {
-                throw new Error('Braavos wallet not available');
+            if (typeof window === 'undefined') {
+                throw new Error('Browser environment required for wallet connection');
             }
+
+            logger.info('🔍 Attempting to connect to real Braavos wallet...');
+
+            // Method 1: Check if Braavos is already the active wallet
+            if (window.starknet) {
+                const isBraavos = this._isBraavosWallet(window.starknet);
+                if (isBraavos) {
+                    logger.info('✅ Braavos already active, connecting...');
+                    await window.starknet.enable();
+                    return {
+                        address: window.starknet.selectedAddress,
+                        name: 'Braavos',
+                        type: 'braavos'
+                    };
+                }
+            }
+
+            // Method 2: Check starknet providers array (most common for Braavos)
+            if (window.starknet && window.starknet.providers && Array.isArray(window.starknet.providers)) {
+                logger.info('🔍 Checking starknet.providers for Braavos...');
+                const braavosProvider = window.starknet.providers.find(p => this._isBraavosWallet(p));
+
+                if (braavosProvider) {
+                    logger.info('✅ Found Braavos in starknet.providers, switching and connecting...');
+                    const originalProvider = window.starknet;
+                    window.starknet = braavosProvider;
+                    try {
+                        await window.starknet.enable();
+                        return {
+                            address: window.starknet.selectedAddress,
+                            name: 'Braavos',
+                            type: 'braavos'
+                        };
+                    } catch (enableError) {
+                        // Restore original provider on failure
+                        window.starknet = originalProvider;
+                        throw enableError;
+                    }
+                }
+            }
+
+            // Method 3: Check ethereum providers (some wallets inject here)
+            if (window.ethereum && window.ethereum.providers) {
+                logger.info('🔍 Checking ethereum.providers for Braavos...');
+                const braavosProvider = window.ethereum.providers.find(p => this._isBraavosWallet(p));
+
+                if (braavosProvider) {
+                    logger.info('✅ Found Braavos in ethereum.providers, switching and connecting...');
+                    const originalStarknet = window.starknet;
+                    window.starknet = braavosProvider;
+                    try {
+                        await window.starknet.enable();
+                        return {
+                            address: window.starknet.selectedAddress,
+                            name: 'Braavos',
+                            type: 'braavos'
+                        };
+                    } catch (enableError) {
+                        // Restore original provider on failure
+                        if (originalStarknet) window.starknet = originalStarknet;
+                        throw enableError;
+                    }
+                }
+            }
+
+            // Method 4: Check for Braavos-specific global objects
+            if (window.starknet_braavos) {
+                logger.info('✅ Found starknet_braavos global, using it...');
+                const originalStarknet = window.starknet;
+                window.starknet = window.starknet_braavos;
+                try {
+                    await window.starknet.enable();
+                    return {
+                        address: window.starknet.selectedAddress,
+                        name: 'Braavos',
+                        type: 'braavos'
+                    };
+                } catch (enableError) {
+                    if (originalStarknet) window.starknet = originalStarknet;
+                    throw enableError;
+                }
+            }
+
+            // Method 5: Try to initialize Braavos directly if available
+            try {
+                // Some wallets expose initialization methods
+                if (window.BraavosWallet || window.braavos) {
+                    logger.info('✅ Found Braavos wallet object, attempting direct initialization...');
+                    const braavosWallet = window.BraavosWallet || window.braavos;
+                    if (braavosWallet.enable) {
+                        const originalStarknet = window.starknet;
+                        window.starknet = braavosWallet;
+                        await braavosWallet.enable();
+                        return {
+                            address: braavosWallet.selectedAddress,
+                            name: 'Braavos',
+                            type: 'braavos'
+                        };
+                    }
+                }
+            } catch (directInitError) {
+                logger.warn('Direct Braavos initialization failed:', directInitError.message);
+            }
+
+            logger.error('❌ Braavos wallet not found in any expected location');
+            throw new Error('Braavos wallet not detected. Please ensure Braavos wallet is installed and unlocked.');
+
         } catch (error) {
             logger.error('Braavos connection failed:', error);
-            throw error;
+            throw new Error(`Failed to connect to Braavos wallet: ${error.message}`);
         }
+    }
+
+    // Helper method to identify Braavos wallet
+    _isBraavosWallet(provider) {
+        if (!provider) return false;
+
+        // Check multiple identification methods
+        return (
+            provider.id === 'braavos' ||
+            provider.name === 'Braavos' ||
+            provider.name?.toLowerCase().includes('braavos') ||
+            provider.isBraavos === true ||
+            provider.constructor?.name === 'BraavosWallet' ||
+            provider.constructor?.name?.includes('Braavos') ||
+            provider.constructor?.toString().toLowerCase().includes('braavos') ||
+            provider.toString().toLowerCase().includes('braavos')
+        );
     }
 
     async connectManualWallet(credentials) {

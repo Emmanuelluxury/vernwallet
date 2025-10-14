@@ -166,8 +166,8 @@ const defaults = {
     starknet: {
         rpcTimeout: 10000,
         maxRetries: 3,
-        // Contract addresses - using deployed contract addresses from contract-addresses.json
-        bridgeContractAddress: process.env.STARKNET_BRIDGE_CONTRACT_ADDRESS || '0x012402f9a1612d3d48bfc7beb93f756e9848f67e3a0a8c1a23d48f03a25acc9e',
+        // Contract addresses - using newly deployed contract with multicall fixes
+        bridgeContractAddress: process.env.STARKNET_BRIDGE_CONTRACT_ADDRESS || '0x05ea098d3afed3c0f34258e25b0ccfbdf5893e24313dd4caed31d5f98faec7fe',
         sbtcContractAddress: process.env.STARKNET_SBTC_CONTRACT_ADDRESS || '0x029a051888fb8d645e4f0279393e18f95b1eacdf47b87829dd997b6264588b2c',
         operatorRegistryAddress: process.env.STARKNET_OPERATORREGISTRY_ADDRESS || '0x077d8d9f403eb1c8384acc3e7e7983d50ae9ffb64b7934d682cb2a6f83a94f13',
         btcDepositManagerAddress: process.env.STARKNET_BTCDEPOSITMANAGER_ADDRESS || '0x01cb8f799219ff2aa63dc6b06e35a944fdb347993c102b3e7a83d8c6373f39c9',

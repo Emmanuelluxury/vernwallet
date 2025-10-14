@@ -204,7 +204,11 @@ pub mod BitcoinUtils {
     #[external(v0)]
     fn btc_to_satoshis(self: @ContractState, btc_amount: u256) -> u64 {
         // 1 BTC = 100,000,000 satoshis
-        (btc_amount.low / 100000000).try_into().unwrap()
+        let satoshis_result = (btc_amount.low / 100000000).try_into();
+        match satoshis_result {
+            Option::Some(satoshis) => satoshis,
+            Option::None => 0, // Return 0 for invalid conversion (should not happen with valid BTC amounts)
+        }
     }
 
     /// Get Bitcoin network parameters

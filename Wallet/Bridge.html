@@ -1379,6 +1379,11 @@
                 <button type="button" class="btn btn-outline" id="connectReadyBtn" style="font-size: 0.85rem; padding: 8px 16px; border-color: var(--primary); color: var(--primary); background: rgba(124, 58, 237, 0.1); margin-right: 10px;">
                     <i class="fas fa-link" style="color: var(--primary);"></i> Ready
                 </button>
+
+                <!-- Braavos Wallet Button -->
+                <!-- <button type="button" class="btn btn-outline" id="connectBraavosBtn" style="font-size: 0.85rem; padding: 8px 16px; border-color: var(--primary); color: var(--primary); background: rgba(124, 58, 237, 0.1); margin-right: 10px;">
+                    <i class="fas fa-shield-alt" style="color: var(--primary);"></i> Braavos
+                </button> -->
             </div>
         </header>
         
@@ -1701,13 +1706,23 @@
 
     <!-- Starknet Bridge Integration -->
     <script src="../backend/src/services/starknet-bridge.js"></script>
+    <script src="../backend/src/services/bridge-fallback.js"></script>
+    <script src="../backend/src/services/contract-integration-test.js"></script>
+    <script src="../backend/src/services/bitcoin-service.js"></script>
+    <script src="../backend/src/utils/validation.js"></script>
+    <script src="../backend/src/utils/ui.js"></script>
+    <script src="../backend/src/utils/api.js"></script>
+    <script src="../backend/src/app/bridge.js"></script>
+    <script src="../backend/src/app/wallet.js"></script>
+    <script src="../backend/src/contracts/Bridge.json"></script>
+    <script src="../src/contracts/Bridge.cairo"></script>
 
     <script>
         // Bridge Configuration
         const BRIDGE_CONFIG = {
-            // Contract addresses (updated to match deployed contract addresses)
-            BRIDGE_CONTRACT: '0x043fc7f2dfb8207e9a666a35e951a2df10039701ca8fff04c1713609df80f941',
-            SBTC_CONTRACT: '0x07b10d8e5e60b2c9c5a5b12a4e1e5c4b3d2e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b',
+            // Contract addresses (UPDATED: Use Sepolia testnet contract addresses)
+            BRIDGE_CONTRACT: '0x02a3a9bc77aa0733b3b3f911e6c14d986aeb1040c8968fc1b7ebac404b8ff347',
+            SBTC_CONTRACT: '0x029a051888fb8d645e4f0279393e18f95b1eacdf47b87829dd997b6264588b2c',
 
             // Token configurations
             TOKENS: {
@@ -1739,8 +1754,8 @@
                     warning: null,
                     // Contract addresses for mainnet
                     contracts: {
-                        BRIDGE_CONTRACT: '0x043fc7f2dfb8207e9a666a35e951a2df10039701ca8fff04c1713609df80f941',
-                        SBTC_CONTRACT: '0x07b10d8e5e60b2c9c5a5b12a4e1e5c4b3d2e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b'
+                        BRIDGE_CONTRACT: '0x02e2bbfd1134c728bd9d5ee12fd9d844b10fb634b8cc64f39c87a5048e43283e',
+                        SBTC_CONTRACT: '0x029a051888fb8d645e4f0279393e18f95b1eacdf47b87829dd997b6264588b2c'
                     }
                 },
                 testnet: {
@@ -1930,6 +1945,7 @@
         // New wallet connect buttons
         const connectXverseBtn = document.getElementById('connectXverseBtn');
         const connectReadyBtn = document.getElementById('connectReadyBtn');
+        const connectBraavosBtn = document.getElementById('connectBraavosBtn');
 
         // Wallet connection state
         let connectedWallet = null;
@@ -2050,6 +2066,103 @@
 
                 if (error.message.includes('not detected') || error.message.includes('not available')) {
                     throw new Error('Ready wallet not found. Please install Argent X, Braavos, or another Starknet wallet.');
+                }
+
+                throw error;
+            }
+        }
+
+        // Connect to Braavos wallet (Starknet) - Shows wallet popup for user to click connect
+        async function connectToBraavosWallet() {
+            try {
+                console.log('🔄 Opening Braavos wallet popup...');
+
+                // Check if Braavos is available as the current Starknet wallet
+                if (window.starknet) {
+                    // Check if it's Braavos by examining wallet properties
+                    const isBraavos = window.starknet.id === 'braavos' ||
+                                      window.starknet.name?.toLowerCase().includes('braavos') ||
+                                      window.starknet.constructor?.name?.includes('Braavos') ||
+                                      window.starknet.constructor?.toString().toLowerCase().includes('braavos');
+
+                    if (isBraavos) {
+                        console.log('✅ Current Starknet wallet is Braavos');
+                    } else {
+                        console.log('⚠️ Current wallet is not Braavos, checking providers...');
+
+                        // Try to find Braavos in providers array
+                        if (window.starknet.providers && Array.isArray(window.starknet.providers)) {
+                            const braavosProvider = window.starknet.providers.find(p =>
+                                p.id === 'braavos' ||
+                                p.name?.toLowerCase().includes('braavos') ||
+                                p.constructor?.name?.includes('Braavos') ||
+                                p.constructor?.toString().toLowerCase().includes('braavos')
+                            );
+
+                            if (braavosProvider) {
+                                console.log('🔄 Switching to Braavos provider...');
+                                window.starknet = braavosProvider;
+                            } else {
+                                console.log('❌ Braavos not found in providers array');
+                            }
+                        }
+                    }
+
+                    // Enable the wallet (this will show Braavos popup if it's the active wallet)
+                    await window.starknet.enable();
+
+                    if (!window.starknet.selectedAddress) {
+                        throw new Error('No address selected in Braavos wallet');
+                    }
+
+                    console.log('✅ Braavos wallet connected successfully');
+                    return {
+                        address: window.starknet.selectedAddress,
+                        name: 'Braavos Wallet',
+                        provider: window.starknet,
+                        type: 'starknet'
+                    };
+                }
+
+                // Check for Braavos in ethereum providers as fallback
+                if (window.ethereum && window.ethereum.providers) {
+                    const braavosProvider = window.ethereum.providers.find(p =>
+                        p.id === 'braavos' ||
+                        p.name?.toLowerCase().includes('braavos') ||
+                        p.isBraavos === true ||
+                        p.constructor?.name?.includes('Braavos') ||
+                        p.constructor?.toString().toLowerCase().includes('braavos')
+                    );
+
+                    if (braavosProvider) {
+                        console.log('🔄 Found Braavos in ethereum providers...');
+                        await braavosProvider.enable();
+
+                        if (!braavosProvider.selectedAddress) {
+                            throw new Error('No address selected in Braavos wallet');
+                        }
+
+                        return {
+                            address: braavosProvider.selectedAddress,
+                            name: 'Braavos Wallet',
+                            provider: braavosProvider,
+                            type: 'starknet'
+                        };
+                    }
+                }
+
+                // If no Starknet wallet found at all, provide helpful error
+                throw new Error('Braavos wallet not detected. Please make sure Braavos is installed and set as your active Starknet wallet in the extension.');
+
+            } catch (error) {
+                console.error('Braavos wallet connection error:', error);
+
+                if (error.message.includes('rejected') || error.code === 4001) {
+                    throw new Error('Wallet connection cancelled by user');
+                }
+
+                if (error.message.includes('not detected') || error.message.includes('not available') || error.message.includes('not found')) {
+                    throw new Error('Braavos wallet not found. Please install Braavos wallet extension and set it as your active Starknet wallet.');
                 }
 
                 throw error;
@@ -2269,6 +2382,19 @@
                     connectReadyBtn.style.background = 'linear-gradient(to right, #4caf50, #45a049)';
                     connectReadyBtn.style.borderColor = '#4caf50';
                 }
+
+                // Update Braavos button if connected to Braavos
+                if (connectedWallet.includes('Braavos') && connectBraavosBtn) {
+                    connectBraavosBtn.innerHTML = `
+                        <i class="fas fa-shield-alt"></i>
+                        <span style="font-size: 0.75rem; display: block; margin-top: 2px;">
+                            ${connectedAddress.substring(0, 6)}...${connectedAddress.substring(connectedAddress.length - 4)}
+                        </span>
+                    `;
+                    connectBraavosBtn.classList.add('connected');
+                    connectBraavosBtn.style.background = 'linear-gradient(to right, #4caf50, #45a049)';
+                    connectBraavosBtn.style.borderColor = '#4caf50';
+                }
             } else {
                 // Reset buttons to default state
                 if (connectXverseBtn) {
@@ -2283,6 +2409,13 @@
                     connectReadyBtn.classList.remove('connected');
                     connectReadyBtn.style.background = 'rgba(124, 58, 237, 0.1)';
                     connectReadyBtn.style.borderColor = 'var(--primary)';
+                }
+
+                if (connectBraavosBtn) {
+                    connectBraavosBtn.innerHTML = '<i class="fas fa-shield-alt" style="color: var(--primary);"></i> Braavos';
+                    connectBraavosBtn.classList.remove('connected');
+                    connectBraavosBtn.style.background = 'rgba(124, 58, 237, 0.1)';
+                    connectBraavosBtn.style.borderColor = 'var(--primary)';
                 }
             }
         }
@@ -2320,6 +2453,24 @@
                 } catch (error) {
                     console.error('Ready connection failed:', error);
                     showNotification(`❌ Ready connection failed: ${error.message}`, true);
+                }
+            });
+        }
+
+        if (connectBraavosBtn) {
+            connectBraavosBtn.addEventListener('click', async () => {
+                try {
+                    console.log('🔄 Connecting to Braavos wallet...');
+                    const result = await connectToBraavosWallet();
+                    if (result) {
+                        connectedWallet = result.name;
+                        connectedAddress = result.address;
+                        updateWalletUI();
+                        showNotification(`✅ Connected to ${result.name}`);
+                    }
+                } catch (error) {
+                    console.error('Braavos connection failed:', error);
+                    showNotification(`❌ Braavos connection failed: ${error.message}`, true);
                 }
             });
         }
@@ -2767,6 +2918,17 @@
                     connect: async () => {
                         await window.starknet.enable();
                         return { address: window.starknet.selectedAddress, name: window.starknet.name || 'Ready Wallet' };
+                    }
+                },
+                {
+                    id: 'braavos',
+                    name: 'Braavos Wallet',
+                    type: 'StarkNet',
+                    icon: 'fas fa-shield-alt',
+                    isAvailable: () => window.starknet,
+                    connect: async () => {
+                        await window.starknet.enable();
+                        return { address: window.starknet.selectedAddress, name: 'Braavos Wallet' };
                     }
                 }
             ];
@@ -5560,11 +5722,56 @@
             console.log('  - debugWalletConnection()');
             console.log('  - testWalletButtons() - Test new wallet connect buttons');
             console.log('  - debugXverseWallet() - Debug Xverse wallet specifically');
+            console.log('  - testArgentMulticallFix() - Test the Argent multicall fix');
 
             // Auto-run wallet button test
             console.log('🧪 Auto-testing wallet connect buttons...');
             testWalletButtons();
+
+            // Auto-run Argent multicall fix test
+            console.log('🧪 Auto-testing Argent multicall fix...');
+            if (typeof testArgentMulticallFix === 'function') {
+                testArgentMulticallFix();
+            }
         }, 2000);
+
+        // Test function for Argent multicall fix
+        window.testArgentMulticallFix = function() {
+            console.log('🧪 Testing Argent Multicall Fix...');
+
+            if (window.starknetBridgeService) {
+                console.log('✅ Bridge service loaded');
+
+                // Check if wallet is connected
+                if (window.starknetBridgeService.account) {
+                    console.log('✅ Wallet account available');
+
+                    // Check execution methods
+                    console.log('🔍 Available execution methods:');
+                    console.log('  - Direct wallet execution:', !!(window.starknet && window.starknet.account && window.starknet.account.execute));
+                    console.log('  - Account.execute:', !!(window.starknetBridgeService.account && window.starknetBridgeService.account.execute));
+                    console.log('  - Provider available:', !!window.starknetBridgeService.provider);
+
+                    console.log('💡 The fix should bypass Argent\'s multicall system');
+                    console.log('💡 Try your bridge transaction now - it should work without the ENTRYPOINT_NOT_FOUND error');
+
+                } else {
+                    console.log('⚠️ No wallet account connected');
+                    console.log('💡 Connect your Ready wallet first, then try the bridge transaction');
+                }
+            } else {
+                console.log('❌ Bridge service not loaded');
+                console.log('💡 Refresh the page to load the updated bridge service');
+            }
+
+            return {
+                serviceLoaded: !!window.starknetBridgeService,
+                walletConnected: !!(window.starknetBridgeService && window.starknetBridgeService.account),
+                directExecution: !!(window.starknet && window.starknet.account && window.starknet.account.execute),
+                accountExecute: !!(window.starknetBridgeService && window.starknetBridgeService.account && window.starknetBridgeService.account.execute),
+                providerAvailable: !!(window.starknetBridgeService && window.starknetBridgeService.provider)
+            };
+        };
 
         // Test function for wallet connect buttons
         window.testWalletButtons = function() {

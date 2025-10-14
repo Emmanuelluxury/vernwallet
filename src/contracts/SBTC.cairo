@@ -104,12 +104,13 @@ pub mod SBTC {
     ) {
         self.admin.write(admin);
 
-        if initial_holder != 0.try_into().unwrap() {
+        let zero_address: ContractAddress = 0.try_into().unwrap();
+        if initial_holder != zero_address {
             self.balances.write(initial_holder, initial_supply);
             self.total_supply.write(initial_supply);
 
             self.emit(Event::Transfer(Transfer {
-                from: 0.try_into().unwrap(),
+                from: zero_address,
                 to: initial_holder,
                 value: initial_supply,
             }));
@@ -183,7 +184,8 @@ pub mod SBTC {
     #[external(v0)]
     fn mint(ref self: ContractState, to: ContractAddress, amount: u256) {
         self.assert_minter();
-        assert(to != 0.try_into().unwrap(), Errors::ZERO_ADDRESS);
+        let zero_address: ContractAddress = 0.try_into().unwrap();
+        assert(to != zero_address, Errors::ZERO_ADDRESS);
         assert(amount > 0, Errors::INVALID_AMOUNT);
 
         self.non_reentrant_enter();
@@ -199,7 +201,7 @@ pub mod SBTC {
         // Emit events
         self.emit(Event::Mint(Mint { to, amount }));
         self.emit(Event::Transfer(Transfer {
-            from: 0.try_into().unwrap(),
+            from: zero_address,
             to,
             value: amount,
         }));
@@ -210,7 +212,8 @@ pub mod SBTC {
     #[external(v0)]
     fn burn_from(ref self: ContractState, owner: ContractAddress, amount: u256) {
         self.assert_burner();
-        assert(owner != 0.try_into().unwrap(), Errors::ZERO_ADDRESS);
+        let zero_address: ContractAddress = 0.try_into().unwrap();
+        assert(owner != zero_address, Errors::ZERO_ADDRESS);
         assert(amount > 0, Errors::INVALID_AMOUNT);
 
         self.non_reentrant_enter();
@@ -230,7 +233,7 @@ pub mod SBTC {
         self.emit(Event::Burn(Burn { from: owner, amount }));
         self.emit(Event::Transfer(Transfer {
             from: owner,
-            to: 0.try_into().unwrap(),
+            to: zero_address,
             value: amount,
         }));
 
@@ -283,8 +286,9 @@ pub mod SBTC {
             recipient: ContractAddress,
             amount: u256
         ) {
-            assert(sender != 0.try_into().unwrap(), Errors::ZERO_ADDRESS);
-            assert(recipient != 0.try_into().unwrap(), Errors::ZERO_ADDRESS);
+            let zero_address: ContractAddress = 0.try_into().unwrap();
+            assert(sender != zero_address, Errors::ZERO_ADDRESS);
+            assert(recipient != zero_address, Errors::ZERO_ADDRESS);
             assert(amount > 0, Errors::INVALID_AMOUNT);
 
             let sender_balance = self.balances.read(sender);
@@ -303,8 +307,9 @@ pub mod SBTC {
             spender: ContractAddress,
             amount: u256
         ) {
-            assert(owner != 0.try_into().unwrap(), Errors::ZERO_ADDRESS);
-            assert(spender != 0.try_into().unwrap(), Errors::ZERO_ADDRESS);
+            let zero_address: ContractAddress = 0.try_into().unwrap();
+            assert(owner != zero_address, Errors::ZERO_ADDRESS);
+            assert(spender != zero_address, Errors::ZERO_ADDRESS);
 
             self.allowances.write((owner, spender), amount);
             self.emit(Event::Approval(Approval { owner, spender, value: amount }));

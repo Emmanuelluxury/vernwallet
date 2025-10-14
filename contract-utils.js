@@ -405,29 +405,49 @@ class ContractUtils {
         }
     }
 
-    // Batch Contract Operations
+    // Batch Contract Operations - Fixed to use individual calls instead of multicall
     async batchContractCalls(calls) {
         try {
             if (!this.provider) {
                 throw new Error('Provider not initialized');
             }
 
-            const { CallData } = window.starknet || await import('starknet');
-            const callData = new CallData([]);
+            if (!calls || calls.length === 0) {
+                return [];
+            }
 
-            // Prepare multicall data
-            const multicallData = calls.map(call => ({
-                contractAddress: call.contractAddress,
-                entrypoint: call.method,
-                calldata: callData.compile(call.method, call.params || [])
-            }));
+            console.log('🔸 Executing batch calls as individual transactions to avoid multicall issues');
 
-            // Execute batch call
-            const results = await this.provider.callContract({
-                contractAddress: this.config.contractAddresses.bridge || this.config.contractAddresses.sbtc,
-                entrypoint: 'batch_call',
-                calldata: callData.compile('batch_call', [multicallData])
-            });
+            // Execute each call individually instead of using multicall
+            const results = [];
+            for (const call of calls) {
+                try {
+                    console.log(`📞 Executing call: ${call.method} on ${call.contractAddress}`);
+
+                    const result = await this.provider.callContract({
+                        contractAddress: call.contractAddress,
+                        entrypoint: call.method,
+                        calldata: call.params || []
+                    });
+
+                    results.push({
+                        success: true,
+                        method: call.method,
+                        contractAddress: call.contractAddress,
+                        result: result
+                    });
+
+                } catch (callError) {
+                    console.error(`❌ Call failed: ${call.method} on ${call.contractAddress}`, callError);
+
+                    results.push({
+                        success: false,
+                        method: call.method,
+                        contractAddress: call.contractAddress,
+                        error: callError.message
+                    });
+                }
+            }
 
             return results;
 
@@ -547,7 +567,7 @@ window.contractUtils = new ContractUtils({
         bitcoinHeaders: '0x05062ab53aea2baa96b31fe73a40e2cabc6871449a5666f949c3c92a51d6b833',
         btcDepositManager: '0x01cb8f799219ff2aa63dc6b06e35a944fdb347993c102b3e7a83d8c6373f39c9',
         btcPegOut: '0x06592114e225312fbd2c8068baeb2e65b743516ef5c0829ddc45766040658e2c',
-        bridge: '0x012402f9a1612d3d48bfc7beb93f756e9848f67e3a0a8c1a23d48f03a25acc9e',
+        bridge: '0x05ea098d3afed3c0f34258e25b0ccfbdf5893e24313dd4caed31d5f98faec7fe',
         escapeHatch: '0x07e01eec5443158d9ae9c36c5df009b8b2c5e20dab34489a79a25718a409a187',
         sbtc: '0x029a051888fb8d645e4f0279393e18f95b1eacdf47b87829dd997b6264588b2c',
         operatorRegistry: '0x077d8d9f403eb1c8384acc3e7e7983d50ae9ffb64b7934d682cb2a6f83a94f13'

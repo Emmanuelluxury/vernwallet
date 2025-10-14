@@ -57,6 +57,7 @@
   "homepage": "https://vernwallet.com",
   "dependencies": {
     "axios": "^1.12.2",
+    "starknet": "^7.6.4",
     "ws": "^8.18.3"
   }
 }
